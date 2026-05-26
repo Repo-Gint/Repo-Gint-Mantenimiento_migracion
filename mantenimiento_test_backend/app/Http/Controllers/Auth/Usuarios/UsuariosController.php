@@ -19,7 +19,7 @@ class UsuariosController extends Controller{
     public function registrarUsuario(Request $request)
      {
          try {
-             return $this->usuariosService->registrarUsuario($request->all());
+               return $this->usuariosService->registrarUsuario($request->all());
          } catch (\Throwable $error) {
              Log::alert('*********************************************');
              Log::alert('Error al registrar usuario');
