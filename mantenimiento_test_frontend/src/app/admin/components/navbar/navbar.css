@@ -1,0 +1,10 @@
+.navbar {
+    position: fixed;
+    width: 100vw;
+} 
+
+.logo-navbar {
+    height: 40px;     
+    width: auto;
+    object-fit: contain;
+}

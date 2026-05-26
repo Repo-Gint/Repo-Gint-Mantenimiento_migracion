@@ -1,1 +1,22 @@
-<p>navbar works!</p>
+<nav class="sb-topnav navbar navbar-expand navbar-dark navbar-custom">
+	<img src="assets/images/logo.png" class="logo-navbar">
+
+	<ul class="navbar-nav ms-auto me-3 me-lg-4">
+		<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown">
+				<i class="bi bi-person-fill"></i>
+			</a>
+			<ul class="dropdown-menu dropdown-menu-end">
+				<li><a class="dropdown-item">Settings</a></li>
+				<li><a class="dropdown-item">Activity Log</a></li>
+				<li>
+					<hr class="dropdown-divider" />
+				</li>
+				<li>
+					<a class="dropdown-item" (click)="cerrarSesion()">Cerrar Sesion</a>
+				</li>
+			</ul>
+		</li>
+	</ul>
+
+</nav>
