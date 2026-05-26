@@ -16,13 +16,13 @@
             }
 
             public function registrarUsuario($usuario) {
-                $resultado = $this->usuariosRepository->validarUsuarioExistente($usuario['email']);
+                $resultado = $this->usuariosRepository->validarUsuarioExistente($usuario['busines_mail']);
                 
                 if($resultado > 0) {
                     return response()->json([
                         'success' => 204,
-                        'title'   => 'El correo electronico existente',
-                        'mensaje' => 'Ya existe un registro con el correo electronico escrito'
+                        'title'   => 'El correo_empresarial existente',
+                        'mensaje' => 'Ya existe un registro con el correo_empresarial escrito'
                     ]);
                 }
 
@@ -93,6 +93,6 @@
                          : 'No se encontró la sesión'
                  ]);
              }
-             
+
         }
     
