@@ -10,9 +10,9 @@
 
             class UsuariosRepository
             {
-                public function validarUsuarioExistente($email)
+                public function validarUsuarioExistente($busines_mail)
                 {
-                    $query = TblUsuarios::where('email', $email);
+                    $query = TblUsuarios::where('busines_mail', $busines_mail);
 
                     return $query->count();
                 }
@@ -23,9 +23,8 @@
 
                     $registro->id_rol_users        = $usuario['id_rol_users'];
                     $registro->id_employee         = $usuario['id_employee'];
-                    $registro->id_busines_mail     = $usuario['id_busines_mail'];
+                    $registro->busines_mail        = $usuario['busines_mail'];
                     $registro->name                = $usuario['name'];
-                    $registro->email               = $usuario['email'];
                     $registro->password            = bcrypt($usuario['password']);
                     $registro->save();
 
@@ -33,7 +32,7 @@
                 }
 
             public function login ($usuario) {
-                $usuarioEncontrado = TblUsuarios::where('email', $usuario['email'])
+                $usuarioEncontrado = TblUsuarios::where('busines_mail', $usuario['busines_mail'])
                 ->first();
 
                 if (!$usuarioEncontrado) return 'no_usuario';
