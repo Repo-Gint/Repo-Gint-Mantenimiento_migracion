@@ -1,0 +1,61 @@
+<div class="pagetitle">
+    <h1>Departamentos</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">Departamentos</li>
+            <li class="breadcrumb-item active">Consulta Departamentos</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section dashboard">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+                <div class="card-body row g-3">
+                    <div class="botonera">
+                        <button class="btn btn-success btn-sm">
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <table class="table table-striped table-hover text-center">
+                <thead>
+                    <tr>
+                        <th>Departamento_ES</th>
+                        <th>Departamento_EN</th>
+                        <th>Acronym</th>
+                        <th>Status</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let departamento of datosTabla">
+                        <td>{{departamento.Departament_ES}}</td>
+                        <td>{{departamento.Departament_EN}}</td>
+                        <td>{{departamento.Acronym}}</td>
+                        <td>{{departamento.estado}}</td>
+                        <td class="text-medium">
+                            <button class="btn btn-sm btn-outline-primary"
+                                (click)="abrirModalRegistrarDepartamento(departamento.id_departaments)">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button *ngIf="!departamento.activo" class="btn btn-sm btn-outline-info"
+                                (click)="cambiarStatus(departamento)">
+                                <i class="bi bi-check"></i>
+                            </button>
+                            <button *ngIf="departamento.activo" class="btn btn-sm btn-outline-warning"
+                                (click)="cambiarStatus(departamento)">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
