@@ -8,6 +8,21 @@
                     Inicio
                 </a>
 
+                <div class="sb-sidenav-menu-heading">Catalogos</div>
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAreas"
+                    aria-expanded="false" aria-controls="collapseAreas">
+                    <i class="bi bi-person-workspace"></i>&nbsp;
+                    Areas
+                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseAreas" aria-labelledby="headingOne"
+                    data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" (click)="abrirModalRegistrarArea()">Registar Area</a>
+                        <a class="nav-link" routerLink="consulta-areas">Consultar Areas</a>
+                    </nav>
+                </div>
+
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseUsuarios"
                     aria-expanded="false" aria-controls="collapseUsuarios">
                     <i class="bi bi-people-fill"></i>&nbsp;
@@ -18,10 +33,25 @@
                 <div class="collapse" id="collapseUsuarios" aria-labelledby="headingOne"
                     data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" >Registar Usuario</a>
+                        <a class="nav-link" (click)="abrirModalRegistrarUsuario()">Registar Usuario</a>
                         <a class="nav-link" routerLink="consulta-usuarios">Consultar Usuarios</a>
                     </nav>
                 </div>
+
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseDepartamentos"
+                    aria-expanded="false" aria-controls="collapseDepartamentos">
+                    <i class="bi bi-building"></i>&nbsp;
+                    Departamentos
+                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseDepartamentos" aria-labelledby="headingOne"
+                    data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" (click)="abrirModalRegistrarDepartamento()">Registar Departamento</a>
+                        <a class="nav-link" routerLink="consulta-departamentos">Consultar Departamentos</a>
+                    </nav>
+                </div>
+
             </div>
         </div>
     </nav>
