@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { MessagesService } from '../../services/messages/messages';
 import { Router } from '@angular/router';
-import { Usuarios } from '../../services/api/usuarios/usuarios';
+import { UsuariosService } from '../../services/api/usuarios/usuarios';
 
 @Component({
   selector: 'app-navbar',
@@ -13,7 +13,7 @@ import { Usuarios } from '../../services/api/usuarios/usuarios';
 export class Navbar {
 
   constructor (
-    private usuariosService: Usuarios,
+    private usuariosService: UsuariosService,
     private messages: MessagesService,
     private router: Router
   ) {}
