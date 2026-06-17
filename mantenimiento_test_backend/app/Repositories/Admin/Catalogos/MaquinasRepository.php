@@ -2,8 +2,8 @@
 
         namespace App\Repositories\Admin\Catalogos;
 
-use App\Models\CatMaquinas;
-use Illuminate\Support\Facades\DB;
+        use App\Models\CatMaquinas;
+        use Illuminate\Support\Facades\DB;
 
         class MaquinasRepository
         {

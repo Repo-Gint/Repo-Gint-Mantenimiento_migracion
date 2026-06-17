@@ -31,7 +31,7 @@ class AuthTokenMiddleware
         }
 
         $request->merge([
-            'id_usuario_auth' => $session->id_usuario
+            'id_users_auth' => $session->id_users
         ]);
 
         return $next($request);

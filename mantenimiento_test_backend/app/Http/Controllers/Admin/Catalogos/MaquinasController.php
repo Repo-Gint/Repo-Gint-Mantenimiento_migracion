@@ -3,25 +3,25 @@
 namespace App\Http\Controllers\Admin\Catalogos;
 
 use App\Http\Controllers\Controller;
-use App\Services\Admin\Catalogos\AreasService;
+use App\Services\Admin\Catalogos\MaquinasService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class AreasController extends Controller {
-    protected AreasService $areasService;
+class MaquinasController extends Controller {
+    protected MaquinasService $maquinasService;
 
-        public function __construct(AreasService $areasService)
+    public function __construct(MaquinasService $maquinasService) 
     {
-        $this->areasService = $areasService;
+        $this->maquinasService = $maquinasService;
     }
 
-    public function registrarArea(Request $request)
+    public function registrarMaquina(Request $request) 
     {
         try {
-            return $this->areasService->registrarArea($request->all());
+            return $this->maquinasService->registrarMaquina($request->all());
         } catch (\Throwable $error) {
             Log::alert('*********************************************');
-            Log::alert('Error al registrar la Area');
+            Log::alert('Error al registrar la Maqina');
             Log::alert($error);
             return response()->json(
                 [
@@ -33,13 +33,13 @@ class AreasController extends Controller {
         }
     }
 
-      public function obtenerListaAreas()
+    public function obtenerListaMaquinas() 
     {
         try {
-            return $this->areasService->obtenerListaAreas();
+            return $this->maquinasService->obtenerListaMaquinas();
         } catch (\Throwable $error) {
             Log::alert('*********************************************');
-            Log::alert('Error al obtener información de Areas');
+            Log::alert('Error al obtener información de Maquinas');
             Log::alert($error);
             return response()->json(
                 [
@@ -49,59 +49,60 @@ class AreasController extends Controller {
                 500
             );
         }
-    }
-
-    public function obtenerDetalleArea($pkArea)
+    }  
+    
+    public function obtenerDetalleMaquina($pkMaquina) 
     {
         try {
-            return $this->areasService->obtenerDetalleArea($pkArea);
+            return $this->maquinasService->obtenerDetalleMaquina($pkMaquina); 
         } catch (\Throwable $error) {
             Log::alert('*********************************************');
-            Log::alert('Error al obtener información de detalle de Area');
+            Log::alert('Error al obtener información de detalle de la Maquina');
             Log::alert($error);
             return response()->json(
                 [
-                    'error' => $error,
+                    'error' => $error, 
                     'mensaje' => 'Ocurrió un error interno'
                 ],
                 500
-            );
+            ); 
         }
     }
 
-    public function actualizarArea(Request $request)
+    public function actualizarMaquina(Request $request) 
     {
         try {
 
-            return $this->areasService->actualizarArea($request->all());
+        return $this->maquinasService->actualizarMaquina($request->all());
         } catch (\Throwable $error) {
-
             Log::alert('*********************************************');
-            Log::alert('Error al actualizar Area');
+            Log::alert('Error al actualizar Maquina');
             Log::alert($error->getMessage());
 
             return response()->json(
                 [
-                'mensaje' => 'Ocurrió un error interno'
-            ], 500);
-        }
-    }
-
-    public function cambiarStatusArea($pkArea)
-    {
-        try {
-            return $this->areasService->cambiarStatusArea($pkArea);
-        } catch (\Throwable $error) {
-            Log::alert('*********************************************');
-            Log::alert('Error al cambiar Status De Area');
-            Log::alert($error);
-            return response()->json(
-                [
-                    'error'   => $error,
-                    'mensaje' => 'Ocurrió un error interno'
+                    'mensaje' => 'Ocurrio un error interno'
                 ],
                 500
             );
         }
     }
+
+    public function cambiarStatusMaquina($pkMaquina) 
+    {
+        try {
+            return $this->maquinasService->cambiarStatusMaquina($pkMaquina);
+        } catch (\Throwable $error) {
+            Log::alert('*********************************************');
+            Log::alert('Error al cambiar Status De Maquina');
+            Log::alert($error);
+            return response()->json(
+                [
+                    'error'   => $error,
+                    'mensaje' => 'Ocurrio un error interno'
+                ]
+            );
+        }
+    }
+    
 }

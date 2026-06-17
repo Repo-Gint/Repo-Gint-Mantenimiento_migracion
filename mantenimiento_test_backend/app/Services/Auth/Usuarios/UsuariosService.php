@@ -4,72 +4,140 @@
         use App\Repositories\Auth\Usuarios\UsuariosRepository;
         use Illuminate\Support\Str;
         use App\Models\TblSessions;
-
+        use App\Repositories\Admin\Catalogos\EmployesRepository;
+        use App\Repositories\Admin\Catalogos\RolesRepository;
+    
         class UsuariosService
         {
             protected UsuariosRepository $usuariosRepository;
+            protected RolesRepository    $rolesRepository;
+            protected EmployesRepository $employesRepository;
 
             public function __construct(
-                UsuariosRepository $UsuariosRepository
+                UsuariosRepository $UsuariosRepository,
+                RolesRepository    $RolesRepository,
+                EmployesRepository $EmployesRepository
             ) {
                 $this->usuariosRepository = $UsuariosRepository;
+                $this->rolesRepository    = $RolesRepository;
+                $this->employesRepository = $EmployesRepository;
             }
 
-            public function registrarUsuario($usuario) {
-                $resultado = $this->usuariosRepository->validarUsuarioExistente($usuario['busines_mail']);
-                
-                if($resultado > 0) {
-                    return response()->json([
-                        'success' => 204,
-                        'title'   => 'El correo_empresarial existente',
-                        'mensaje' => 'Ya existe un registro con el correo_empresarial escrito'
-                    ]);
-                }
+            public function obtenerRecursosRegistroUsuario() {
+                $rol       =$this->rolesRepository->obtenerListaRoles();
+                $empleado  =$this->employesRepository->obtenerListaEmpleados();
 
-                $pkUsuario = $this->usuariosRepository->registrarUsuario($usuario); 
-
-                return response ()->json(
+                return response()->json(
                     [
-                        'pkUsuario' => $pkUsuario, 
-                        'mensaje' => 'Se ha registrado correctamente el usuario', 
-                        'title' => 'Registro exitoso'
+                        'mensaje' => 'Se obtuvo los recursos correctamente',
+                        'recursos' => [
+                            'listaRol'      => $rol,
+                            'listaempleado' => $empleado
+                        ]
                     ]
                 );
             }
 
-                public function login($usuario)
-                  {
-                      $resultado = $this->usuariosRepository->login($usuario);
-  
-                      if ($resultado === 'no_usuario') {
-                          return response()->json([
-                              'success' => 204,
-                              'title'   => 'Usuario no encontrado',
-                              'mensaje' => 'El usuario no existe o las credenciales son incorrectas'
-                          ]);
-                      }
-  
-                      if ($resultado === 'mal_contraseña') {
-                          return response()->json([
-                              'success' => 204,
-                              'title'   => 'Credenciales Incorrectas',
-                              'mensaje' => 'Las credenciales son incorrectas'
-                          ]);
-                      }
-  
-                      $token = Str::random(60);
-  
-                      TblSessions::create([
-                          'id_usuario' => $resultado->id_usuario,
-                          'token'      => hash('sha256', $token) 
-                      ]);
-  
-                      return response()->json([
-                          'usuarios' => $resultado,
-                          'token'    => $token,
-                          'mensaje'  => 'Inicio de sesión correctamente'
-                      ]);
-                  }
+            public function registrarUsuario($usuario)
+            {
+                $correo = trim(strtolower($usuario['busines_mail']));
+            
+                if (!str_contains($correo, '@')) {
+                    $correo .= '@grupointerconsult.com';
+                }
+            
+                $resultado = $this->usuariosRepository->validarUsuarioExistente($correo);
+            
+                if ($resultado > 0) {
+                    return response()->json([
+                        'title'   => 'Correo existente',
+                        'mensaje' => 'Ya existe un registro con el correo empresarial escrito'
+                    ], 409);
+                }
+            
+                $usuario['busines_mail'] = $correo;
+            
+                $pkUsuario = $this->usuariosRepository->registrarUsuario($usuario);
+            
+                return response()->json([
+                    'pkUsuario' => $pkUsuario,
+                    'mensaje'   => 'Se ha registrado correctamente el usuario',
+                    'title'     => 'Registro exitoso'
+                ], 201);
+            }
+
+            public function obtenerListaGeneralUsuarios() {
+                $usuario = $this->usuariosRepository->obtenerListaGeneralUsuarios();
+
+                return response()->json(
+                    [
+                        'usuarios' => $usuario,
+                        'mensaje'  => 'Se obtuvo la información de Usuarios'
+                    ]
+                );
+            }
+
+            public function obtenerDetalleUsuario($pkUsuario) {
+                $usuario = $this->usuariosRepository->obtenerDetalleUsuario($pkUsuario);
+
+                return response()->json(
+                    [
+                        'usuario' => $usuario[0],
+                        'mensaje' => 'Se obtuvo la informacion correctamente'
+                    ]
+                );
+            }
+
+            public function actualizarUsuario($usuario) {
+                $this->usuariosRepository->actualizarUsuario($usuario['pkUsuario'], $usuario['usuario']);
+
+                return response()->json(
+                    [
+                        'title'   => 'Actualización exitosa',
+                        'mensaje' => 'Se actualizó correctamente el usuario'
+                    ]
+                );
+            }
+
+            public function cambiarStatusUsuario($id) {
+                $status = $this->usuariosRepository->cambiarStatusUsuario($id);
+
+                return response()->json(
+                    [
+                        'title' => ($status ? 'Activar' : 'Inactivar') . ' usuario',
+                        'mensaje' => 'Se ' . ($status ? 'activo' : 'inactivo') . ' el usuario con éxito'
+                        ]
+                );
+            }
+
+            public function login($usuario)
+            {
+                $resultado = $this->usuariosRepository->login($usuario);    
+                if ($resultado === 'no_usuario') {
+                    return response()->json([
+                        'success' => 204,
+                        'title'   => 'Usuario no encontrado',
+                        'mensaje' => 'El usuario no existe o las credenciales son incorrectas'
+                    ]);
+                }    
+                if ($resultado === 'mal_contraseña') {
+                    return response()->json([
+                        'success' => 204,
+                        'title'   => 'Credenciales Incorrectas',
+                        'mensaje' => 'Las credenciales son incorrectas'
+                    ]);
+                }    
+                $token = Str::random(60);    
+                TblSessions::create([
+                    'id_users' => $resultado->id_users,
+                    'token'      => hash('sha256', $token) 
+                ]);    
+                return response()->json([
+                    'usuarios' => $resultado,
+                    'token'    => $token,
+                    'mensaje'  => 'Inicio de sesión correctamente'
+                ]);
+            }
 
             public function cerrarSesion($request)
              {

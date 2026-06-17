@@ -12,7 +12,7 @@ class Tblorders extends Model {
 
     protected $fillable = [
         'id_order',
-        'id_maquina',
+        'id_machines',
         'id_departament',
         'id_area', 
         'id:employee',

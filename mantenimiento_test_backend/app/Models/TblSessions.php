@@ -14,7 +14,7 @@ class TblSessions extends Model
 
     protected $fillable   = [
         'id_sessions', 
-        'id_usuario', 
+        'id_users', 
         'token'
     ];
 }

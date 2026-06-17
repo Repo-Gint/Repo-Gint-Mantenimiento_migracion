@@ -3,25 +3,25 @@
 namespace App\Http\Controllers\Admin\Catalogos;
 
 use App\Http\Controllers\Controller;
-use App\Services\Admin\Catalogos\AreasService;
+use App\Services\Admin\Catalogos\MonedasService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class AreasController extends Controller {
-    protected AreasService $areasService;
+class MonedasController extends Controller {
+    protected MonedasService $monedasService;
 
-        public function __construct(AreasService $areasService)
-    {
-        $this->areasService = $areasService;
-    }
+    public function __construct(MonedasService $monedasService) 
+        {
+            $this->monedasService = $monedasService;
+        }
 
-    public function registrarArea(Request $request)
+    public function registrarMoneda(Request $request) 
     {
-        try {
-            return $this->areasService->registrarArea($request->all());
+          try {
+            return $this->monedasService->registrarMoneda($request->all());
         } catch (\Throwable $error) {
             Log::alert('*********************************************');
-            Log::alert('Error al registrar la Area');
+            Log::alert('Error al registrar la Moneda');
             Log::alert($error);
             return response()->json(
                 [
@@ -33,13 +33,13 @@ class AreasController extends Controller {
         }
     }
 
-      public function obtenerListaAreas()
+    public function obtenerListaMonedas() 
     {
         try {
-            return $this->areasService->obtenerListaAreas();
+            return $this->monedasService->obtenerListaMonedas();
         } catch (\Throwable $error) {
             Log::alert('*********************************************');
-            Log::alert('Error al obtener información de Areas');
+            Log::alert('Error al obtener información de Monedas');
             Log::alert($error);
             return response()->json(
                 [
@@ -50,57 +50,57 @@ class AreasController extends Controller {
             );
         }
     }
-
-    public function obtenerDetalleArea($pkArea)
-    {
+    
+    public function obtenerDetalleMoneda($pkMoneda)
+       {
         try {
-            return $this->areasService->obtenerDetalleArea($pkArea);
+            return $this->monedasService->obtenerDetalleMoneda($pkMoneda); 
         } catch (\Throwable $error) {
             Log::alert('*********************************************');
-            Log::alert('Error al obtener información de detalle de Area');
+            Log::alert('Error al obtener información de detalle de la Moneda');
             Log::alert($error);
             return response()->json(
                 [
-                    'error' => $error,
+                    'error' => $error, 
                     'mensaje' => 'Ocurrió un error interno'
                 ],
                 500
-            );
+            ); 
         }
     }
 
-    public function actualizarArea(Request $request)
-    {
+    public function actualizarMoneda(Request $request) 
+     {
         try {
 
-            return $this->areasService->actualizarArea($request->all());
+        return $this->monedasService->actualizarMoneda($request->all());
         } catch (\Throwable $error) {
-
             Log::alert('*********************************************');
-            Log::alert('Error al actualizar Area');
+            Log::alert('Error al actualizar Moneda');
             Log::alert($error->getMessage());
 
             return response()->json(
                 [
-                'mensaje' => 'Ocurrió un error interno'
-            ], 500);
+                    'mensaje' => 'Ocurrio un error interno'
+                ],
+                500
+            );
         }
     }
 
-    public function cambiarStatusArea($pkArea)
-    {
+    public function cambiarStatusMoneda($pkMoneda) 
+      {
         try {
-            return $this->areasService->cambiarStatusArea($pkArea);
+            return $this->monedasService->cambiarStatusMoneda($pkMoneda);
         } catch (\Throwable $error) {
             Log::alert('*********************************************');
-            Log::alert('Error al cambiar Status De Area');
+            Log::alert('Error al cambiar Status De Moneda');
             Log::alert($error);
             return response()->json(
                 [
                     'error'   => $error,
-                    'mensaje' => 'Ocurrió un error interno'
-                ],
-                500
+                    'mensaje' => 'Ocurrio un error interno'
+                ]
             );
         }
     }
