@@ -14,7 +14,7 @@ class RolesService
         $this->rolesRepository = $rolesRepository;
     }
 
-    public function registrarRol($rol) {
+    public function registrarRol(array $rol) {
         $pkRol = $this->rolesRepository->registrarRoles($rol);
 
         return response()->json(

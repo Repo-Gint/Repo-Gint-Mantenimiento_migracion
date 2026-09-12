@@ -2,8 +2,8 @@
 
         namespace App\Repositories\Admin\Catalogos;
 
-use App\Models\CatMonedas;
-use Illuminate\Support\Facades\DB;
+        use App\Models\CatMonedas;
+        use Illuminate\Support\Facades\DB;
 
         class MonedasRepository {
 
@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
                 $query = CatMonedas::select(
                 'id_coins',
                 'coin',
+                'active',
                 DB::raw("
                                         CASE
                                             WHEN active = 1 THEN 'Activo'
@@ -32,7 +33,7 @@ use Illuminate\Support\Facades\DB;
                 return $query->get();
             }
 
-            public function obtenerDetalleMoneda($pkMoneda) {
+            public function obtenerDetalleMoneda(int $pkMoneda) {
                 $query = CatMonedas::select(
                     'id_coins', 
                     'coin',
@@ -46,14 +47,14 @@ use Illuminate\Support\Facades\DB;
                 return $query->get();
             }
 
-            public function actualizarMoneda($id, $moneda) {
+            public function actualizarMoneda(int $id, array $moneda) {
                 $actualizar = CatMonedas::findOrFail($id);
 
                 $actualizar->coin   = $moneda['coin'];
                 $actualizar->save();
             }
 
-            public function cambiarStatusMoneda($pkMoneda) {
+            public function cambiarStatusMoneda(int $pkMoneda) {
                 $monedas          =CatMonedas::findOrFail($pkMoneda);
                 $monedas->active  = $monedas->active ? 0 :1;
                 $monedas->save();

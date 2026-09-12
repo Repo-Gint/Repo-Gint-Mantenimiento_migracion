@@ -1,15 +1,41 @@
 <?php
 
         namespace App\Services\Admin\Catalogos;
+
+        use App\Repositories\Admin\Catalogos\AreasRepository;
+        use App\Repositories\Admin\Catalogos\MaquinasCatalogoRepository;
         use App\Repositories\Admin\Catalogos\MaquinasRepository;
 
         class MaquinasService {
-            protected MaquinasRepository $maquinasRepository;
+
+            protected MaquinasRepository         $maquinasRepository;
+            protected AreasRepository            $areasRepository;
+            protected MaquinasCatalogoRepository $maquinasCatalogoRepository;
 
             public function __construct(
-                MaquinasRepository $maquinasRepository
+                MaquinasRepository         $maquinasRepository,
+                AreasRepository            $areasRepository,
+                MaquinasCatalogoRepository $maquinasCatalogoRepository
+
             ) {
-                $this->maquinasRepository = $maquinasRepository;
+                $this->maquinasRepository         = $maquinasRepository;
+                $this->areasRepository            = $areasRepository;
+                $this->maquinasCatalogoRepository = $maquinasCatalogoRepository;
+            }
+
+            public function obtenerRecursosRegistroMaquina() {
+                $areas            = $this->areasRepository->obtenerListaAreas();
+                $maquinasCatalogo  = $this->maquinasCatalogoRepository->obtenerListaCatalogoMaquina();
+
+                return response()->json(
+                    [
+                        'mensaje'  => 'Se obtuvo los recursos correctamente',
+                        'recursos' => [
+                            'listaareas'             => $areas,
+                            'listacatalogomaquina'   => $maquinasCatalogo,
+                        ]
+                    ]
+                );
             }
 
             public function registrarMaquina(array $maquina) {
@@ -35,18 +61,18 @@
                 );
             }
 
-            public function obtenerDetalleMaquina($pkMaquina) {
+            public function obtenerDetalleMaquina(int $pkMaquina) {
                 $maquinas = $this->maquinasRepository->obtenerDetalleMaquina($pkMaquina);
 
                 return response()->json(
                     [
-                        'maquinas' => $maquinas[0],
+                        'maquinas' => $maquinas,
                         'mensaje'  => 'Se obtuvo la información correcta'
                     ]
                 );
             }
 
-            public function actualizarMaquina($maquina) {
+            public function actualizarMaquina(array $maquina) {
                 $this->maquinasRepository->actualizarMaquina($maquina['pkMaquina'], $maquina['maquina']);
 
                 return response()->json(
@@ -57,7 +83,7 @@
                 );
             }
 
-            public function cambiarStatusMaquina($pkMaquina) {
+            public function cambiarStatusMaquina(int $pkMaquina) {
 
                 $status = $this->maquinasRepository->cambiarStatusMaquina($pkMaquina);
 
@@ -68,5 +94,13 @@
                     ]
                 );
             }
-            
+
+            public function obtenerMaquinasPorAreaYCategoria(int $pkArea, int $pkCatalogoMaquina) {
+                $maquinas = $this->maquinasRepository->obtenerMaquinasPorAreaYCategoria($pkArea, $pkCatalogoMaquina);
+
+                    return response()->json([
+                        'maquinas' => $maquinas,
+                        'mensaje'  => 'Se obtuvieron las máquinas filtradas correctamente'
+                    ]);
+            }   
         }

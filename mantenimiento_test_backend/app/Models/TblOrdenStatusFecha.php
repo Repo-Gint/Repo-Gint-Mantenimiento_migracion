@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TblOrdenStatusFecha extends Model {
@@ -12,7 +13,7 @@ class TblOrdenStatusFecha extends Model {
 
     protected $fillable = [
         'id_order_status_date',
-        'id_orden', 
+        'id_order', 
         'date_pendient_order',
         'date_'
     ];

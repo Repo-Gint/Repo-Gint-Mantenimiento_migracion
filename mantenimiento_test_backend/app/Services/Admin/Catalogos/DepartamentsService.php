@@ -2,21 +2,20 @@
 
         namespace App\Services\Admin\Catalogos;
 
-use App\Repositories\Admin\Catalogos\DepartamentsRepository;
+use App\Repositories\Admin\Catalogos\DepartamentosRepository;
 
         class DepartamentsService {
-            protected DepartamentsRepository $departamentsRepository;
+            protected DepartamentosRepository $departamentosRepository;
 
             public function __construct(
-                DepartamentsRepository $departamentsRepository
+                DepartamentosRepository $departamentosRepository
             ) {
-                $this->departamentsRepository = $departamentsRepository;
-               
+                $this->departamentosRepository = $departamentosRepository;
             }
 
             public function registrarDepartamento(array $departamentos) {
-
-                $pkDepartamento = $this->departamentsRepository->registrarDepartamento($departamentos);
+                
+                $pkDepartamento = $this->departamentosRepository->registrarDepartamento($departamentos);
 
                 return response()->json(
                     [
@@ -28,7 +27,7 @@ use App\Repositories\Admin\Catalogos\DepartamentsRepository;
             }
 
             public function obtenerListaDepartamentos() {
-                $departamentos = $this->departamentsRepository->obtenerListaDepartamentos();
+                $departamentos = $this->departamentosRepository->obtenerListaDepartamentos();
 
                 return response()->json(
                     [
@@ -38,8 +37,8 @@ use App\Repositories\Admin\Catalogos\DepartamentsRepository;
                 );
             }
 
-            public function obtenerDetalleDepartamento($pkDepartamento) {
-                $departamento = $this->departamentsRepository->obtenerDetalleDepartamento($pkDepartamento);
+            public function obtenerDetalleDepartamento(int $pkDepartamento) {
+                $departamento = $this->departamentosRepository->obtenerDetalleDepartamento($pkDepartamento);
 
                 return response()->json(
                     [
@@ -49,8 +48,8 @@ use App\Repositories\Admin\Catalogos\DepartamentsRepository;
                 );
             }
 
-            public function actualizarDepartamento($departamento) {
-                $this->departamentsRepository->actualizarDepartamento($departamento['pkDepartamento'], $departamento['departamento']);
+            public function actualizarDepartamento(array $departamento) {
+                $this->departamentosRepository->actualizarDepartamento($departamento['pkDepartamento'], $departamento['departamento']);
 
                 return response()->json(
                     [
@@ -60,8 +59,8 @@ use App\Repositories\Admin\Catalogos\DepartamentsRepository;
                 );
             }
 
-            public function cambiarStatusDepartamento($pkDepartamento) {
-                $status = $this->departamentsRepository->cambiarStatusDepartamento($pkDepartamento);
+            public function cambiarStatusDepartamento(int $pkDepartamento) {
+                $status = $this->departamentosRepository->cambiarStatusDepartamento($pkDepartamento);
 
                 return response()->json(
                     [

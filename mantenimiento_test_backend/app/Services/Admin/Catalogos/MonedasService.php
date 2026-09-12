@@ -36,7 +36,7 @@ use App\Repositories\Admin\Catalogos\MonedasRepository;
                 );
             }
 
-            public function obtenerDetalleMoneda($pkMoneda) {
+            public function obtenerDetalleMoneda(int $pkMoneda) {
                 $monedas = $this->monedasRepository->obtenerDetalleMoneda($pkMoneda); 
 
                 return response()->json(
@@ -47,7 +47,7 @@ use App\Repositories\Admin\Catalogos\MonedasRepository;
                 );
             }
 
-            public function actualizarMoneda($moneda) {
+            public function actualizarMoneda(array $moneda) {
                 $this->monedasRepository->actualizarMoneda($moneda['pkMoneda'], $moneda['moneda']);
 
                 return response()->json(
@@ -58,7 +58,7 @@ use App\Repositories\Admin\Catalogos\MonedasRepository;
                 );
             }
 
-            public function cambiarStatusMoneda($pkMoneda) {
+            public function cambiarStatusMoneda(int $pkMoneda) {
                 
                 $status = $this->monedasRepository->cambiarStatusMoneda($pkMoneda);
 
@@ -68,7 +68,7 @@ use App\Repositories\Admin\Catalogos\MonedasRepository;
                         'mensaje' => 'Se ' . ($status ? 'activo' : 'inactivo') . ' la moneda con éxito'
                     ]
                 );
-             }
+            }
             
         }
     

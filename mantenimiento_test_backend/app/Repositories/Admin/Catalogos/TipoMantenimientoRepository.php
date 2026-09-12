@@ -5,23 +5,23 @@
 use App\Models\CatTipoMantenimiento;
 use Illuminate\Support\Facades\DB;
 
-        class TipoMantenimiento
-        {
+        class TipoMantenimientoRepository
+                {
             public function registrarTipoMantenimiento(array $tipoMantenimiento) {
                 $registro = new CatTipoMantenimiento();
-                $registro->type_maintances = $tipoMantenimiento['type_maintances'];
-                $registro->color           = $tipoMantenimiento['color'];
-                $registro->acronym         = $tipoMantenimiento['acronym'];
-                $registro->active          = 1;
+                $registro->type_maintenances = $tipoMantenimiento['type_maintenances'];
+                $registro->color             = $tipoMantenimiento['color'];
+                $registro->acronym           = $tipoMantenimiento['acronym'];
+                $registro->active            = 1;
                 $registro->save();
 
                 return $registro->id_type_maintenances;
             }
 
-            public function obtenerListatipoMantenimentos() {
+            public function obtenerListatipoMantenimientos() {
                 $query  = CatTipoMantenimiento::select(
                     'id_type_maintenances',
-                    'type_maintances',
+                    'type_maintenances',
                     'color',
                     'acronym',
                     'active',
@@ -36,38 +36,38 @@ use Illuminate\Support\Facades\DB;
                 return $query->get();
             }
 
-            public function obtenerDetalletipoMantenimento($pkMantenimiento) {
+            public function obtenerDetalletipoMantenimiento(int $pktipoMantenimiento) {
                 $query = CatTipoMantenimiento::select(
                     'id_type_maintenances',
-                    'type_maintances',
+                    'type_maintenances',
                     'color',
                     'acronym',
                     'active'
                 )
 
                 ->where([
-                    ['id_type_maintenances', $pkMantenimiento],
+                    ['id_type_maintenances', $pktipoMantenimiento],
                     ['Active', 1]
                 ]);
 
                 return $query->get();
             }
 
-            public function actualizarMantenimiento($id, $mantenimiento) {
+            public function actualizartipoMantenimiento(int $id, array $tipoMantenimiento) {
                 $actualizar = CatTipoMantenimiento::findOrFail($id);
 
-                $actualizar->type_maintances = $mantenimiento['type_maintances'];
-                $actualizar->color = $mantenimiento['color'];
-                $actualizar->acronym = $mantenimiento['acronym'];
+                $actualizar->type_maintenances = $tipoMantenimiento['type_maintenances'];
+                $actualizar->color             = $tipoMantenimiento['color'];
+                $actualizar->acronym           = $tipoMantenimiento['acronym'];
                 $actualizar->save();
             }
 
-            public function cambiarStatusMantenimiento($pkMantenimiento) {
-                $mantenimientos = CatTipoMantenimiento::findOrFail($pkMantenimiento);
-                $mantenimientos->Active = $mantenimientos->Active ? 0 :1;
-                $mantenimientos->save();
+            public function cambiarStatustipoMantenimiento(int $pktipoMantenimiento) {
+                $tipoMantenimientos         = CatTipoMantenimiento::findOrFail($pktipoMantenimiento);
+                $tipoMantenimientos->Active = $tipoMantenimientos->active ? 0 :1;
+                $tipoMantenimientos->save();
 
-                return $mantenimientos->absctive();
+                return $tipoMantenimientos->active;
             }
         }
     

@@ -8,23 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class CatMaquinas extends Model {
     use HasFactory;
     public $timestamps = false;
-    protected $primaryKey = 'id_machines';
-    protected $table      = 'cat_machines';
-
+    protected $primaryKey = 'id_cat_machines';
+    protected $table      = 'cat_machines'; 
     protected $fillable = [
-        'id_machines', 
-        'id_aea', 
-        'machines', 
-        'brand', 
-        'model', 
-        'year',
-        'serial', 
-        'weight', 
-        'voltaje', 
-        'amperage', 
-        'frequency', 
-        'kva',
+        'id_cat_machines', 
+        'cat_machines',
         'active'
     ];
-    
 }

@@ -6,7 +6,7 @@ use App\Models\CatRoles;
 
         class RolesRepository
         {
-            public function registrarRoles($rol) {
+            public function registrarRoles(array $rol) {
 
                 $registro = new CatRoles();
                 $registro->roles       = $rol['roles'];

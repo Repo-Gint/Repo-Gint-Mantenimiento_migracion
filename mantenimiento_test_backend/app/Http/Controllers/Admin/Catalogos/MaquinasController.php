@@ -15,6 +15,24 @@ class MaquinasController extends Controller {
         $this->maquinasService = $maquinasService;
     }
 
+    public function obtenerRecursosRegistroMaquina()
+    {
+        try {
+            return $this->maquinasService->obtenerRecursosRegistroMaquina();
+        } catch (\Throwable $error) {
+            Log::alert('*********************************************');
+            Log::alert('Error al obtener información de Recursos registro maquinas');
+            Log::alert($error);
+            return response()->json(
+                [
+                    'error' => $error,
+                    'mensaje' => 'Ocurrió un error interno'
+                ],
+                500
+            );
+        }
+    }
+
     public function registrarMaquina(Request $request) 
     {
         try {
@@ -101,6 +119,27 @@ class MaquinasController extends Controller {
                     'error'   => $error,
                     'mensaje' => 'Ocurrio un error interno'
                 ]
+            );
+        }
+    }
+
+    public function obtenerMaquinasPorAreaYCategoria(Request $request) 
+    {
+        try {
+            $pkArea = $request->input('id_area');
+            $pkCatalogoMaquina = $request->input('id_cat_machines');
+
+            return $this->maquinasService->obtenerMaquinasPorAreaYCategoria($pkArea, $pkCatalogoMaquina);
+        } catch (\Throwable $error) {
+            Log::alert('*********************************************');
+            Log::alert('Error al filtrar máquinas por área y categoría');
+            Log::alert($error);
+            return response()->json(
+                [
+                    'error'   => $error,
+                    'mensaje' => 'Ocurrió un error interno'
+                ],
+                500
             );
         }
     }

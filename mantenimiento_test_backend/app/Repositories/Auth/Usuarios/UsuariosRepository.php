@@ -3,10 +3,8 @@
         namespace App\Repositories\Auth\Usuarios;
 
         use App\Models\TblUsuarios;
-        use App\Models\TblSessions; 
-        use Carbon\Carbon;
-        use Illuminate\Support\Facades\DB;
-        use Illuminate\Support\Facades\Log;
+        use App\Models\TblSessions;
+use Illuminate\Support\Facades\DB;
 
             class UsuariosRepository
             {
@@ -17,7 +15,7 @@
                 return $query->count();
             }
             
-            public function registrarUsuario($usuario)
+            public function registrarUsuario(array $usuario)
             {
                 $registro = new TblUsuarios();
             
@@ -49,13 +47,12 @@
                 )
             
                 ->join('cat_roles', 'cat_roles.id_roles', '=', 'tbl_users.id_rol_users')
-            
-                ->join('tbl_employee', 'tbl_employee.id_employe', '=', 'tbl_users.id_employee');
+                ->join('tbl_employee', 'tbl_employee.id_employee', '=', 'tbl_users.id_employee');
             
                 return $query->get();
             }
             
-            public function obtenerDetalleUsuario($pkUsuario) {
+            public function obtenerDetalleUsuario(int $pkUsuario) {
                 $query = TblUsuarios::select(
                     'id_users',
                     'id_rol_users',
@@ -69,7 +66,7 @@
                 return $query->get();
             }
 
-            public function actualizarUsuario($id, $usuario) {
+            public function actualizarUsuario(int $id, array $usuario) {
 
                 $actualizar = TblUsuarios::findOrFail($id);
 
@@ -79,7 +76,7 @@
                 $actualizar->save();
             }
 
-            public function cambiarStatusUsuario($id) {
+            public function cambiarStatusUsuario(int $id) {
 
                 $usuario = TblUsuarios::findOrFail($id);
                 $usuario->active = $usuario->active ? 0 : 1;
@@ -89,7 +86,7 @@
             }
 
 
-            public function login ($usuario) {
+            public function login (array $usuario) {
                 $usuarioEncontrado = TblUsuarios::where('busines_mail', $usuario['busines_mail'])
                 ->first();
 

@@ -13,7 +13,7 @@ class CatTipoMantenimiento extends Model {
 
     protected $fillable = [
         'id_type_maintenances', 
-        'type_maintances',
+        'type_maintenances',
         'color',
         'acronym',
         'active'

@@ -4,41 +4,40 @@
         use App\Repositories\Auth\Usuarios\UsuariosRepository;
         use Illuminate\Support\Str;
         use App\Models\TblSessions;
-        use App\Repositories\Admin\Catalogos\EmployesRepository;
+        use App\Repositories\Admin\Catalogos\EmpleadosRepository;
         use App\Repositories\Admin\Catalogos\RolesRepository;
     
         class UsuariosService
         {
-            protected UsuariosRepository $usuariosRepository;
-            protected RolesRepository    $rolesRepository;
-            protected EmployesRepository $employesRepository;
+            protected UsuariosRepository  $usuariosRepository;
+            protected RolesRepository     $rolesRepository;
+            protected EmpleadosRepository $empleadosRepository;
 
             public function __construct(
-                UsuariosRepository $UsuariosRepository,
-                RolesRepository    $RolesRepository,
-                EmployesRepository $EmployesRepository
+                UsuariosRepository  $UsuariosRepository,
+                RolesRepository     $RolesRepository,
+                EmpleadosRepository $EmpleadosRepository
             ) {
-                $this->usuariosRepository = $UsuariosRepository;
-                $this->rolesRepository    = $RolesRepository;
-                $this->employesRepository = $EmployesRepository;
+                $this->usuariosRepository  = $UsuariosRepository;
+                $this->rolesRepository     = $RolesRepository;
+                $this->empleadosRepository = $EmpleadosRepository;
             }
 
             public function obtenerRecursosRegistroUsuario() {
                 $rol       =$this->rolesRepository->obtenerListaRoles();
-                $empleado  =$this->employesRepository->obtenerListaEmpleados();
+                $empleado  =$this->empleadosRepository->obtenerListaEmpleados();
 
                 return response()->json(
                     [
                         'mensaje' => 'Se obtuvo los recursos correctamente',
-                        'recursos' => [
-                            'listaRol'      => $rol,
-                            'listaempleado' => $empleado
+                        'recursos' => ['listaRol'       => $rol,
+                                        'listaempleado' => $empleado
                         ]
                     ]
                 );
             }
 
-            public function registrarUsuario($usuario)
+            public function registrarUsuario(array $usuario)
             {
                 $correo = trim(strtolower($usuario['busines_mail']));
             
@@ -77,7 +76,7 @@
                 );
             }
 
-            public function obtenerDetalleUsuario($pkUsuario) {
+            public function obtenerDetalleUsuario(int $pkUsuario) {
                 $usuario = $this->usuariosRepository->obtenerDetalleUsuario($pkUsuario);
 
                 return response()->json(
@@ -88,7 +87,7 @@
                 );
             }
 
-            public function actualizarUsuario($usuario) {
+            public function actualizarUsuario(array $usuario) {
                 $this->usuariosRepository->actualizarUsuario($usuario['pkUsuario'], $usuario['usuario']);
 
                 return response()->json(
@@ -99,18 +98,18 @@
                 );
             }
 
-            public function cambiarStatusUsuario($id) {
+            public function cambiarStatusUsuario(int $id) {
                 $status = $this->usuariosRepository->cambiarStatusUsuario($id);
 
                 return response()->json(
                     [
-                        'title' => ($status ? 'Activar' : 'Inactivar') . ' usuario',
+                        'title'   => ($status ? 'Activar' : 'Inactivar') . ' usuario',
                         'mensaje' => 'Se ' . ($status ? 'activo' : 'inactivo') . ' el usuario con éxito'
                         ]
                 );
             }
 
-            public function login($usuario)
+            public function login(array $usuario)
             {
                 $resultado = $this->usuariosRepository->login($usuario);    
                 if ($resultado === 'no_usuario') {
