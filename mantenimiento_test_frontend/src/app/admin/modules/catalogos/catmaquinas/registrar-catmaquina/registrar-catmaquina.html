@@ -1,0 +1,41 @@
+<div class="modal-body dashboard">
+    <div class="pagetitle">
+        <h4 class="t-bold">
+            {{pkCatalogoMaquina == null ? 'Registrar' : 'Actualizar'}} catalogo maquina
+        </h4>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">Maquina</li>
+                <li class="breadcrumb-item active"> {{pkCatalogoMaquina == null ? 'Registrar' : 'Actualizar'}} catalogo maquina</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form [formGroup]="formCatMaquina" class="row g-3" autocomplete="off">
+                        
+                        <div class="col-lg-6">
+                            <label for="cat_machines" class="form-label" >Catalogo Maquina:</label>
+                            <input id="cat_machines" type="text" class="form-control form-control-sm" placeholder="Catalogo Maquina" formControlName="cat_machines">
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button *ngIf="pkCatalogoMaquina == null" class="btn btn-sm btn-primary" (click)="registrarCatalogoMaquina()">
+        Registrar
+    </button> 
+        <button *ngIf="pkCatalogoMaquina != null" class="btn btn-sm btn-warning" (click)="actualizarCatalogoMaquina()">
+        Actualizar
+    </button>
+    <button class="btn btn-sm btn-danger" (click)="cerrarModal()">
+        {{cambiosForm || pkCatalogoMaquina != null ? 'Cancelar' : 'Cerrar'}}
+    </button>
+</div>

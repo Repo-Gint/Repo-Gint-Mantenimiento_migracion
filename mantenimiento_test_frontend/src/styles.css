@@ -10881,6 +10881,13 @@ body {
   margin-top: 56px !important;
 }
 
+#layoutSidenav_nav {
+    background-color: #263b5e;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
 .sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav {
   transform: translateX(0);
 }
@@ -10975,7 +10982,7 @@ body {
 
 /* Navbar color */
 .navbar-custom {
-    background: linear-gradient(90deg, #0e4057, #23627f);
+    background: linear-gradient(90deg, #263b5e);
 }
 
 .sb-sidenav {
@@ -11025,7 +11032,7 @@ body {
 }
 
 .sb-sidenav-dark {
-  background-color: #004060;
+  background-color: #263b5e;
   color: rgba(0, 64, 96);
 }
 .sb-sidenav-dark .sb-sidenav-menu .sb-sidenav-menu-heading {
@@ -11050,7 +11057,7 @@ body {
   color: #fff;
 }
 .sb-sidenav-dark .sb-sidenav-footer {
-  background-color: #343a40;
+  background-color: #A9A9B2;
 }
 
 .sb-sidenav-light {
@@ -11080,6 +11087,18 @@ body {
 }
 .sb-sidenav-light .sb-sidenav-footer {
   background-color: #e9ecef;
+}
+
+/* Fuerza el ancho del contenedor principal del modal */
+.modal-dialog, 
+.cdk-overlay-pane {
+    max-width: 950px !important; 
+    width: 95vw !important;      
+}
+
+/* Asegura que el contenido interno se expanda */
+.modal-body.dashboard {
+    width: 100% !important;
 }
 
 .datatable-wrapper .datatable-container {

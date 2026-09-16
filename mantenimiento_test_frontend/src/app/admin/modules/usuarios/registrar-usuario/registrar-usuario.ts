@@ -31,16 +31,18 @@ export class RegistrarUsuario {
   ){}
 
   async ngOnInit(): Promise<void> {
-    this.messages.mensajeEsperar();
+  this.messages.mensajeEsperar();
 
-    this.crearFormUsuario();
-    await this.obtenerRecursosRegistroUsuario();
+  this.crearFormUsuario();
+  
+  await this.obtenerRecursosRegistroUsuario();
 
-    if (this.pkUsuario != null) await this.obtenerDetalleUsuario(this.pkUsuario);
-
-    this.messages.cerrarMensajes();
-    
+  if (this.pkUsuario != null) {
+    await this.obtenerDetalleUsuario(this.pkUsuario);
   }
+
+  this.messages.cerrarMensajes();
+}
 
   private crearFormUsuario(): void{
     this.formUsuario = this.fb.group ({
@@ -103,9 +105,7 @@ export class RegistrarUsuario {
                   next: (res: any) => {
                       this.messages.cerrarMensajes();
                       this.messages.mensajeGenerico(
-                          res.message,
-                          'success',
-                          res.title
+                          res.message, 'success', res.title
                       );
                   },
       

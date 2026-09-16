@@ -42,7 +42,6 @@ export class ConsultaDepartamentos implements OnDestroy {
 public async obtenerListaDepartamentos(): Promise<any> {
   return this.departamentos.obtenerListaDepartamentos().toPromise().then(
     respuesta => {
-      console.log(respuesta);
 
       this.datosTabla = respuesta.departaments;
       this.ch.markForCheck();
@@ -75,16 +74,11 @@ public async obtenerListaDepartamentos(): Promise<any> {
 
 public abrirModalRegistrarDepartamento(pkDepartamento: number): void {
 
-  console.log('ID ENVIADO:', pkDepartamento);
-
   const data: any = {
     pkDepartamento: pkDepartamento
   };
 
-  this.modal.abrirModalConComponente(RegistrarDepartamento,
-    data,
-    'md-modal'
-  );
+  this.modal.abrirModalConComponente(RegistrarDepartamento, data, 'md-modal');
 }
 
   ngOnDestroy(): void {

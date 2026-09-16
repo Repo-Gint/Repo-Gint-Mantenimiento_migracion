@@ -1,0 +1,106 @@
+<div class="modal-body dashboard">
+    <div class="pagetitle">
+        <h4 class="t-bold">
+            {{pkMaquina == null ? 'Registrar' : 'Actualizar'}} maquina
+        </h4>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">Maquina</li>
+                <li class="breadcrumb-item active"> {{pkMaquina == null ? 'Registrar' : 'Actualizar'}} maquina</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form [formGroup]="formMaquina" class="row g-3" autocomplete="off">
+                        <div class="col-lg-6">
+                            <label for="machines" class="form-label" >Maquina:</label>
+                            <input id="machines" type="text" class="form-control form-control-sm" placeholder="Maquina" formControlName="machines">
+                        </div>
+
+                        <div class="col-lg-6">
+                            <label for="area" class="form-label">Area:</label>
+                            <select name="area" id="area" class="form-select form-select-sm" formControlName="id_area">
+                                <option *ngFor="let area of listaAreas" [value]="area.id_area">{{ area.area }}</option>
+                                <option style="display: none; visibility: hidden;" value="">Selecciona una opción</option>
+                            </select>
+                        </div>
+
+                        <div class="col-lg-4"> 
+							<label class="form-label">Cat.Maquina:</label> 
+							<select class="form-select form-select-sm" formControlName="id_cat_machines"> 
+								<option *ngFor="let catmaquina of listacatalogoMaquina" [value]="catmaquina.id_cat_machines"> 
+									{{ catmaquina.cat_machines }} 
+								</option> 
+								<option style="display: none; visibility: hidden;" value=""> 
+									Selecciona una opción 
+								</option> 
+							</select> 
+						</div>
+                        
+                        <div class="col-lg-4">
+                            <label for="brand" class="form-label" >Marca:</label>
+                            <input id="brand" type="text" class="form-control form-control-sm" placeholder="Escribe la Marca" formControlName="brand">
+                        </div>
+
+                        <div class="col-lg-4">
+                            <label for="model" class="form-label" >Modelo:</label>
+                            <input id="model" type="text" class="form-control form-control-sm" placeholder="Escribe el modelo" formControlName="model">
+                        </div>
+
+                        <div class="col-lg-4">
+                            <label for="year" class="form-label" >Año:</label>
+                            <input id="year" type="text" class="form-control form-control-sm" placeholder="Escribe el año" formControlName="year">
+                        </div>
+
+                        <div class="col-lg-4">
+                            <label for="serial" class="form-label" >Número de serie:</label>
+                            <input id="serial" type="text" class="form-control form-control-sm" placeholder="Escribe el Número de serie" formControlName="serial">
+                        </div>
+
+                        <div class="col-lg-4">
+                            <label for="weight" class="form-label" >Peso:</label>
+                            <input id="weight" type="text" class="form-control form-control-sm" placeholder="Escribe el peso" formControlName="weight">
+                        </div>
+
+                        <div class="col-lg-4">
+                            <label for="voltaje" class="form-label" >Voltaje:</label>
+                            <input id="voltaje" type="text" class="form-control form-control-sm" placeholder="Escribe el voltaje" formControlName="voltaje">
+                        </div>
+
+                        <div class="col-lg-4">
+                            <label for="amperage" class="form-label" >Amperage:</label>
+                            <input id="amperage" type="text" class="form-control form-control-sm" placeholder="Escribe el amperage"
+                                formControlName="amperage">
+                        </div>
+
+                        <div class="col-lg-4">
+                            <label for="frequency" class="form-label" >Frecuencia:</label>
+                            <input id="frequency" type="text" class="form-control form-control-sm" placeholder="Escribe la frecuencia" formControlName="frequency">
+                        </div>
+
+                        <div class="col-lg-4">
+                            <label for="kva" class="form-label" >KVA:</label>
+                            <input id="kva" type="text" class="form-control form-control-sm" placeholder="Escribe el kva" formControlName="kva">
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button *ngIf="pkMaquina == null" class="btn btn-sm btn-primary" (click)="registrarMaquina()">
+        Registrar
+    </button> 
+        <button *ngIf="pkMaquina != null" class="btn btn-sm btn-warning" (click)="actualizarMaquina()">
+        Actualizar
+    </button>
+    <button class="btn btn-sm btn-danger" (click)="cerrarModal()">
+        {{cambiosForm || pkMaquina != null ? 'Cancelar' : 'Cerrar'}}
+    </button>
+</div>

@@ -21,7 +21,7 @@
                             <label for="empleado" class="form-label">Empleado: </label> 
                             <select id="empleado" class="form-select form-select-sm" formControlName="id_employee">
                                 <option value="" hidden> Selecciona una opción </option>
-                            <option *ngFor="let empleado of listaempleado" [value]="empleado.id_employe">
+                            <option *ngFor="let empleado of listaempleado" [value]="empleado.id_employee">
                                 {{ empleado.Name }}
                             </option>
                             </select>

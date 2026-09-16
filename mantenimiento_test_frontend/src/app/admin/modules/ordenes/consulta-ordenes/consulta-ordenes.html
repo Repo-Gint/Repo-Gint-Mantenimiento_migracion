@@ -1,0 +1,98 @@
+<div class="pagetitle">
+    <h1>Ordenes</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">Ordenes</li>
+            <li class="breadcrumb-item active">Consulta Ordenes</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section dashboard">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body row g-3 col-4">
+                    <label for="area" class="form-label">Area:</label>
+                    <select id="area" class="form-select form-select-sm" [(ngModel)]="id_area" (change)="busquedaFiltros()">
+                        <option *ngFor="let area of listaAreas" [value]="area.id_area">
+                            {{ area.area }}
+                        </option>
+                        <option style="display: none; visibility: hidden;" value="">Selecciona una opción
+                        </option>
+                    </select>
+                    
+                    <label class="form-label">Status:</label>
+                    <div class="dropdown w-100">
+
+                        <button class="form-select form-select-sm text-start" type="button" data-bs-toggle="dropdown">
+                            {{ getStatusNombre(id_status) || 'Selecciona una opción' }}
+                        </button>
+
+                        <div class="dropdown-menu w-100 p-2">
+
+                            <div *ngFor="let status of listaStatus" class="form-check">
+
+                                <input class="form-check-input" type="radio" name="status"
+                                    [value]="status.id_status_order" [(ngModel)]="id_status"
+                                    (change)="busquedaFiltros()" id="status{{status.id_status_order}}">
+
+                                <label class="form-check-label w-100" for="status{{status.id_status_order}}">
+                                    {{ status.status }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="botonera">
+                        <button class="btn btn-success btn-sm"> Exportar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12" style="margin-top: 20px !important;">
+            <table class="table table-striped table-hover text-center">
+                <thead>
+                    <tr>
+                        <th>Folio</th>
+                        <th>Maquina</th>
+                        <th>Departamento</th>
+                        <th>Area</th>
+                        <th>Solicitante</th>
+                        <th>Tipo.Mantenimiento</th>
+                        <th>Tipo.Orden</th>
+                        <th>Prioridad</th>
+                        <th>Status</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                <tr *ngFor="let orden of datosTabla">
+                    <td>{{ orden.folio }}</td>
+                    <td>{{ orden.machines }}</td>
+                    <td>{{ orden.Departament_ES }}</td>
+                    <td>{{ orden.area }}</td>
+                    <td>{{ orden.Name }}</td>
+                    <td>{{ orden.type_maintenances }}</td>
+                    <td>{{ orden.type_orders }}</td>
+                    <td>{{ orden.priority }}</td>
+                    <td>
+                        <i class="bi" [ngClass]="getStatusIcon(orden.status)"></i>
+                        {{ orden.status }}
+                    </td>
+                    <td class="text-medium">
+            <button class="btn btn-sm btn-outline-primary me-1"
+                (click)="abrirModalRegistrarOrdenes(orden.id_order)">
+                <i class="bi bi-pencil"></i>
+            </button>
+
+            <button class="btn btn-sm btn-outline-primary" (click)="cancelarOrden(orden.id_order)">
+                <i class="bi bi-x-circle text-danger"></i>
+            </button>
+        </td>
+    </tr>
+</tbody>
+            </table>
+        </div>
+    </div>
+</section>

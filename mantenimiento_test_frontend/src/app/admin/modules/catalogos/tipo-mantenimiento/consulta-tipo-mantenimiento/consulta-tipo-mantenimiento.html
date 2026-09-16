@@ -1,0 +1,61 @@
+<div class="pagetitle">
+    <h1>Tipo de Mantenimiento</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">Tipo de Mantenimiento</li>
+            <li class="breadcrumb-item active">Consulta tipo de Mantenimiento</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section dashboard">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+                <div class="card-body row g-3">
+                    <div class="botonera">
+                        <button class="btn btn-success btn-sm">
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <table class="table table-striped table-hover text-center">
+                <thead>
+                    <tr>
+                        <th>Tipo de Mantenimiento</th>
+                        <th>Color</th>
+                        <th>Abreviatura</th>
+                        <th>status</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let tipoMantenimiento of datosTabla">
+                        <td>{{tipoMantenimiento.type_maintenances}}</td>
+                        <td>{{tipoMantenimiento.color}}</td>
+                        <td>{{tipoMantenimiento.acronym}}</td>
+                        <td>{{tipoMantenimiento.estado}}</td>
+                        <td class="text-medium">
+                            <button class="btn btn-sm btn-outline-primary"
+                                (click)="abrirModalRegistrotipoMantenimiento(tipoMantenimiento.id_type_maintenances)">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button *ngIf="!tipoMantenimiento.activo" class="btn btn-sm btn-outline-info"
+                                (click)="cambiarStatus(tipoMantenimiento)">
+                                <i class="bi bi-check"></i>
+                            </button>
+                            <button *ngIf="tipoMantenimiento.activo" class="btn btn-sm btn-outline-warning"
+                                (click)="cambiarStatus(tipoMantenimiento)">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

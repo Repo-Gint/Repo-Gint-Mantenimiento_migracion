@@ -1,0 +1,57 @@
+<div class="pagetitle">
+    <h1>Maquinas</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">Maquinas</li>
+            <li class="breadcrumb-item active">Consulta Maquinas</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section dashboard">
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+                <div class="card-body row g-3">
+                    <div class="botonera">
+                        <button class="btn btn-success btn-sm">
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <table class="table table-striped table-hover text-center">
+                <thead>
+                    <tr>
+                        <th>Maquina</th>
+                        <th>status</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let cat_maquina of datosTabla">
+                        <td>{{cat_maquina.cat_machines}}</td>
+                        <td>{{cat_maquina.estado}}</td>
+                        <td class="text-medium">
+                            <button class="btn btn-sm btn-outline-primary"
+                                (click)="abrirModalRegistroCatMaquina(cat_maquina.id_cat_machines)">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button *ngIf="!cat_maquina.activo" class="btn btn-sm btn-outline-info"
+                                (click)="cambiarStatusCatalogoMaquina(cat_maquina)">
+                                <i class="bi bi-check"></i>
+                            </button>
+                            <button *ngIf="cat_maquina.activo" class="btn btn-sm btn-outline-warning"
+                                (click)="cambiarStatusCatalogoMaquina(cat_maquina)">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

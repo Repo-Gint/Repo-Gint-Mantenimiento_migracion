@@ -18,26 +18,23 @@ export class RegistrarArea implements OnInit {
 	protected formArea!: FormGroup;
 
 	constructor(
-		private modal: ModalService,
-		private ch: ChangeDetectorRef,
-		private fb: FormBuilder,
+		private modal:    ModalService,
+		private ch:       ChangeDetectorRef,
+		private fb:       FormBuilder,
 		private messages: MessagesService,
-		private areas: AreasService
+		private areas: |  AreasService
 	) { }
 
 	async ngOnInit(): Promise<any> {
 		this.messages.mensajeEsperar();
-
 		this.crearFormAreas();
-
 		if (this.pkArea != null) await this.obtenerDetalleArea(this.pkArea);
-
 		this.messages.cerrarMensajes();
 	}
 
 	protected crearFormAreas(): void {
 		this.formArea = this.fb.group({
-			area:    [null, [Validators.required, Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$')]],
+			area:    [null, [Validators.required, Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9 -]+$')]],
 			acronym: [null, [Validators.required, Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$')]],
 			color:   [null, [Validators.required, Validators.pattern('^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$')]],
 		});
@@ -115,8 +112,6 @@ export class RegistrarArea implements OnInit {
 					this.areas.actualizarArea(data).toPromise().then(
 						respuesta => {
 
-		console.log('pkArea componente:', this.pkArea);
-		console.log('respuesta:', respuesta);
 							this.obtenerDetalleArea(this.pkArea).then(() => {
 								this.messages.mensajeGenerico(respuesta.mensaje, 'success', respuesta.title)
 							});

@@ -1,0 +1,177 @@
+<div class="modal-body dashboard"> 
+    <div class="pagetitle"> 
+        <h4 class="t-bold"> {{ pkOrden == null ? 'Registrar' : 'Actualizar'}} orden </h4> 
+
+        <nav> 
+            <ol class="breadcrumb"> 
+                <li class="breadcrumb-item">Ordenes</li> 
+                <li class="breadcrumb-item active"> 
+                    {{ pkOrden == null ? 'Registrar' : 'Actualizar'}} orden 
+                </li> 
+            </ol> 
+        </nav> 
+    </div> 
+
+    <div class="row"> 
+        <div class="col-12"> 
+            <div class="card"> 
+                <div class="card-body"> 
+
+                    <form [formGroup]="formOrden" class="row g-3" autocomplete="off"> 
+
+                        <div class="col-lg-4"> 
+                            <label class="form-label">Tipo de Orden:</label> 
+                            <select class="form-select form-select-sm" formControlName="id_type_orders"> 
+                                <option *ngFor="let tipoOrden of listatipoOrden" [value]="tipoOrden.id_type_orders"> 
+                                    {{ tipoOrden.type_orders }} 
+                                </option> 
+                                <option style="display: none; visibility: hidden;" value=""> 
+                                    Selecciona una opción 
+                                </option> 
+                            </select> 
+                        </div> 
+
+                        <div class="col-lg-4"> 
+                            <label class="form-label">Area:</label> 
+                            <select class="form-select form-select-sm" formControlName="id_area"> 
+                                <option *ngFor="let area of listaAreas" [value]="area.id_area"> 
+                                    {{ area.area }} 
+                                </option> 
+                                <option style="display: none; visibility: hidden;" value=""> 
+                                    Selecciona una opción 
+                                </option> 
+                            </select> 
+                        </div> 
+
+                        <div class="col-lg-4"> 
+                            <label class="form-label">Cat.Maquina:</label> 
+                            <select class="form-select form-select-sm" formControlName="id_cat_machines"> 
+                                <option *ngFor="let catmaquina of listacatalogoMaquina" [value]="catmaquina.id_cat_machines"> 
+                                    {{ catmaquina.cat_machines }} 
+                                </option> 
+                                <option style="display: none; visibility: hidden;" value=""> 
+                                    Selecciona una opción 
+                                </option> 
+                            </select> 
+                        </div>
+
+                        <div class="col-lg-4"> 
+                            <label class="form-label">Maquina:</label> 
+                            <select class="form-select form-select-sm" formControlName="id_machines"> 
+                                <option *ngFor="let maquina of listaMaquinas" [value]="maquina.id_machines"> 
+                                    {{ maquina.machines }} 
+                                </option> 
+                                <option style="display: none; visibility: hidden;" value=""> 
+                                    Selecciona una opción 
+                                </option> 
+                            </select> 
+                        </div> 
+
+                        <div class="col-lg-4"> 
+                            <label class="form-label">Departamento:</label> 
+                            <select class="form-select form-select-sm" formControlName="id_departaments"> 
+                                <option *ngFor="let departamento of listaDepartamentos" [value]="departamento.id_departaments"> 
+                                    {{ departamento.Departament_ES}} 
+                                </option> 
+                                <option style="display: none; visibility: hidden;" value=""> 
+                                    Selecciona una opción 
+                                </option> 
+                            </select> 
+                        </div>
+
+                        <div class="col-lg-4"> 
+                            <label class="form-label">Solicitante:</label> 
+                            <select class="form-select form-select-sm" formControlName="id_employee"> 
+                                <option *ngFor="let empleado of listaEmpleados" [value]="empleado.id_employee"> 
+                                    {{ empleado.Name }} 
+                                </option> 
+                                <option style="display: none; visibility: hidden;" value=""> 
+                                    Selecciona una opción 
+                                </option> 
+                            </select> 
+                        </div> 
+
+                        <div class="col-lg-6"> 
+                            <label class="form-label">Tipo de Mantenimiento:</label> 
+                            <select class="form-select form-select-sm" formControlName="id_type_maintenances"> 
+                                <option *ngFor="let tipoMantenimiento of listatipoMantenimiento" [value]="tipoMantenimiento.id_type_maintenances"> 
+                                    {{ tipoMantenimiento.type_maintenances }} 
+                                </option> 
+                                <option style="display: none; visibility: hidden;" value=""> Selecciona una opción </option> 
+                            </select> 
+                        </div> 
+
+                        <div class="col-lg-4"> 
+                            <label class="form-label">Prioridad:</label> 
+                            <select class="form-select form-select-sm" formControlName="id_priority"> 
+                                <option *ngFor="let prioridadOrden of listaprioridadOrden" [value]="prioridadOrden.id_priority"> 
+                                    {{ prioridadOrden.priority }} 
+                                </option> 
+                                <option style="display: none; visibility: hidden;" value=""> Selecciona una opción</option> 
+                            </select> 
+                        </div> 
+
+                        <div class="col-lg-12"> 
+                            <label class="form-label">Descripción:</label> 
+                            <textarea class="form-control form-control-sm" rows="3" formControlName="problem_description"> 
+                            </textarea> 
+                        </div> 
+
+                        <div class="col-lg-12 mt-3"> 
+                            <label class="form-label">Evidencias:</label> 
+
+                            <div class="mb-2"> 
+                                <button type="button" class="btn btn-sm btn-primary" (click)="fileInput.click()"> 
+                                    Agregar imagen 
+                                </button> 
+
+                                <input #fileInput type="file" multiple accept="image/*" (change)="onFileSelected($event)" hidden> 
+                            </div> 
+
+                            <div class="d-flex flex-wrap gap-3">
+                                <div *ngFor="let img of images; let i = index" class="position-relative">
+                                    <img [src]="img.url_evidence_image" width="120" height="120" class="rounded border" style="object-fit: cover;">
+
+                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" (click)="eliminarEvidenciaOrden(i, img.id_eviden_order)" style="padding: 2px 6px;">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div> 
+
+                        <div class="col-lg-12" *ngIf="pkOrden != null"> 
+    <label class="form-label">
+        {{ (usuariosAsignados.length || 0) > 1 ? 'Usuarios asignados:' : 'Usuario asignado:' }}
+    </label>
+    <div>
+        <span *ngFor="let nombre of usuariosAsignados; let i = index">
+            {{ nombre }}<span *ngIf="i < usuariosAsignados.length - 1">, </span>
+        </span>
+    </div>
+</div>
+
+                    </form> 
+
+                </div> 
+            </div> 
+        </div> 
+    </div> 
+</div> 
+
+<div class="modal-footer"> 
+    <button *ngIf="pkOrden == null" class="btn btn-sm btn-primary" (click)="registrarOrden()"> 
+        Registrar 
+    </button>
+    
+    <button *ngIf="pkOrden != null" class="btn btn-sm btn-primary" (click)="abrirAsignar()">
+        Asignar a
+    </button>
+
+    <button *ngIf="pkOrden != null" class="btn btn-sm btn-warning" (click)="actualizarOrden()">
+        Actualizar
+    </button>
+
+    <button class="btn btn-sm btn-danger" (click)="cerrarModal()"> 
+        {{ cambiosForm || pkOrden != null ? 'Cancelar' : 'Cerrar' }} 
+    </button> 
+</div>

@@ -26,10 +26,8 @@ export class ConsultaAreas implements OnDestroy {
 
 	async ngOnInit(): Promise<any> {
 		this.messages.mensajeEsperar();
-
 		await this.obtenerListaAreas();
 		this.repetitiveInstruction();
-
 		this.messages.cerrarMensajes();
 	}
 
@@ -50,47 +48,32 @@ export class ConsultaAreas implements OnDestroy {
 
 protected cambiarStatus(area: any): void {
 
-	const estaActivo = Number(area.activo) === 1; // 🔥 clave
+	const estaActivo = Number(area.activo) === 1; 
 	const accion = estaActivo ? 'inactivar' : 'activar';
 	const titulo = estaActivo ? 'Inactivar area' : 'Activar area';
 
-	this.messages.mensajeConfirmacionCustom(
-		`¿Está seguro de ${accion} el area?`,
-		'question',
-		titulo
+	this.messages.mensajeConfirmacionCustom(`¿Está seguro de ${accion} el area?`, 'question', titulo
 	).then(res => {
 		if (!res.isConfirmed) return;
 
 		this.messages.mensajeEsperar();
-
 		this.areas.cambiarStatusArea(area.id_area).subscribe(
 			(respuesta) => {
-
-				// opcional pero recomendable
 				area.activo = estaActivo ? 0 : 1;
-
 				this.obtenerListaAreas().then(() => {
-					this.messages.mensajeGenerico(
-						respuesta.mensaje,
-						'success',
-						respuesta.title
-					);
+					this.messages.mensajeGenerico(respuesta.mensaje, 'success', respuesta.title );
 				});
 			},
 			(error) => {
 				this.messages.mensajeGenerico(
-					'Error al cambiar el estado del área',
-					'error',
-					'Error'
+					'Error al cambiar el estado del área', 'error', 'Error'
 				);
 			}
 		);
 	});
 }
 	public abrirModalRegistrarArea(pkArea: number): void {
-		const data: any = {
-			pkArea: pkArea
-		};
+		const data: any = {pkArea: pkArea};
 
 		this.modal.abrirModalConComponente(RegistrarArea, data, 'md-modal');
 	}

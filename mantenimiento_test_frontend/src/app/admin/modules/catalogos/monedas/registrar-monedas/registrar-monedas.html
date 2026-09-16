@@ -1,0 +1,42 @@
+<div class="modal-body dashboard">
+    <div class="pagetitle">
+        <h4 class="t-bold">
+            {{pkMoneda == null ? 'Registrar' : 'Actualizar'}} moneda
+        </h4>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">Moneda</li>
+                <li class="breadcrumb-item active"> {{pkMoneda == null ? 'Registrar' : 'Actualizar'}} moneda</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form [formGroup]="formMoneda" class="row g-3" autocomplete="off">
+                        <div class="col-lg-6">
+                            <label for="coin" class="form-label" >Moneda:</label>
+                            <input id="coin" type="text"
+                             class="form-control form-control-sm" placeholder="Escribe la Moneda"
+                                formControlName="coin">
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button *ngIf="pkMoneda == null" class="btn btn-sm btn-primary" (click)="registrarMoneda()">
+        Registrar
+    </button> 
+        <button *ngIf="pkMoneda != null" class="btn btn-sm btn-warning" (click)="actualizarMoneda()">
+        Actualizar
+    </button>
+    <button class="btn btn-sm btn-danger" (click)="cerrarModal()">
+        {{cambiosForm || pkMoneda != null ? 'Cancelar' : 'Cerrar'}}
+    </button>
+</div>

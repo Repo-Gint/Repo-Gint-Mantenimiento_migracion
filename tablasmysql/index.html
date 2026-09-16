@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelo Entidad-Relación (MER / ERD) - Sistema de Gestión de Mantenimiento</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #f8fafc;
+      --grid-line: #cbd5e1;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #cbd5e1;
+      
+      /* Module Colors */
+      --header-main: #1e3a8a; /* Deep Blue for Core Order */
+      --badge-main: #dbeafe;
+      --header-cat: #0d9488; /* Teal for Catalogs */
+      --badge-cat: #ccfbf1;
+      --header-user: #6b21a8; /* Purple for Users */
+      --badge-user: #f3e8ff;
+      --header-msg: #c2410c; /* Orange for Messaging */
+      --badge-msg: #ffedd5;
+      --header-doc: #15803d; /* Green for Projects/Docs */
+      --badge-doc: #dcfce7;
+      
+      --pk-color: #d97706;
+      --fk-color: #2563eb;
+      --line-color: #475569;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Header Bar */
+    header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 64px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .title-area h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-area h1 span.subtitle {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: #f1f5f9;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    /* Canvas Viewport */
+    #viewport {
+      width: 100vw;
+      height: calc(100vh - 64px);
+      margin-top: 64px;
+      position: relative;
+      cursor: grab;
+      overflow: hidden;
+      background-image: radial-gradient(var(--grid-line) 1.5px, transparent 1.5px);
+      background-size: 24px 24px;
+    }
+    #viewport:active { cursor: grabbing; }
+
+    #container {
+      position: absolute;
+      transform-origin: 0 0;
+      width: 3200px;
+      height: 2200px;
+    }
+
+    /* SVG Lines Layer */
+    #svg-layer {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Diagram Tables */
+    .table-node {
+      position: absolute;
+      width: 290px;
+      background: var(--card-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+      z-index: 2;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .table-node:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      border-color: #64748b;
+    }
+
+    .table-node.is-central {
+      width: 320px;
+      border: 2px solid #1e3a8a;
+      box-shadow: 0 12px 20px -3px rgba(30, 58, 138, 0.2);
+    }
+
+    .table-header {
+      padding: 10px 14px;
+      border-top-left-radius: 7px;
+      border-top-right-radius: 7px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.92rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mod-orden .table-header { background: var(--header-main); }
+    .mod-cat .table-header { background: var(--header-cat); }
+    .mod-user .table-header { background: var(--header-user); }
+    .mod-msg .table-header { background: var(--header-msg); }
+    .mod-doc .table-header { background: var(--header-doc); }
+
+    .tag-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .mod-orden .tag-badge { background: var(--badge-main); color: #1e3a8a; }
+    .mod-cat .tag-badge { background: var(--badge-cat); color: #0f766e; }
+    .mod-user .tag-badge { background: var(--badge-user); color: #6b21a8; }
+    .mod-msg .tag-badge { background: var(--badge-msg); color: #c2410c; }
+    .mod-doc .tag-badge { background: var(--badge-doc); color: #15803d; }
+
+    .table-body {
+      padding: 6px 0;
+    }
+
+    .field-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 12px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .field-row:last-child { border-bottom: none; }
+
+    .field-name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #1e293b;
+    }
+
+    .key-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .key-pk { background: #fef3c7; color: var(--pk-color); border: 1px solid #fde68a; }
+    .key-fk { background: #eff6ff; color: var(--fk-color); border: 1px solid #bfdbfe; }
+
+    /* Legend Overlay */
+    .legend-card {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 18px;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      font-size: 0.82rem;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    /* Module Bounding Boxes */
+    .module-box {
+      position: absolute;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.4);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .module-box-label {
+      position: absolute;
+      top: -14px;
+      left: 20px;
+      background: #ffffff;
+      padding: 2px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .box-orden { border-color: #93c5fd; background: rgba(239, 246, 255, 0.4); }
+    .box-orden .module-box-label { color: #1e3a8a; border-color: #93c5fd; }
+
+    .box-cat { border-color: #99f6e4; background: rgba(240, 253, 250, 0.4); }
+    .box-cat .module-box-label { color: #0f766e; border-color: #99f6e4; }
+
+    .box-user { border-color: #e9d5ff; background: rgba(250, 245, 255, 0.4); }
+    .box-user .module-box-label { color: #6b21a8; border-color: #e9d5ff; }
+
+    .box-msg { border-color: #fed7aa; background: rgba(255, 247, 237, 0.4); }
+    .box-msg .module-box-label { color: #c2410c; border-color: #fed7aa; }
+
+    .box-doc { border-color: #bbf7d0; background: rgba(240, 253, 244, 0.4); }
+    .box-doc .module-box-label { color: #15803d; border-color: #bbf7d0; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title-area">
+      <h1>
+        Mantenimiento MER / ERD
+        <span class="subtitle">Modelo Entidad-Relación Profesional</span>
+      </h1>
+    </div>
+    <div class="controls">
+      <button class="btn" id="btn-zoom-in">🔍 Zoom +</button>
+      <button class="btn" id="btn-zoom-out">🔍 Zoom -</button>
+      <button class="btn" id="btn-reset">🎯 Recentrar</button>
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir / PDF</button>
+    </div>
+  </header>
+
+  <div id="viewport">
+    <div id="container">
+      
+      <!-- SVG Lines for Crow's Foot Relationships -->
+      <svg id="svg-layer">
+        <defs>
+          <!-- Crow's Foot Marker Many -->
+          <marker id="crows-foot-many" viewBox="0 0 20 20" refX="18" refY="10" markerWidth="12" markerHeight="12" orient="auto-start-reverse">
+            <path d="M 0 2 L 18 10 L 0 18 M 18 2 L 18 18" stroke="#475569" stroke-width="2.5" fill="none"/>
+          </marker>
+          <!-- One Marker -->
+          <marker id="crows-foot-one" viewBox="0 0 20 20" refX="18" refY="10" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+            <path d="M 10 2 L 10 18 M 18 2 L 18 18" stroke="#475569" stroke-width="2.5" fill="none"/>
+          </marker>
+        </defs>
+        <g id="lines-group"></g>
+      </svg>
+
+      <!-- MODULE BACKGROUND BOXES -->
+      <div class="module-box box-user" style="left: 60px; top: 380px; width: 360px; height: 1100px;">
+        <div class="module-box-label">Módulo de Usuarios</div>
+      </div>
+
+      <div class="module-box box-cat" style="left: 470px; top: 100px; width: 380px; height: 1880px;">
+        <div class="module-box-label">Catálogos Auxiliares</div>
+      </div>
+
+      <div class="module-box box-orden" style="left: 900px; top: 100px; width: 1140px; height: 1880px;">
+        <div class="module-box-label">Módulo Principal de Órdenes (Core)</div>
+      </div>
+
+      <div class="module-box box-msg" style="left: 2090px; top: 380px; width: 700px; height: 750px;">
+        <div class="module-box-label">Módulo de Mensajería</div>
+      </div>
+
+      <div class="module-box box-doc" style="left: 2090px; top: 1200px; width: 700px; height: 500px;">
+        <div class="module-box-label">Proyectos y Documentos</div>
+      </div>
+
+      <!-- TABLES NODES -->
+
+      <!-- MODULE: USUARIOS -->
+      <div class="table-node mod-user" id="tbl-roles_users" style="left: 95px; top: 430px;">
+        <div class="table-header">
+          <span>roles_users</span>
+          <span class="tag-badge">Tabla</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_roles</span></div>
+          <div class="field-row"><span class="field-name">description</span></div>
+          <div class="field-row"><span class="field-name">rol</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-user" id="tbl-users" style="left: 95px; top: 640px;">
+        <div class="table-header">
+          <span>users</span>
+          <span class="tag-badge">Tabla</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_usuario</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_rol_users</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_employee</span></div>
+          <div class="field-row"><span class="field-name">name</span></div>
+          <div class="field-row"><span class="field-name">email</span></div>
+          <div class="field-row"><span class="field-name">password</span></div>
+          <div class="field-row"><span class="field-name">Busines_mail</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-user" id="tbl-sessions" style="left: 95px; top: 1040px;">
+        <div class="table-header">
+          <span>sessions</span>
+          <span class="tag-badge">Tabla</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_sessions</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_usuario</span></div>
+          <div class="field-row"><span class="field-name">sessions</span></div>
+          <div class="field-row"><span class="field-name">token</span></div>
+        </div>
+      </div>
+
+      <!-- MODULE: CATÁLOGOS -->
+      <div class="table-node mod-cat" id="tbl-departaments" style="left: 510px; top: 150px;">
+        <div class="table-header">
+          <span>departaments</span>
+          <span class="tag-badge">Catálogo</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id</span></div>
+          <div class="field-row"><span class="field-name">Departament_ES</span></div>
+          <div class="field-row"><span class="field-name">Departament_EN</span></div>
+          <div class="field-row"><span class="field-name">Acronym</span></div>
+          <div class="field-row"><span class="field-name">Active</span></div>
+          <div class="field-row"><span class="field-name">slug</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> Parent_id</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+          <div class="field-row"><span class="field-name">update_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-cat" id="tbl-cat_areas" style="left: 510px; top: 520px;">
+        <div class="table-header">
+          <span>cat_areas</span>
+          <span class="tag-badge">Catálogo</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_areas</span></div>
+          <div class="field-row"><span class="field-name">area</span></div>
+          <div class="field-row"><span class="field-name">acronym</span></div>
+          <div class="field-row"><span class="field-name">color</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+          <div class="field-row"><span class="field-name">update_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-cat" id="tbl-cat_machines" style="left: 510px; top: 780px;">
+        <div class="table-header">
+          <span>cat_machines</span>
+          <span class="tag-badge">Catálogo</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_machines</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_area</span></div>
+          <div class="field-row"><span class="field-name">machines</span></div>
+          <div class="field-row"><span class="field-name">brand</span></div>
+          <div class="field-row"><span class="field-name">model</span></div>
+          <div class="field-row"><span class="field-name">year</span></div>
+          <div class="field-row"><span class="field-name">serial</span></div>
+          <div class="field-row"><span class="field-name">weight</span></div>
+          <div class="field-row"><span class="field-name">voltaje</span></div>
+          <div class="field-row"><span class="field-name">amperage</span></div>
+          <div class="field-row"><span class="field-name">frequency</span></div>
+          <div class="field-row"><span class="field-name">kva</span></div>
+          <div class="field-row"><span class="field-name">active</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+          <div class="field-row"><span class="field-name">updated_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-cat" id="tbl-type_maintances" style="left: 510px; top: 1360px;">
+        <div class="table-header">
+          <span>type_maintances</span>
+          <span class="tag-badge">Catálogo</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id</span></div>
+          <div class="field-row"><span class="field-name">type_maintances</span></div>
+          <div class="field-row"><span class="field-name">color</span></div>
+          <div class="field-row"><span class="field-name">enable</span></div>
+          <div class="field-row"><span class="field-name">acronym</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+          <div class="field-row"><span class="field-name">update_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-cat" id="tbl-type_machines" style="left: 510px; top: 1660px;">
+        <div class="table-header">
+          <span>type_machines</span>
+          <span class="tag-badge">Catálogo</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id</span></div>
+          <div class="field-row"><span class="field-name">machines</span></div>
+          <div class="field-row"><span class="field-name">description</span></div>
+        </div>
+      </div>
+
+      <!-- MODULE: PRINCIPAL ÓRDENES -->
+      <div class="table-node mod-orden is-central" id="tbl-Orden" style="left: 1300px; top: 580px;">
+        <div class="table-header">
+          <span>⭐ Orden</span>
+          <span class="tag-badge">Central</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_orden</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_maquina</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_departament</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_area</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_employee</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_type_maintenance</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_type_order</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_status_order</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_prioridad</span></div>
+          <div class="field-row"><span class="field-name">folio_orden</span></div>
+          <div class="field-row"><span class="field-name">descripcion_problema</span></div>
+          <div class="field-row"><span class="field-name">solicitante</span></div>
+          <div class="field-row"><span class="field-name">fecha_de_solicitud</span></div>
+          <div class="field-row"><span class="field-name">fecha_inicio</span></div>
+          <div class="field-row"><span class="field-name">fecha_finalizacion</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-orden" id="tbl-prioridad" style="left: 940px; top: 150px;">
+        <div class="table-header">
+          <span>prioridad</span>
+          <span class="tag-badge">Catálogo</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_prioridad</span></div>
+          <div class="field-row"><span class="field-name">prioridad</span></div>
+          <div class="field-row"><span class="field-name">descripcion</span></div>
+          <div class="field-row"><span class="field-name">color</span></div>
+          <div class="field-row"><span class="field-name">active</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-orden" id="tbl-orden_status_fecha" style="left: 940px; top: 380px;">
+        <div class="table-header">
+          <span>orden_status_fecha</span>
+          <span class="tag-badge">Historial</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_ordn_status_fecha</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_orden</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_status_order</span></div>
+          <div class="field-row"><span class="field-name">coment</span></div>
+          <div class="field-row"><span class="field-name">fecha_status</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-orden" id="tbl-orden_asignacion" style="left: 940px; top: 620px;">
+        <div class="table-header">
+          <span>orden_asignacion</span>
+          <span class="tag-badge">Asignación</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_ordn_asig</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_orden</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_employee</span></div>
+          <div class="field-row"><span class="field-name">fecha_asignacion</span></div>
+          <div class="field-row"><span class="field-name">fecha_reasignacion</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_status</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-orden" id="tbl-evidencia_orden" style="left: 940px; top: 880px;">
+        <div class="table-header">
+          <span>evidencia_orden</span>
+          <span class="tag-badge">Evidencia</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_eviden_ordn</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_orden</span></div>
+          <div class="field-row"><span class="field-name">url_evidencia_imagen</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-orden" id="tbl-orden_Solucion" style="left: 940px; top: 1080px;">
+        <div class="table-header">
+          <span>orden_Solucion</span>
+          <span class="tag-badge">Solución</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_ordern_solucion</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_orden</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_falla</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_coin</span></div>
+          <div class="field-row"><span class="field-name">costo_orden</span></div>
+          <div class="field-row"><span class="field-name">resolucion</span></div>
+          <div class="field-row"><span class="field-name">refacciones</span></div>
+          <div class="field-row"><span class="field-name">materiales</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-orden" id="tbl-evidencia_solucion_orden" style="left: 940px; top: 1400px;">
+        <div class="table-header">
+          <span>evidencia_solucion_orden</span>
+          <span class="tag-badge">Evidencia</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_eviden_soln_ordn</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_orden_solucion</span></div>
+          <div class="field-row"><span class="field-name">url_solucion_orden_imagen</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-orden" id="tbl-orders_coments" style="left: 940px; top: 1600px;">
+        <div class="table-header">
+          <span>orders_coments</span>
+          <span class="tag-badge">Comentarios</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_comentarios</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_orden</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_estatus_ordn</span></div>
+          <div class="field-row"><span class="field-name">coments</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> employee_id</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-orden" id="tbl-order_status" style="left: 1700px; top: 150px;">
+        <div class="table-header">
+          <span>order_status</span>
+          <span class="tag-badge">Catálogo</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_status_order</span></div>
+          <div class="field-row"><span class="field-name">nombre_status</span></div>
+          <div class="field-row"><span class="field-name">description</span></div>
+          <div class="field-row"><span class="field-name">color</span></div>
+          <div class="field-row"><span class="field-name">active</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+          <div class="field-row"><span class="field-name">update_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-orden" id="tbl-order_resolutions" style="left: 1700px; top: 430px;">
+        <div class="table-header">
+          <span>order_resolutions</span>
+          <span class="tag-badge">Resolución</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_ordn_resolutions</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> order_id</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_usuario</span></div>
+          <div class="field-row"><span class="field-name">id_business_mail</span></div>
+          <div class="field-row"><span class="field-name">confirmed</span></div>
+          <div class="field-row"><span class="field-name">auto_closed</span></div>
+          <div class="field-row"><span class="field-name">confirmed_at</span></div>
+          <div class="field-row"><span class="field-name">token</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+          <div class="field-row"><span class="field-name">update_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-orden" id="tbl-type_orders" style="left: 1700px; top: 760px;">
+        <div class="table-header">
+          <span>type_orders</span>
+          <span class="tag-badge">Catálogo</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id</span></div>
+          <div class="field-row"><span class="field-name">type</span></div>
+          <div class="field-row"><span class="field-name">acronym</span></div>
+          <div class="field-row"><span class="field-name">color</span></div>
+          <div class="field-row"><span class="field-name">active</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+          <div class="field-row"><span class="field-name">update_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-orden" id="tbl-type_failures" style="left: 1700px; top: 1040px;">
+        <div class="table-header">
+          <span>type_failures</span>
+          <span class="tag-badge">Catálogo</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id</span></div>
+          <div class="field-row"><span class="field-name">type</span></div>
+          <div class="field-row"><span class="field-name">color</span></div>
+          <div class="field-row"><span class="field-name">enable</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+          <div class="field-row"><span class="field-name">update_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-orden" id="tbl-coins" style="left: 1700px; top: 1300px;">
+        <div class="table-header">
+          <span>coins</span>
+          <span class="tag-badge">Catálogo</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_coins</span></div>
+          <div class="field-row"><span class="field-name">coin</span></div>
+          <div class="field-row"><span class="field-name">enable</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+          <div class="field-row"><span class="field-name">update_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-cat" id="tbl-cat_material" style="left: 1700px; top: 1540px;">
+        <div class="table-header">
+          <span>cat_material</span>
+          <span class="tag-badge">Catálogo</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_materiales</span></div>
+          <div class="field-row"><span class="field-name">material</span></div>
+          <div class="field-row"><span class="field-name">descripcion</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> order_id</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+          <div class="field-row"><span class="field-name">update_at</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-cat" id="tbl-spare_parts" style="left: 1700px; top: 1780px;">
+        <div class="table-header">
+          <span>spare_parts</span>
+          <span class="tag-badge">Catálogo</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_refaccion</span></div>
+          <div class="field-row"><span class="field-name">repair</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> order_id</span></div>
+          <div class="field-row"><span class="field-name">created_at</span></div>
+          <div class="field-row"><span class="field-name">update_at</span></div>
+        </div>
+      </div>
+
+      <!-- MODULE: MENSAJERÍA -->
+      <div class="table-node mod-msg" id="tbl-chat_messages_orden" style="left: 2130px; top: 430px;">
+        <div class="table-header">
+          <span>chat_messages_orden</span>
+          <span class="tag-badge">Chat</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_orden_messages</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_orden</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_usuario</span></div>
+          <div class="field-row"><span class="field-name">Business_mail</span></div>
+          <div class="field-row"><span class="field-name">asunto</span></div>
+          <div class="field-row"><span class="field-name">contenido</span></div>
+          <div class="field-row"><span class="field-name">fecha_envio</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_status_order</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_status_messages</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-msg" id="tbl-status_chat_messages" style="left: 2470px; top: 430px;">
+        <div class="table-header">
+          <span>status_chat_messages</span>
+          <span class="tag-badge">Estado Chat</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_status_messages</span></div>
+          <div class="field-row"><span class="field-name">status_messages</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-msg" id="tbl-evidencia_chat_orden" style="left: 2130px; top: 820px;">
+        <div class="table-header">
+          <span>evidencia_chat_orden</span>
+          <span class="tag-badge">Evidencia Chat</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_chat_orden</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_orden_messages</span></div>
+          <div class="field-row"><span class="field-name">url_evidencia_messages</span></div>
+        </div>
+      </div>
+
+      <!-- MODULE: PROYECTOS Y DOCUMENTOS -->
+      <div class="table-node mod-doc" id="tbl-proyectos" style="left: 2130px; top: 1260px;">
+        <div class="table-header">
+          <span>proyectos</span>
+          <span class="tag-badge">Proyecto</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_proyecto</span></div>
+          <div class="field-row"><span class="field-name">proyecto</span></div>
+          <div class="field-row"><span class="field-name"><span class="key-badge key-fk">FK</span> id_status_docuemnto</span></div>
+        </div>
+      </div>
+
+      <div class="table-node mod-doc" id="tbl-status_documentos" style="left: 2470px; top: 1260px;">
+        <div class="table-header">
+          <span>status_documentos</span>
+          <span class="tag-badge">Estado Doc</span>
+        </div>
+        <div class="table-body">
+          <div class="field-row"><span class="field-name"><span class="key-badge key-pk">PK</span> id_status_docuemnto</span></div>
+          <div class="field-row"><span class="field-name">status</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend-card">
+    <div class="legend-item"><span class="key-badge key-pk">PK</span> Primary Key</div>
+    <div class="legend-item"><span class="key-badge key-fk">FK</span> Foreign Key</div>
+    <div class="legend-item">
+      <svg width="24" height="12" viewBox="0 0 24 12"><path d="M 0 6 L 14 6 M 14 2 L 22 6 L 14 10" stroke="#475569" stroke-width="2" fill="none"/></svg>
+      Relación 1:N (Crow's Foot)
+    </div>
+    <div class="legend-item">
+      <svg width="24" height="12" viewBox="0 0 24 12"><path d="M 0 6 L 24 6 M 18 2 L 18 10 M 22 2 L 22 10" stroke="#475569" stroke-width="2" fill="none"/></svg>
+      Relación 1:1
+    </div>
+  </div>
+
+  <script>
+    // List of explicit relationships defined in specs
+    const relationships = [
+      { from: 'tbl-users', to: 'tbl-roles_users', type: '1:N' },
+      { from: 'tbl-users', to: 'tbl-sessions', type: '1:N' },
+      { from: 'tbl-Orden', to: 'tbl-cat_machines', type: '1:N' },
+      { from: 'tbl-Orden', to: 'tbl-departaments', type: '1:N' },
+      { from: 'tbl-Orden', to: 'tbl-cat_areas', type: '1:N' },
+      { from: 'tbl-Orden', to: 'tbl-type_maintances', type: '1:N' },
+      { from: 'tbl-Orden', to: 'tbl-type_orders', type: '1:N' },
+      { from: 'tbl-Orden', to: 'tbl-order_status', type: '1:N' },
+      { from: 'tbl-Orden', to: 'tbl-prioridad', type: '1:N' },
+      { from: 'tbl-orden_status_fecha', to: 'tbl-Orden', type: '1:N' },
+      { from: 'tbl-orden_status_fecha', to: 'tbl-order_status', type: '1:N' },
+      { from: 'tbl-evidencia_orden', to: 'tbl-Orden', type: '1:N' },
+      { from: 'tbl-orden_asignacion', to: 'tbl-Orden', type: '1:N' },
+      { from: 'tbl-orden_Solucion', to: 'tbl-Orden', type: '1:N' },
+      { from: 'tbl-orden_Solucion', to: 'tbl-type_failures', type: '1:N' },
+      { from: 'tbl-orden_Solucion', to: 'tbl-coins', type: '1:N' },
+      { from: 'tbl-evidencia_solucion_orden', to: 'tbl-orden_Solucion', type: '1:N' },
+      { from: 'tbl-chat_messages_orden', to: 'tbl-Orden', type: '1:N' },
+      { from: 'tbl-chat_messages_orden', to: 'tbl-users', type: '1:N' },
+      { from: 'tbl-chat_messages_orden', to: 'tbl-order_status', type: '1:N' },
+      { from: 'tbl-chat_messages_orden', to: 'tbl-status_chat_messages', type: '1:N' },
+      { from: 'tbl-evidencia_chat_orden', to: 'tbl-chat_messages_orden', type: '1:N' },
+      { from: 'tbl-orders_coments', to: 'tbl-Orden', type: '1:N' },
+      { from: 'tbl-order_resolutions', to: 'tbl-Orden', type: '1:N' },
+      { from: 'tbl-order_resolutions', to: 'tbl-users', type: '1:N' },
+      { from: 'tbl-proyectos', to: 'tbl-status_documentos', type: '1:N' },
+      { from: 'tbl-cat_machines', to: 'tbl-cat_areas', type: '1:N' }
+    ];
+
+    function renderLines() {
+      const group = document.getElementById('lines-group');
+      group.innerHTML = '';
+
+      relationships.forEach(rel => {
+        const fromElem = document.getElementById(rel.from);
+        const toElem = document.getElementById(rel.to);
+        if (!fromElem || !toElem) return;
+
+        const fRect = {
+          x: parseFloat(fromElem.style.left),
+          y: parseFloat(fromElem.style.top),
+          w: fromElem.offsetWidth,
+          h: fromElem.offsetHeight
+        };
+        const tRect = {
+          x: parseFloat(toElem.style.left),
+          y: parseFloat(toElem.style.top),
+          w: toElem.offsetWidth,
+          h: toElem.offsetHeight
+        };
+
+        // Determine best attachment anchor points
+        let p1 = { x: fRect.x + fRect.w/2, y: fRect.y + fRect.h/2 };
+        let p2 = { x: tRect.x + tRect.w/2, y: tRect.y + tRect.h/2 };
+
+        if (fRect.x + fRect.w < tRect.x) {
+          p1 = { x: fRect.x + fRect.w, y: fRect.y + fRect.h/2 };
+          p2 = { x: tRect.x, y: tRect.y + tRect.h/2 };
+        } else if (fRect.x > tRect.x + tRect.w) {
+          p1 = { x: fRect.x, y: fRect.y + fRect.h/2 };
+          p2 = { x: tRect.x + tRect.w, y: tRect.y + tRect.h/2 };
+        } else if (fRect.y + fRect.h < tRect.y) {
+          p1 = { x: fRect.x + fRect.w/2, y: fRect.y + fRect.h };
+          p2 = { x: tRect.x + tRect.w/2, y: tRect.y };
+        } else {
+          p1 = { x: fRect.x + fRect.w/2, y: fRect.y };
+          p2 = { x: tRect.x + tRect.w/2, y: tRect.y + tRect.h };
+        }
+
+        const dx = Math.abs(p2.x - p1.x) / 2;
+        
+        let pathD = '';
+        if (Math.abs(p1.y - p2.y) < 30) {
+          pathD = `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`;
+        } else {
+          pathD = `M ${p1.x} ${p1.y} C ${p1.x + (p2.x > p1.x ? dx : -dx)} ${p1.y}, ${p2.x - (p2.x > p1.x ? dx : -dx)} ${p2.y}, ${p2.x} ${p2.y}`;
+        }
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', pathD);
+        path.setAttribute('stroke', '#475569');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('fill', 'none');
+        path.setAttribute('marker-start', 'url(#crows-foot-many)');
+        path.setAttribute('marker-end', 'url(#crows-foot-one)');
+        group.appendChild(path);
+      });
+    }
+
+    // Pan & Zoom Implementation
+    let zoom = 0.75;
+    let panX = 40;
+    let panY = 20;
+    let isDragging = false;
+    let startX, startY;
+
+    const viewport = document.getElementById('viewport');
+    const container = document.getElementById('container');
+
+    function updateTransform() {
+      container.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+    }
+
+    viewport.addEventListener('mousedown', e => {
+      if (e.target.closest('.table-node')) return;
+      isDragging = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+    });
+
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      updateTransform();
+    });
+
+    window.addEventListener('mouseup', () => isDragging = false);
+
+    viewport.addEventListener('wheel', e => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+      zoom = Math.min(Math.max(0.3, zoom * zoomFactor), 2.0);
+      updateTransform();
+    }, { passive: false });
+
+    document.getElementById('btn-zoom-in').addEventListener('click', () => { zoom = Math.min(2.0, zoom + 0.15); updateTransform(); });
+    document.getElementById('btn-zoom-out').addEventListener('click', () => { zoom = Math.max(0.3, zoom - 0.15); updateTransform(); });
+    document.getElementById('btn-reset').addEventListener('click', () => { zoom = 0.75; panX = 40; panY = 20; updateTransform(); });
+
+    window.addEventListener('load', () => {
+      renderLines();
+      updateTransform();
+    });
+  </script>
+</body>
+</html>
