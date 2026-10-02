@@ -24,7 +24,7 @@ export class OrdenesService {
   }
 
   public ObtenerListaGeneralOrdenes(data: any): Observable<any> {
-  return this.http.post<any>(`${api}/ordenes/ObtenerListaGeneralOrdenes`, data); 
+    return this.http.post<any>(`${api}/ordenes/ObtenerListaGeneralOrdenes`, data); 
   }
 
   public obtenerDetalleOrden($pkOrden: number): Observable<any> {
@@ -39,7 +39,7 @@ export class OrdenesService {
     return this.http.delete<any>(`${api}/ordenes/eliminarEvidenciaOrden/${id_eviden_order}`);
   }
 
-    public cancelarOrden(id: number): Observable<any> {
+  public cancelarOrden(id: number): Observable<any> {
     return this.http.post<any>(`${api}/ordenes/cancelarOrden/${id}`, {});
   }
 
@@ -55,4 +55,19 @@ export class OrdenesService {
     return this.http.get<any>(`${api}/ordenes/obtenerMaquinasPorAreaYCategoria/${idArea}/${idCatMachines}`);
   }
 
+  public obtenerMensajesOrden(id_order: number): Observable<any> {
+    return this.http.get<any>(`${api}/ordenes/obtenerMensajesOrden/${id_order}`);
+  }
+
+  public enviarMensajeOrden(data: any): Observable<any> {
+    return this.http.post<any>(`${api}/ordenes/enviarMensajeOrden`, data);
+  }
+
+  public cambiarStatusYSolucionarOrden(data: any): Observable<any> {
+    return this.http.post<any>(`${api}/ordenes/cambiarStatusYSolucionarOrden`, data);
+  }
+
+  public obtenerListaMonedas(): Observable<any> {
+    return this.http.get<any>(`${api}/monedas/obtenerListaMonedas`);
+  }
 }

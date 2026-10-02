@@ -1,0 +1,23 @@
+.status-segment-switch {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+}
+
+.status-segment-switch .btn {
+    border: none;
+    color: #64748b;
+    font-size: 0.813rem;
+    font-weight: 500;
+    box-shadow: none !important;
+}
+
+.status-segment-switch .btn.active-pill {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+.status-segment-switch .btn:hover:not(.active-pill) {
+    color: #1e293b;
+    background-color: #f1f5f9;
+}

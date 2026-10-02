@@ -11,31 +11,36 @@ export class UsuariosService {
     private http: HttpClient
   ){}
 
-  	public registrarUsuario(usuario: any): Observable<any> {
-		return this.http.post<any>(`${api}/usuarios/registrarUsuario`, usuario);
-	}
+  public registrarUsuario(usuario: any): Observable<any> {
+      return this.http.post<any>(`${api}/usuarios/registrarUsuario`, usuario);
+  }
 
   public obtenerListaGeneralUsuarios(): Observable<any>{
     return this.http.get<any>(`${api}/usuarios/obtenerListaGeneralUsuarios`);
   }
 
-	public obtenerDetalleUsuario(pkUsuario: number): Observable<any> {
-		return this.http.get<any>(`${api}/usuarios/obtenerDetalleUsuario/${pkUsuario}`);
-	}
+  public obtenerDetalleUsuario(pkUsuario: number): Observable<any> {
+      return this.http.get<any>(`${api}/usuarios/obtenerDetalleUsuario/${pkUsuario}`);
+  }
 
-  	public actualizarUsuario(usuario: any): Observable<any> {
-		return this.http.put<any>(`${api}/usuarios/actualizarUsuario`, usuario);
-	}
+  public actualizarUsuario(usuario: any): Observable<any> {
+      return this.http.put<any>(`${api}/usuarios/actualizarUsuario`, usuario);
+  }
 
   public cambiarStatusUsuario(id: number): Observable<any> {
-		return this.http.get<any>(`${api}/usuarios/cambiarStatusUsuario/${id}`)
-	}
+      return this.http.get<any>(`${api}/usuarios/cambiarStatusUsuario/${id}`)
+  }
 
   public obtenerRecursosRegistroUsuario(): Observable<any> {
     return this.http.get<any>(`${api}/usuarios/obtenerRecursosRegistroUsuario`);
   }
 
+  // --- NUEVO MÉTODO PARA CONSULTAR PERMISOS DEL USUARIO EN SESIÓN ---
+  public obtenerPermisosUsuarioActual(): Observable<any> {
+      return this.http.get<any>(`${api}/usuarios/obtenerPermisosUsuarioActual`);
+  }
+
   public cerrarSesion(): Observable<any> {
-		return this.http.post<any>(`${api}/usuarios/cerrarSesion`, {});
-	}
+      return this.http.post<any>(`${api}/usuarios/cerrarSesion`, {});
+  }
 }

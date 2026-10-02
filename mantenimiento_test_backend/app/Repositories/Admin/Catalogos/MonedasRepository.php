@@ -16,22 +16,31 @@
                 return $registro->id_coins;
             }
 
-            public function obtenerListaMonedas()
-            {
-                $query = CatMonedas::select(
-                'id_coins',
-                'coin',
-                'active',
-                DB::raw("
-                                        CASE
-                                            WHEN active = 1 THEN 'Activo'
-                                            ELSE 'Inactivo'
-                                            END AS estado
-                ")
-            );
+            public function obtenerListaMonedas(?string $busqueda = null, ?string $estado = null) {
+                    $query = CatMonedas::select(
+                        'id_coins',
+                        'coin',
+                        'active',
+                        DB::raw("
+                            CASE
+                                WHEN active = 1 THEN 'Activo'
+                                ELSE 'Inactivo'
+                            END AS estado
+                        ")
+                    );
 
-                return $query->get();
-            }
+                    if (!empty($busqueda)) {
+                        $query->where('coin', 'LIKE', '%' . $busqueda . '%');
+                    }
+
+                    if ($estado === 'activos') {
+                        $query->where('active', 1);
+                    } elseif ($estado === 'inactivos') {
+                        $query->where('active', 0);
+                    }
+
+                    return $query->get();
+                }
 
             public function obtenerDetalleMoneda(int $pkMoneda) {
                 $query = CatMonedas::select(

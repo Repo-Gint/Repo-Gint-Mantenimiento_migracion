@@ -3,141 +3,142 @@
         <div class="sb-sidenav-menu">
             <div class="nav">
                 <div class="sb-sidenav-menu-heading">Core</div>
-                <a class="nav-link" href="#">
-                    <i class="bi bi-house-door-fill"></i>&nbsp;
-                    Inicio
+                <a class="nav-link cursor-pointer" routerLink="/inicio">
+                    <i class="bi bi-house-door-fill"></i>&nbsp; Inicio
                 </a>
                 
+                <!-- Ordenes (Visible siempre o condicionado) -->
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseOrdenes"
                     aria-expanded="false" aria-controls="collapseOrdenes">
-                    <i class="bi bi-coin"></i>&nbsp;
-                    Ordenes
+                    <i class="bi bi-coin"></i>&nbsp; Ordenes
                     <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
                 </a>
                 <div class="collapse" id="collapseOrdenes" aria-labelledby="headingOne"
                     data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" (click)="abrirModalRegistrarOrden()">Registar Orden</a>
-                        <a class="nav-link" routerLink="consulta-ordenes">Consultar Ordenes</a>
+                        <a class="nav-link cursor-pointer" (click)="abrirModalRegistrarOrden()">Registar Orden</a>
+                        <a class="nav-link cursor-pointer" routerLink="consulta-ordenes">Consultar Ordenes</a>
                     </nav>
                 </div>
 
                 <div class="sb-sidenav-menu-heading">Catalogos</div>
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAreas"
-                    aria-expanded="false" aria-controls="collapseAreas">
-                    <i class="bi bi-person-workspace"></i>&nbsp;
-                    Areas
-                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
-                </a>
-                <div class="collapse" id="collapseAreas" aria-labelledby="headingOne"
-                    data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" (click)="abrirModalRegistrarArea()">Registar Area</a>
-                        <a class="nav-link" routerLink="consulta-areas">Consultar Areas</a>
-                    </nav>
-                </div>
 
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseUsuarios"
-                    aria-expanded="false" aria-controls="collapseUsuarios">
-                    <i class="bi bi-people-fill"></i>&nbsp;
-                    Usuarios
-                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
-                </a>
+                <!-- Usuarios (Se oculta si el usuario no tiene el permiso 'gestionar_usuarios') -->
+                <ng-container *ngIf="tienePermiso('gestionar_usuarios')">
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseUsuarios"
+                        aria-expanded="false" aria-controls="collapseUsuarios">
+                        <i class="bi bi-people-fill"></i>&nbsp; Usuarios
+                        <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseUsuarios" aria-labelledby="headingOne"
+                        data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link cursor-pointer" (click)="abrirModalRegistrarUsuario()">Registar Usuario</a>
+                            <a class="nav-link cursor-pointer" routerLink="consulta-usuarios">Consultar Usuarios</a>
+                        </nav>
+                    </div>
+                </ng-container>
 
-                <div class="collapse" id="collapseUsuarios" aria-labelledby="headingOne"
-                    data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" (click)="abrirModalRegistrarUsuario()">Registar Usuario</a>
-                        <a class="nav-link" routerLink="consulta-usuarios">Consultar Usuarios</a>
-                    </nav>
-                </div>
+                <!-- Resto de Catálogos (Se ocultan si el usuario no tiene el permiso 'gestionar_catalogos') -->
+                <ng-container *ngIf="tienePermiso('gestionar_catalogos')">
+                    <!-- Areas -->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAreas"
+                        aria-expanded="false" aria-controls="collapseAreas">
+                        <i class="bi bi-person-workspace"></i>&nbsp; Areas
+                        <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseAreas" aria-labelledby="headingOne"
+                        data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link cursor-pointer" (click)="abrirModalRegistrarArea()">Registar Area</a>
+                            <a class="nav-link cursor-pointer" routerLink="consulta-areas">Consultar Areas</a>
+                        </nav>
+                    </div>
 
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseDepartamentos"
-                    aria-expanded="false" aria-controls="collapseDepartamentos">
-                    <i class="bi bi-building"></i>&nbsp;
-                    Departamentos
-                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
-                </a>
-                <div class="collapse" id="collapseDepartamentos" aria-labelledby="headingOne"
-                    data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" (click)="abrirModalRegistrarDepartamento()">Registar Departamento</a>
-                        <a class="nav-link" routerLink="consulta-departamentos">Consultar Departamentos</a>
-                    </nav>
-                </div>
+                    <!-- Departamentos -->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseDepartamentos"
+                        aria-expanded="false" aria-controls="collapseDepartamentos">
+                        <i class="bi bi-building"></i>&nbsp; Departamentos
+                        <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseDepartamentos" aria-labelledby="headingOne"
+                        data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link cursor-pointer" (click)="abrirModalRegistrarDepartamento()">Registar Departamento</a>
+                            <a class="nav-link cursor-pointer" routerLink="consulta-departamentos">Consultar Departamentos</a>
+                        </nav>
+                    </div>
 
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseMaquinas"
-                    aria-expanded="false" aria-controls="collapseMaquinas">
-                    <i class="bi bi-tools"></i>&nbsp;
-                    Maquinas
-                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
-                </a>
-                <div class="collapse" id="collapseMaquinas" aria-labelledby="headingOne"
-                    data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" (click)="abrirModalRegistrarMaquinas()">Registar Maquina</a>
-                        <a class="nav-link" routerLink="consulta-maquinas">Consultar Maquinas</a>
-                    </nav>
-                </div>
+                    <!-- Maquinas -->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseMaquinas"
+                        aria-expanded="false" aria-controls="collapseMaquinas">
+                        <i class="bi bi-tools"></i>&nbsp; Maquinas
+                        <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseMaquinas" aria-labelledby="headingOne"
+                        data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link cursor-pointer" (click)="abrirModalRegistrarMaquinas()">Registar Maquina</a>
+                            <a class="nav-link cursor-pointer" routerLink="consulta-maquinas">Consultar Maquinas</a>
+                        </nav>
+                    </div>
 
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseCatMaquinas"
-                    aria-expanded="false" aria-controls="collapseCatMaquinas">
-                    <i class="bi bi-tools"></i>&nbsp;
-                    Catalogo Maquinas
-                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
-                </a>
-                <!-- Corregido: id cambiado a collapseCatMaquinas para coincidir con el data-bs-target de arriba -->
-                <div class="collapse" id="collapseCatMaquinas" aria-labelledby="headingOne"
-                    data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" (click)="abrirModalRegistrarCatalogoMaquina()">Registar Catalogo Maquina</a>
-                        <a class="nav-link" routerLink="consulta-catmaquinas">Consultar Catalogo Maquina</a>
-                    </nav>
-                </div>
+                    <!-- Catalogo Maquinas -->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseCatMaquinas"
+                        aria-expanded="false" aria-controls="collapseCatMaquinas">
+                        <i class="bi bi-tools"></i>&nbsp; Catalogo Maquinas
+                        <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseCatMaquinas" aria-labelledby="headingOne"
+                        data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link cursor-pointer" (click)="abrirModalRegistrarCatalogoMaquina()">Registar Catalogo Maquina</a>
+                            <a class="nav-link cursor-pointer" routerLink="consulta-catmaquinas">Consultar Catalogo Maquina</a>
+                        </nav>
+                    </div>
 
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseMonedas"
-                    aria-expanded="false" aria-controls="collapseMonedas">
-                    <i class="bi bi-coin"></i>&nbsp;
-                    Monedas
-                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
-                </a>
-                <div class="collapse" id="collapseMonedas" aria-labelledby="headingOne"
-                    data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" (click)="abrirModalRegistrarMonedas()">Registar Moneda</a>
-                        <a class="nav-link" routerLink="consulta-monedas">Consultar Monedas</a>
-                    </nav>
-                </div>
+                    <!-- Monedas -->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseMonedas"
+                        aria-expanded="false" aria-controls="collapseMonedas">
+                        <i class="bi bi-coin"></i>&nbsp; Monedas
+                        <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseMonedas" aria-labelledby="headingOne"
+                        data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link cursor-pointer" (click)="abrirModalRegistrarMonedas()">Registar Moneda</a>
+                            <a class="nav-link cursor-pointer" routerLink="consulta-monedas">Consultar Monedas</a>
+                        </nav>
+                    </div>
 
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-                    data-bs-target="#collapseTipoMantenimiento" aria-expanded="false"
-                    aria-controls="collapseTipoMantenimiento">
-                    <i class="bi bi-wrench-adjustable"></i>&nbsp;
-                    Tipo Mantenimiento
-                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
-                </a>
+                    <!-- Tipo Mantenimiento -->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                        data-bs-target="#collapseTipoMantenimiento" aria-expanded="false"
+                        aria-controls="collapseTipoMantenimiento">
+                        <i class="bi bi-wrench-adjustable"></i>&nbsp; Tipo Mantenimiento
+                        <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseTipoMantenimiento" data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link cursor-pointer" (click)="abrirModalRegistrartipoMantenimiento()">Registrar Tipo de Mantenimiento</a>
+                            <a class="nav-link cursor-pointer" routerLink="/consulta-tipo-mantenimiento">Consultar Tipo de Mantenimiento</a>
+                        </nav>
+                    </div>
 
-                <div class="collapse" id="collapseTipoMantenimiento" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" (click)="abrirModalRegistrartipoMantenimiento()">Registrar Tipo de Mantenimiento</a>
-                        <a class="nav-link" routerLink="/consulta-tipo-mantenimiento">Consultar Tipo de Mantenimiento</a>
-                    </nav>
-                </div>
-
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-                    data-bs-target="#collapseTipoOrden" aria-expanded="false"
-                    aria-controls="collapseTipoOrden">
-                    <i class="bi bi-wrench-adjustable"></i>&nbsp;
-                    Tipo Orden
-                    <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
-                </a>
-
-                <div class="collapse" id="collapseTipoOrden" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" (click)="abrirModalRegistrartipoOrden()">Registrar Tipo de Orden</a>
-                        <a class="nav-link" routerLink="/consulta-tipo-orden">Consultar Tipo de Orden</a>
-                    </nav>
-                </div>
+                    <!-- Tipo Orden -->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                        data-bs-target="#collapseTipoOrden" aria-expanded="false"
+                        aria-controls="collapseTipoOrden">
+                        <i class="bi bi-wrench-adjustable"></i>&nbsp; Tipo Orden
+                        <div class="sb-sidenav-collapse-arrow"><i class="bi bi-caret-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseTipoOrden" data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link cursor-pointer" (click)="abrirModalRegistrartipoOrden()">Registrar Tipo de Orden</a>
+                            <a class="nav-link cursor-pointer" routerLink="/consulta-tipo-orden">Consultar Tipo de Orden</a>
+                        </nav>
+                    </div>
+                </ng-container>
 
             </div>
         </div>

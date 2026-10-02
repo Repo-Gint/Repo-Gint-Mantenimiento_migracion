@@ -1,40 +1,100 @@
-<p>dropdown works!</p>
-<div class="dropdown" (shown.bs.dropdown)="onDropdownShown()">
-    <button #dropdownButton class="btn btn-outline-dark dropdown-toggle btn-sm" type="button" id="dropdownMenuButton"
-        data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false"
-        [disabled]="disabled">
-        <ng-container *ngIf="type == 'many'; else simple">
-            {{ getSelectedOptions().length }} Seleccionado{{ getSelectedOptions().length !== 1 ? 's' : '' }}
-        </ng-container>
-        <ng-template #simple>
-            {{ getSelectedOptions()[0]?.label ?? 'Seleccione una opción' }}
-        </ng-template>
-    </button>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <li class="form-check" *ngIf="type == 'many'">
-            <input class="form-check-input" type="checkbox" value="select-all" id="{{'select-all'+'-'+font}}"
-                [checked]="allOptionsSelected()" (change)="selectAllChanged($event)">
-            <label class="form-check-label" for="{{'select-all'+'-'+font}}">Seleccionar todo</label>
-        </li>
-        <div class="dropdown-search" *ngIf="search">
-            <input #searchInput class="form-control form-control-sm" type="search" placeholder="Buscar..."
-                aria-label="Buscar" (input)="filterOptions($event)">
+<div class="dropdown custom-dropdown-wrapper" (shown.bs.dropdown)="onDropdownShown()">
+    <!-- Botón Principal Estilo Pastilla con Chips de Selección Animados -->
+    <button #dropdownButton class="btn dropdown-toggle btn-sm d-flex align-items-center justify-content-between gap-2 shadow-xs transition-all" 
+            type="button" id="dropdownMenuButton"
+            data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-haspopup="true" aria-expanded="false"
+            [disabled]="disabled">
+        <div class="d-flex align-items-center gap-2 text-truncate flex-wrap py-1">
+            <span class="fw-bold text-dark d-flex align-items-center gap-1">
+                <i class="bi bi-people-fill text-primary"></i>
+                {{ getSelectedOptions().length }} Seleccionado{{ getSelectedOptions().length !== 1 ? 's' : '' }}:
+            </span>
+            
+            <!-- Chips de elementos seleccionados dentro del botón -->
+            <div class="d-flex align-items-center gap-1 flex-wrap" *ngIf="getSelectedOptions().length > 0">
+                <span *ngFor="let sel of getSelectedOptions().slice(0, 3)" class="badge bg-light text-dark border d-inline-flex align-items-center gap-1 py-1 px-2 rounded-pill shadow-xxs animate-scale-in">
+                    <span class="avatar-mini bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center fs-xxs fw-bold" style="width: 14px; height: 14px;">
+                        {{ (sel.label || '').charAt(0).toUpperCase() }}
+                    </span>
+                    {{ sel.label }}
+                    <i class="bi bi-x cursor-pointer text-muted hover-danger" (click)="$event.stopPropagation(); removeOption(sel)"></i>
+                </span>
+                <span *ngIf="getSelectedOptions().length > 3" class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1 fs-xxs fw-bold">
+                    +{{ getSelectedOptions().length - 3 }} más
+                </span>
+            </div>
+            <span *ngIf="getSelectedOptions().length === 0" class="text-muted fw-normal">Ninguno seleccionado</span>
         </div>
-        <ul class="dropdown-list" *ngIf="filteredOptions.length > 0">
+        <i class="bi bi-chevron-down text-muted transition-transform"></i>
+    </button>
+
+    <!-- Menú Desplegable Flotante -->
+    <div class="dropdown-menu shadow-lg border-0 rounded-4 p-3 animate-fade-in" aria-labelledby="dropdownMenuButton">
+        <!-- Cabecera Seleccionar Todo -->
+        <div *ngIf="type == 'many'" class="dropdown-header-all d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom">
+            <div class="form-check d-flex align-items-center gap-2 m-0 p-0">
+                <input class="form-check-input custom-checkbox shadow-none" type="checkbox" value="select-all" id="{{'select-all'+'-'+font}}"
+                    [checked]="allOptionsSelected()" (change)="selectAllChanged($event)">
+                <label class="form-check-label fw-bold text-dark cursor-pointer select-none small" for="{{'select-all'+'-'+font}}">
+                    Seleccionar todo
+                </label>
+            </div>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 fs-xxs fw-bold">
+                {{ options.length }} Opciones
+            </span>
+        </div>
+
+        <!-- Buscador Interno Animado -->
+        <div class="dropdown-search mb-2" *ngIf="search">
+            <div class="input-group input-group-sm search-animated-box">
+                <span class="input-group-text bg-transparent border-end-0 text-muted ps-3">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input #searchInput class="form-control form-control-sm border-start-0 shadow-none bg-transparent ps-2" type="search" placeholder="Buscar opción..."
+                    aria-label="Buscar" (input)="filterOptions($event)">
+            </div>
+        </div>
+
+        <!-- Lista de Opciones -->
+        <ul class="dropdown-list list-unstyled m-0 p-0" *ngIf="filteredOptions.length > 0">
             <ng-container *ngFor="let option of filteredOptions">
                 <li *ngIf="!option.disabled || (option.disabled && option.checked)"
-                    class="form-check listaSocios w-100">
-                    <input class="form-check-input" type="checkbox" [value]="option.value"
-                        id="{{option.value + '-' + font}}" [checked]="option.checked" (change)="optionChanged(option)"
-                        [disabled]="(type == 'simple' && option.checked) || option.disabled">
-                    <label class="form-check-label w-100" for="{{option.value + '-' + font}}">
-                        {{ option.label }}
-                    </label>
+                    class="dropdown-item-custom rounded-3 px-2 py-2 mb-1 d-flex align-items-center justify-content-between transition-all">
+                    <div class="form-check d-flex align-items-center gap-2 w-100 m-0 p-0 cursor-pointer">
+                        <input class="form-check-input custom-checkbox shadow-none m-0" type="checkbox" [value]="option.value"
+                            id="{{option.value + '-' + font}}" [checked]="option.checked" (change)="optionChanged(option)"
+                            [disabled]="(type == 'simple' && option.checked) || option.disabled">
+                        
+                        <label class="form-check-label w-100 cursor-pointer select-none d-flex align-items-center justify-content-between" for="{{option.value + '-' + font}}">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-circle bg-primary-subtle text-primary fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                    {{ (option.label || '').charAt(0).toUpperCase() }}
+                                </div>
+                                <div>
+                                    <span class="d-block fw-bold text-dark small">{{ option.label }}</span>
+                                    <span class="d-block text-muted fs-xxs" *ngIf="option.subtitle || option.description">{{ option.subtitle || option.description }}</span>
+                                </div>
+                            </div>
+                            <!-- Badge de Estado Opcional -->
+                            <span *ngIf="option.status" class="badge px-2 py-1 fs-xxs" [ngClass]="option.statusClass || 'bg-success-subtle text-success border border-success-subtle'">
+                                <i class="bi bi-circle-fill fs-xxs me-1"></i> {{ option.status }}
+                            </span>
+                        </label>
+                    </div>
                 </li>
             </ng-container>
         </ul>
-        <div class="col-12 t-center" *ngIf="filteredOptions.length == 0">
-            <span style="font-weight: lighter;">Nada para seleccionar</span>
+
+        <!-- Estado Vacío -->
+        <div class="text-center py-4 text-muted" *ngIf="filteredOptions.length == 0">
+            <i class="bi bi-inbox fs-4 d-block mb-1 text-secondary opacity-50"></i>
+            <span class="small fw-light">Nada para seleccionar</span>
+        </div>
+
+        <!-- Pie / Hint Estilo SCADA -->
+        <div class="dropdown-footer-hint pt-2 mt-2 border-top d-flex justify-content-between align-items-center text-muted fs-xxs">
+            <span><i class="bi bi-arrow-down-up me-1"></i> Flechas para navegar</span>
+            <span>Presione <kbd class="px-1 py-0.5 bg-light border rounded text-dark font-monospace">Tab</kbd> para salir</span>
         </div>
     </div>
 </div>

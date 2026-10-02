@@ -33,37 +33,23 @@ class TipoMantenimientoController extends Controller
         }
     }
 
-    public function obtenerListatipoMantenimientos() {
+    public function obtenerListatipoMantenimientos(Request $request) {
         try {
-            return $this->tipoMantenimientoService->obtenerListaMantenimientos();
+            return $this->tipoMantenimientoService->obtenerListaMantenimientos($request->all());
         } catch (\Throwable $error) {
-            Log::alert('*********************************************');
             Log::alert('Error al obtener información del Tipo de Mantenimiento');
             Log::alert($error);
-            return response()->json(
-                [
-                    'error' => $error,
-                    'mensaje' => 'Ocurrió un error interno'
-                ],
-                500
-            );
+            return response()->json(['error' => $error, 'mensaje' => 'Ocurrió un error interno'], 500);
         }
     }
 
     public function obtenerDetalletipoMantenimiento($pktipoMantenimiento) {
-    try {
+        try {
             return $this->tipoMantenimientoService->obtenerDetalletipoMantenimiento($pktipoMantenimiento);
         } catch (\Throwable $error) {
-            Log::alert('*********************************************');
             Log::alert('Error al obtener información de detalle de Tipo de Mantenimiento');
             Log::alert($error);
-            return response()->json(
-                [
-                    'error' => $error,
-                    'mensaje' => 'Ocurrió un error interno'
-                ],
-                500
-            );
+            return response()->json(['error' => $error, 'mensaje' => 'Ocurrió un error interno'], 500);
         }
     }
 
@@ -71,16 +57,9 @@ class TipoMantenimientoController extends Controller
         try {
             return $this->tipoMantenimientoService->actualizartipoMantenimiento($request->all());
         } catch (\Throwable $error) {
-            Log::alert('*********************************************');
             Log::alert('Error al actualizar Tipo de Mantenimiento');
             Log::alert($error->getMessage());
-
-            return response()->json(
-                [
-                    'mensaje' => 'Ocurrio un error interno'
-                ],
-                500
-            );
+            return response()->json(['mensaje' => 'Ocurrió un error interno'], 500);
         }
     }
 
@@ -88,16 +67,9 @@ class TipoMantenimientoController extends Controller
         try {
             return $this->tipoMantenimientoService->cambiarStatustipoMantenimiento($pktipoMantenimiento);
         } catch (\Throwable $error) {
-            Log::alert('*********************************************');
             Log::alert('Error al cambiar Status De Tipo de Mantenimiento');
             Log::alert($error->getMessage());
-
-            return response()->json(
-                [
-                    'mensaje' => 'Ocurrio un error interno'
-                ],
-                500
-            );
+            return response()->json(['mensaje' => 'Ocurrió un error interno'], 500);
         }
     }
 }

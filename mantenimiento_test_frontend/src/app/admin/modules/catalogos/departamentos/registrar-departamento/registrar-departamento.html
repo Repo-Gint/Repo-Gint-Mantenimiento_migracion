@@ -1,58 +1,106 @@
-<div class="modal-body dashboard">
-    <div class="pagetitle">
-        <h4 class="t-bold">
-            {{pkDepartamento == null ? 'Registrar' : 'Actualizar'}} departamento
-        </h4>
-        <nav>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">Departamento</li>
-                <li class="breadcrumb-item active"> {{pkDepartamento == null ? 'Registrar' : 'Actualizar'}} departamento</li>
-            </ol>
-        </nav>
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <form [formGroup]="formDepartamento" class="row g-3" autocomplete="off">
-                        <div class="col-lg-6">
-                            <label for="Departament_ES" class="form-label" >Departamento_ES:</label>
-                            <input id="Departament_ES" type="text"
-                             class="form-control form-control-sm" placeholder="Departamento en español"
-                                formControlName="Departament_ES">
-                        </div>
-
-                        
-                        <div class="col-lg-6">
-                            <label for="Departament_EN" class="form-label" >Departamento_EN:</label>
-                            <input id="Departament_EN" type="text"
-                             class="form-control form-control-sm" placeholder="Departamento en ingles"
-                                formControlName="Departament_EN">
-                        </div>
-
-                        <div class="col-lg-6">
-                            <label for="Acronym" class="form-label" >Acronym:</label>
-                            <input id="Acronym" type="text"
-                             class="form-control form-control-sm" placeholder="Abreviatura"
-                                formControlName="Acronym">
-                        </div>
-
-
-                    </form>
-                </div>
+<div class="modal-body dashboard p-4">
+    <!-- Header Corporativo Estilo MES/SCADA -->
+    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+        <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3 me-3 fs-4">
+            <i class="bi bi-diagram-3-fill"></i>
+        </div>
+        <div>
+            <div class="text-uppercase text-muted fw-bold small tracking-wider">
+                CATÁLOGO CORPORATIVO • FORM-DEPTO-01
             </div>
+            <h4 class="fw-bold text-dark mb-1">
+                {{ pkDepartamento == null ? 'Registrar' : 'Actualizar' }} departamento
+            </h4>
+            <p class="text-muted small mb-0">
+                Definición de centro operativo y claves bilingües de despacho.
+            </p>
         </div>
     </div>
+
+    <!-- Vista Previa Identificador -->
+    <div class="alert bg-light border rounded-3 p-3 mb-4 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-hdd-network text-primary fs-5"></i>
+            <div>
+                <span class="d-block text-uppercase text-muted fw-bold fs-xxs">Vista Previa Identificador</span>
+                <span class="small text-dark">Código generado para órdenes y tags SCADA</span>
+            </div>
+        </div>
+        <div>
+            <span class="badge bg-primary px-3 py-2 font-monospace fw-bold">{{ formDepartamento.get('Acronym')?.value || 'DEP' }}</span>
+            <span class="badge bg-success-subtle text-success border border-success-subtle ms-1 px-2 py-2">VÁLIDO</span>
+        </div>
+    </div>
+
+    <!-- Formulario Principal con validación visual en rojo -->
+    <form [formGroup]="formDepartamento" class="row g-3" autocomplete="off">
+        <div class="col-lg-6">
+            <label for="Departament_ES" class="form-label fw-bold text-dark small">Departamento_ES <span class="text-danger">*</span></label>
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-light border-end-0 text-muted" [ngClass]="{'border-danger text-danger': formDepartamento.get('Departament_ES')?.invalid && (formDepartamento.get('Departament_ES')?.touched || submitted)}"><i class="bi bi-globe"></i></span>
+                <input id="Departament_ES" type="text"
+                    class="form-control form-control-sm border-start-0 shadow-none" 
+                    [ngClass]="{'is-invalid': formDepartamento.get('Departament_ES')?.invalid && (formDepartamento.get('Departament_ES')?.touched || submitted)}"
+                    placeholder="Castellano (Oficial)"
+                    formControlName="Departament_ES">
+                <div class="invalid-feedback">
+                    Campo obligatorio (Solo letras y espacios).
+                </div>
+            </div>
+            <small class="text-muted fs-xxs mt-1 d-block">Nombre oficial para reportes ejecutivos y bitácoras.</small>
+        </div>
+
+        <div class="col-lg-6">
+            <label for="Departament_EN" class="form-label fw-bold text-dark small">Departamento_EN <span class="text-danger">*</span></label>
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-light border-end-0 text-muted" [ngClass]="{'border-danger text-danger': formDepartamento.get('Departament_EN')?.invalid && (formDepartamento.get('Departament_EN')?.touched || submitted)}"><i class="bi bi-translate"></i></span>
+                <input id="Departament_EN" type="text"
+                    class="form-control form-control-sm border-start-0 shadow-none" 
+                    [ngClass]="{'is-invalid': formDepartamento.get('Departament_EN')?.invalid && (formDepartamento.get('Departament_EN')?.touched || submitted)}"
+                    placeholder="English (MES / ERP)"
+                    formControlName="Departament_EN">
+                <div class="invalid-feedback">
+                    Campo obligatorio (Solo letras y espacios).
+                </div>
+            </div>
+            <small class="text-muted fs-xxs mt-1 d-block">Designación bilingüe requerida para sincronización.</small>
+        </div>
+
+        <div class="col-lg-12">
+            <label for="Acronym" class="form-label fw-bold text-dark small">Acronym (Abreviatura) <span class="text-danger">*</span></label>
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-light border-end-0 text-muted" [ngClass]="{'border-danger text-danger': formDepartamento.get('Acronym')?.invalid && (formDepartamento.get('Acronym')?.touched || submitted)}"><i class="bi bi-tag"></i></span>
+                <input id="Acronym" type="text"
+                    class="form-control form-control-sm border-start-0 shadow-none text-uppercase" 
+                    [ngClass]="{'is-invalid': formDepartamento.get('Acronym')?.invalid && (formDepartamento.get('Acronym')?.touched || submitted)}"
+                    placeholder="Ej. MTTO"
+                    formControlName="Acronym">
+                <div class="invalid-feedback">
+                    Campo obligatorio (2 a 5 caracteres, solo letras).
+                </div>
+            </div>
+            <small class="text-muted fs-xxs mt-1 d-block">Abreviatura única para tags de pasarela.</small>
+        </div>
+    </form>
+
+    <!-- Nota Informativa Industrial -->
+    <div class="mt-4 p-3 bg-primary-subtle border border-primary-subtle rounded-3 text-primary small d-flex align-items-center gap-2">
+        <i class="bi bi-info-circle-fill fs-5"></i>
+        <span>Los departamentos creados quedan inmediatamente disponibles para órdenes y asignación en planta.</span>
+    </div>
 </div>
-<div class="modal-footer">
-    <button *ngIf="pkDepartamento == null" class="btn btn-sm btn-primary" (click)="registrarDepartamento()">
-        Registrar
-    </button> 
-        <button *ngIf="pkDepartamento != null" class="btn btn-sm btn-warning" (click)="actualizarDepartamento()">
-        Actualizar
-    </button>
-    <button class="btn btn-sm btn-danger" (click)="cerrarModal()">
-        {{cambiosForm || pkDepartamento != null ? 'Cancelar' : 'Cerrar'}}
-    </button>
+
+<div class="modal-footer bg-light px-4 py-3 d-flex justify-content-between align-items-center">
+    <span class="text-muted small">Campos marcados con <span class="text-danger">*</span> son obligatorios</span>
+    <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary px-3" (click)="cerrarModal()">
+            {{ cambiosForm || pkDepartamento != null ? 'Cancelar' : 'Cerrar' }}
+        </button>
+        <button *ngIf="pkDepartamento == null" class="btn btn-sm btn-primary px-4 fw-medium shadow-sm d-flex align-items-center gap-1" (click)="registrarDepartamento()">
+            <i class="bi bi-check-lg"></i> Registrar departamento
+        </button> 
+        <button *ngIf="pkDepartamento != null" class="btn btn-sm btn-warning px-4 fw-medium shadow-sm text-dark d-flex align-items-center gap-1" (click)="actualizarDepartamento()">
+            <i class="bi bi-arrow-repeat"></i> Actualizar departamento
+        </button>
+    </div>
 </div>

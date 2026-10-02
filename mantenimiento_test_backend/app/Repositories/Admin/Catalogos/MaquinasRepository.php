@@ -10,19 +10,19 @@ class MaquinasRepository
     public function registrarMaquina(array $maquinas)
     {
         $registro = new TblMaquinas();
-        $registro->machines        = $maquinas['machines'];
-        $registro->id_area         = $maquinas['id_area'];
-        $registro->id_cat_machines = $maquinas['id_cat_machines'];
-        $registro->brand           = $maquinas['brand'];
-        $registro->model           = $maquinas['model'];
-        $registro->year            = $maquinas['year'];
-        $registro->serial          = $maquinas['serial'];
-        $registro->weight          = $maquinas['weight'];
-        $registro->voltaje         = $maquinas['voltaje'];
-        $registro->amperage        = $maquinas['amperage'];
-        $registro->frequency       = $maquinas['frequency'];
-        $registro->kva             = $maquinas['kva'];
-        $registro->active          = 1;
+        $registro->machines         = $maquinas['machines'];
+        $registro->id_area          = $maquinas['id_area'];
+        $registro->id_cat_machines  = $maquinas['id_cat_machines'];
+        $registro->brand            = $maquinas['brand'];
+        $registro->model            = $maquinas['model'];
+        $registro->year             = $maquinas['year'];
+        $registro->serial           = $maquinas['serial'];
+        $registro->weight           = $maquinas['weight'];
+        $registro->voltaje          = $maquinas['voltaje'];
+        $registro->amperage         = $maquinas['amperage'];
+        $registro->frequency        = $maquinas['frequency'];
+        $registro->kva              = $maquinas['kva'];
+        $registro->active           = 1;
         $registro->save();
 
         return $registro->id_machines;
@@ -30,7 +30,7 @@ class MaquinasRepository
 
     public function obtenerListaMaquinas()
     {
-        $query = TblMaquinas::select(
+        return TblMaquinas::select(
             'tbl_machines.id_machines',
             'tbl_machines.machines',
             'tbl_machines.id_area',
@@ -54,15 +54,13 @@ class MaquinasRepository
                 END as estado
             ")
         )
-            ->join('cat_areas', 'cat_areas.id_area', '=', 'tbl_machines.id_area')
-            ->join('cat_machines', 'cat_machines.id_cat_machines', '=', 'tbl_machines.id_cat_machines');
-
-        return $query->get();
+        ->join('cat_areas', 'cat_areas.id_area', '=', 'tbl_machines.id_area')
+        ->join('cat_machines', 'cat_machines.id_cat_machines', '=', 'tbl_machines.id_cat_machines');
     }
 
     public function obtenerDetalleMaquina($pkMaquina)
-{
-    return TblMaquinas::select(
+    {
+        return TblMaquinas::select(
             'id_machines',
             'machines',
             'id_area',
@@ -78,34 +76,32 @@ class MaquinasRepository
             'kva',
             'active',
         )
-        ->where([
-            ['id_machines', $pkMaquina]
-        ])
+        ->where('id_machines', $pkMaquina)
         ->firstOrFail();
-}
+    }
 
     public function actualizarMaquina($id, $maquina)
     {
         $actualizar = TblMaquinas::findOrFail($id);
 
-        $actualizar->machines        = $maquina['machines'];
-        $actualizar->id_area         = $maquina['id_area'];
-        $actualizar->id_cat_machines = $maquina['id_cat_machines'];
-        $actualizar->brand           = $maquina['brand'];
-        $actualizar->model           = $maquina['model'];
-        $actualizar->year            = $maquina['year'];
-        $actualizar->serial          = $maquina['serial'];
-        $actualizar->weight          = $maquina['weight'];
-        $actualizar->voltaje         = $maquina['voltaje'];
-        $actualizar->amperage        = $maquina['amperage'];
-        $actualizar->frequency       = $maquina['frequency'];
-        $actualizar->kva             = $maquina['kva'];
+        $actualizar->machines         = $maquina['machines'];
+        $actualizar->id_area          = $maquina['id_area'];
+        $actualizar->id_cat_machines  = $maquina['id_cat_machines'];
+        $actualizar->brand            = $maquina['brand'];
+        $actualizar->model            = $maquina['model'];
+        $actualizar->year             = $maquina['year'];
+        $actualizar->serial           = $maquina['serial'];
+        $actualizar->weight           = $maquina['weight'];
+        $actualizar->voltaje          = $maquina['voltaje'];
+        $actualizar->amperage         = $maquina['amperage'];
+        $actualizar->frequency        = $maquina['frequency'];
+        $actualizar->kva              = $maquina['kva'];
         $actualizar->save();
     }
 
     public function cambiarStatusMaquina($pkMaquina)
     {
-        $maquinas         = TblMaquinas::findOrFail($pkMaquina);
+        $maquinas = TblMaquinas::findOrFail($pkMaquina);
         $maquinas->active = $maquinas->active ? 0 : 1;
         $maquinas->save();
 

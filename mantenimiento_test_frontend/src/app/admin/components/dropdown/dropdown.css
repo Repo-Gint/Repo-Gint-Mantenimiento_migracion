@@ -1,29 +1,145 @@
-.dropdown {
+.custom-dropdown-wrapper {
     width: 100% !important;
 }
 
+/* Ocultar la flecha nativa de Bootstrap para evitar el efecto de doble flecha */
+.custom-dropdown-wrapper .dropdown-toggle::after {
+    display: none !important;
+}
+
+/* Botón Estilo Pastilla Dinámico Animado */
+.custom-dropdown-wrapper .btn-outline-dark,
+.custom-dropdown-wrapper .btn {
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 50rem;
+    color: #1e293b;
+    font-size: 0.813rem;
+    font-weight: 500;
+    padding: 6px 14px;
+    text-align: left;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+}
+
+.custom-dropdown-wrapper .btn:hover,
+.custom-dropdown-wrapper .btn:focus {
+    background-color: #f8fafc;
+    border-color: #0284c7;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12);
+    color: #0f172a;
+    transform: translateY(-1px);
+}
+
+/* Menú Flotante de Alta Gama con Animación */
 .dropdown-menu {
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-    min-width: 300px !important;
-    z-index: 1001;
+    padding: 12px !important;
+    min-width: 280px !important;
+    max-width: 340px !important;
+    width: 100%;
+    border-radius: 1rem !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15), 0 10px 20px -10px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e2e8f0 !important;
+    margin-top: 6px !important;
+    animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1050;
 }
 
-.dropdown-search {
-    margin-top: 5px !important;
-    margin-bottom: 5px !important;
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
+/* Animación al aparecer chips */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.2s ease-in-out;
+}
+
+/* Buscador Animado Interno */
+.search-animated-box {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 50rem;
+    transition: all 0.25s ease;
+}
+
+.search-animated-box:focus-within {
+    background-color: #ffffff;
+    border-color: #0284c7;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+}
+
+/* Lista Desplazable Estilizada */
 .dropdown-list {
-    max-height: 110px !important;
+    max-height: 220px !important;
     overflow-y: auto !important;
-    margin-top: 20px !important;
-    margin-left: -30px !important;
+    margin-top: 4px !important;
+    padding-right: 2px !important;
 }
 
-.btn {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: auto;
+.dropdown-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.dropdown-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+/* Elementos de la lista con hover animado */
+.dropdown-item-custom {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item-custom:hover {
+    background-color: #f0fdf4;
+    transform: translateX(2px);
+}
+
+/* Checkboxes personalizados */
+.custom-checkbox {
+    width: 1.15rem;
+    height: 1.15rem;
+    cursor: pointer;
+    border: 1.5px solid #94a3b8;
+    transition: all 0.2s ease;
+}
+
+.custom-checkbox:checked {
+    background-color: #0284c7;
+    border-color: #0284c7;
+}
+
+.hover-danger:hover {
+    color: #dc2626 !important;
+}
+
+.fs-xxs {
+    font-size: 0.65rem;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.select-none {
+    user-select: none;
 }

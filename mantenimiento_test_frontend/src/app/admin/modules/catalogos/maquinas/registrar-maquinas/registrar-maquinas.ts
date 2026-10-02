@@ -41,18 +41,18 @@ export class RegistrarMaquinas {
 
   protected crearFormMaquinas(): void {
     this.formMaquina = this.fb.group({
-      id_area:        ['', [Validators.required]],
+      id_area:         ['', [Validators.required]],
       id_cat_machines: ['', [Validators.required]],
       machines:   [null, [Validators.required, Validators.pattern('^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s.-]+$')]],
-      brand:     [null, [Validators.required, Validators.pattern('^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s.-]+$')]],
-      model:     [null, [Validators.required, Validators.pattern('^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s.-]+$')]],
-      serial:    [null, [Validators.required, Validators.pattern('^[a-zA-Z0-9-]+$')]],
-      year:      [null, [Validators.required, Validators.pattern('^[0-9]{4}$')]],
-      weight:    [null, [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]+)?$')]],
-      voltaje:   [null, [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]+)?$')]],
-      amperage:  [null, [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]+)?$')]], // Corregido de amverage a amperage
-      frequency: [null, [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]+)?$')]],
-      kva:       [null, [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]+)?$')]],
+      brand:      [null, [Validators.required, Validators.pattern('^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s.-]+$')]],
+      model:      [null, [Validators.required, Validators.pattern('^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s.-]+$')]],
+      serial:     [null, [Validators.required, Validators.pattern('^[a-zA-Z0-9-]+$')]],
+      year:       [null, [Validators.required, Validators.pattern('^[0-9]{4}$')]],
+      weight:     [null, [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]+)?$')]],
+      voltaje:    [null, [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]+)?$')]],
+      amperage:   [null, [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]+)?$')]],
+      frequency:  [null, [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]+)?$')]],
+      kva:        [null, [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]+)?$')]],
     });
   }
 
@@ -61,7 +61,7 @@ export class RegistrarMaquinas {
       const respuesta: any = await this.maquinas.obtenerRecursosRegistroMaquina().toPromise();
       const recursos = respuesta?.recursos || respuesta;
 
-      this.listaAreas           = recursos?.listaareas || recursos?.lista_areas || [];
+      this.listaAreas             = recursos?.listaareas || recursos?.lista_areas || [];
       this.listacatalogoMaquina = recursos?.listacatalogomaquina || recursos?.listacatmachines || recursos?.lista_catalogo_maquina || [];
       
       this.ch.detectChanges();
@@ -72,10 +72,8 @@ export class RegistrarMaquinas {
   }
 
   public async obtenerDetalleMaquina(pkMaquina: number): Promise<any> {
-
     return this.maquinas.obtenerDetalleMaquina(pkMaquina).toPromise().then(
       respuesta => {
-
         const maquina = respuesta.maquinas;
 
         this.formMaquina.get('id_area')?.setValue(maquina.id_area);
@@ -88,25 +86,23 @@ export class RegistrarMaquinas {
         this.formMaquina.get('weight')?.setValue(maquina.weight);
         this.formMaquina.get('voltaje')?.setValue(maquina.voltaje);
         this.formMaquina.get('amperage')?.setValue(maquina.amperage);
-        this.formMaquina.get('frequency')?.setValue(maquina.frequency)
+        this.formMaquina.get('frequency')?.setValue(maquina.frequency);
         this.formMaquina.get('kva')?.setValue(maquina.kva);
       }
     );
   }
 
   protected registrarMaquina(): void {
-
     if (this.formMaquina.invalid) {
       this.messages.mensajeGenerico('Aún hay campos vacíos o que no cumplen con la estructura correcta.',
-				'info', 'Los campos requeridos están marcados con un *'
+        'info', 'Los campos requeridos están marcados con un *'
       );
       return;
     }
 
-    this.messages.mensajeConfirmacionCustom('¿Está seguro de continuar con el registro del maquina?',
-				'question', 'Registrar maquina'
-      ).then(res=> {
-
+    this.messages.mensajeConfirmacionCustom('¿Está seguro de continuar con el registro de la máquina?',
+        'question', 'Registrar máquina'
+      ).then(res => {
         if (!res.isConfirmed) return;
         this.messages.mensajeEsperar();
 
@@ -114,7 +110,6 @@ export class RegistrarMaquinas {
 
         this.maquinas.registrarMaquina(maquina).toPromise().then(
           respuesta => {
-
             this.pkMaquina = respuesta.pkMaquina;
             this.ch.markForCheck();
 
@@ -125,7 +120,7 @@ export class RegistrarMaquinas {
             this.messages.mensajeGenerico('error', 'error');
           }
         );
-      })
+      });
   }
 
   protected actualizarMaquina(): void {
@@ -134,8 +129,8 @@ export class RegistrarMaquinas {
       return;
     }
 
-    this.messages.mensajeConfirmacionCustom('¿Está seguro de continuar con la actualización del maquina?',
-        'question', 'Actualizar maquina').then(
+    this.messages.mensajeConfirmacionCustom('¿Está seguro de continuar con la actualización de la máquina?',
+        'question', 'Actualizar máquina').then(
           res => {
             if (!res.isConfirmed) return;
 
@@ -148,14 +143,13 @@ export class RegistrarMaquinas {
 
             this.maquinas.actualizarMaquina(data).toPromise().then(
               respuesta => {
-
                 this.obtenerDetalleMaquina(this.pkMaquina).then(() => {
                   this.messages.mensajeGenerico(respuesta.mensaje, 'success', respuesta.title)
                 });
               }, error => {
                 this.messages.mensajeGenerico('error', 'error')
               }
-            )
+            );
           }
         )
   }
@@ -172,8 +166,8 @@ export class RegistrarMaquinas {
 
     this.messages.mensajeConfirmacionCustom(
       '¿Está seguro de cerrar sin guardar cambios?',
-			'question',
-			'Cancelar registro'
+      'question',
+      'Cancelar registro'
     ).then(
       res => {
         if (!res.isConfirmed) return;
@@ -182,5 +176,4 @@ export class RegistrarMaquinas {
       }
     )
   }
-
 }

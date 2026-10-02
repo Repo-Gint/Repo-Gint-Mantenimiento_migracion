@@ -43,8 +43,55 @@ export class RegistrarTipoMantenimiento {
     });
   }
 
-  public async obtenerDetalletipoMantenimiento(pktipoMantenimiento: number): Promise<any> {
+  protected seleccionarColor(colorHex: string): void {
+    this.formtipoMantenimiento.get('color')?.setValue(colorHex);
+    this.formtipoMantenimiento.get('color')?.markAsTouched();
+    this.formtipoMantenimiento.get('color')?.markAsDirty();
+  }
 
+  // Verifica si el campo es inválido
+  protected campoEsInvalido(nombreCampo: string): boolean {
+    const campo = this.formtipoMantenimiento.get(nombreCampo);
+    return !!(campo && campo.invalid && (campo.touched || campo.dirty));
+  }
+
+  // Verifica si el campo es válido (para mostrar la palomita verde)
+  protected campoEsValido(nombreCampo: string): boolean {
+    const campo = this.formtipoMantenimiento.get(nombreCampo);
+    return !!(campo && campo.valid && (campo.touched || campo.dirty));
+  }
+
+  protected obtenerMensajeError(nombreCampo: string): string {
+    const campo = this.formtipoMantenimiento.get(nombreCampo);
+    if (!campo || !campo.errors) return '';
+
+    if (campo.errors['required']) return 'Este campo es obligatorio.';
+    if (campo.errors['pattern']) {
+      if (nombreCampo === 'color') return 'Formato HEX inválido (Ej: #EF4444).';
+      return 'Solo se permiten letras y espacios.';
+    }
+    return 'Campo inválido.';
+  }
+
+  private obtenerCamposInvalidosTexto(): string {
+    const camposNombres: { [key: string]: string } = {
+      type_maintenances: 'Tipo de Mantenimiento',
+      color: 'Color',
+      acronym: 'Abreviatura'
+    };
+
+    const pendientes: string[] = [];
+    Object.keys(this.formtipoMantenimiento.controls).forEach(key => {
+      const control = this.formtipoMantenimiento.get(key);
+      if (control && control.invalid) {
+        pendientes.push(camposNombres[key] || key);
+      }
+    });
+
+    return pendientes.length > 0 ? pendientes.join(', ') : '';
+  }
+
+  public async obtenerDetalletipoMantenimiento(pktipoMantenimiento: number): Promise<any> {
     return this.tipoMantenimientos.obtenerDetalletipoMantenimiento(pktipoMantenimiento).toPromise().then(
       respuesta => {
         const tipoMantenimiento = respuesta.tipoMantenimiento;
@@ -56,8 +103,13 @@ export class RegistrarTipoMantenimiento {
 
   protected registrarTipoMantenimiento(): void {
     if (this.formtipoMantenimiento.invalid) {
-      this.messages.mensajeGenerico('Aún hay campos vacíos o que no cumplen con la estructura correcta.',
-        'info', 'Los campos requeridos están marcados con un *'
+      this.formtipoMantenimiento.markAllAsTouched();
+      const camposFaltantes = this.obtenerCamposInvalidosTexto();
+      
+      this.messages.mensajeGenerico(
+        `Por favor verifica los siguientes campos: ${camposFaltantes}.`,
+        'info',
+        'Campos incompletos o incorrectos'
       );
       return;
     }
@@ -87,7 +139,14 @@ export class RegistrarTipoMantenimiento {
 
   protected actualizartipoMantenimiento(): void {
     if (this.formtipoMantenimiento.invalid) {
-      this.messages.mensajeGenerico('Aún hay campos vacíos o que no cumplen con la estructura correcta.', 'info', 'Los campos requeridos están marcados con un *');
+      this.formtipoMantenimiento.markAllAsTouched();
+      const camposFaltantes = this.obtenerCamposInvalidosTexto();
+
+      this.messages.mensajeGenerico(
+        `Por favor verifica los siguientes campos: ${camposFaltantes}.`,
+        'info',
+        'Campos incompletos o incorrectos'
+      );
       return;
     }
 

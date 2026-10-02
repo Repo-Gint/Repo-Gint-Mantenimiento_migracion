@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ModalService } from '../../../services/modal/modal';
 import { MessagesService } from '../../../services/messages/messages';
 import { OrdenesService } from '../../../services/api/ordenes/ordenes';
+import { UsuariosService } from '../../../services/api/usuarios/usuarios';
 import { AsignarOrden } from '../asignar-orden/asignar-orden';
 
 @Component({
@@ -17,6 +18,8 @@ export class RegistrarOrden {
   @Input() pkOrden: any = null;
 
   protected formOrden!: FormGroup;
+  protected esAdminOTecnico: boolean = false;
+  protected puedeEditar: boolean = false;
 
   protected listaAreas:             any[] = [];
   protected listaMaquinas:          any[] = [];
@@ -33,17 +36,22 @@ export class RegistrarOrden {
   files: File[] = [];
 
   constructor(
-    private modal:    ModalService,
-    private messages: MessagesService,
-    private ordenes:  OrdenesService,
-    private ch:       ChangeDetectorRef,
-    private fb:       FormBuilder
+    private modal:     ModalService,
+    private messages:  MessagesService,
+    private ordenes:   OrdenesService,
+    private usuarios:  UsuariosService,
+    private ch:        ChangeDetectorRef,
+    private fb:        FormBuilder
   ) {}
 
   async ngOnInit(): Promise<void> {
     this.messages.mensajeEsperar();
-    try {this.crearFormOrden();
+    try {
+      this.crearFormOrden();
+      
+      await this.verificarPermisosDesdeApi();
       await this.obtenerRecursosRegistroOrden();
+
       this.formOrden.get('id_area')?.valueChanges.subscribe(() => {
         this.cargarMaquinasFiltradas();
       });
@@ -58,7 +66,6 @@ export class RegistrarOrden {
     } catch (error) {
       this.messages.mensajeGenerico('error', 'error');
     } finally {
-
       this.messages.cerrarMensajes();
     }
   }
@@ -70,13 +77,38 @@ export class RegistrarOrden {
       id_departaments:      ['', Validators.required],
       id_cat_machines:      ['', Validators.required], 
       id_machines:          ['', Validators.required],
-      id_employee:          ['', Validators.required],
+      id_employee:          [''],
       problem_description:  ['', Validators.required], 
       id_type_maintenances: ['', Validators.required],
       id_priority:          ['', Validators.required],
       order_folio:          ['ORD-GEN-M'],
-      idUsuario: [[]]
+      idUsuario:            [[]]
     });
+  }
+
+  private async verificarPermisosDesdeApi(): Promise<void> {
+    try {
+      const respuesta: any = await this.usuarios.obtenerPermisosUsuarioActual().toPromise();
+      const permisos: string[] = respuesta?.permisos || [];
+      const rolUsuario = Number(respuesta?.id_rol_users || 1);
+
+      this.esAdminOTecnico = (rolUsuario === 2 || rolUsuario === 3);
+      this.puedeEditar = this.esAdminOTecnico || permisos.includes('editar_orden');
+
+      if (this.pkOrden !== null && !this.puedeEditar) {
+        this.formOrden.disable();
+      } else {
+        this.formOrden.enable();
+      }
+    } catch (error) {
+      this.puedeEditar = false;
+      if (this.pkOrden === null) {
+        this.formOrden.enable();
+      }
+    } finally {
+      // 🛠️ Solución exacta para evitar el error NG0100 de Angular
+      this.ch.detectChanges();
+    }
   }
 
   private cargarMaquinasFiltradas(limpiarSeleccion: boolean = true): void {
@@ -135,10 +167,10 @@ export class RegistrarOrden {
         problem_description: orden.problem_description
       }, { emitEvent: false });
 
-
       this.images = evidencias;
       this.ch.detectChanges();
-    } catch (error) {this.modal.cerrarModal();
+    } catch (error) {
+      this.modal.cerrarModal();
       this.messages.mensajeGenerico('error', 'error');
     }
   }
@@ -147,19 +179,20 @@ export class RegistrarOrden {
     const respuesta: any = await this.ordenes.obtenerRecursosRegistroOrden().toPromise();
     const recursos = respuesta?.recursos || respuesta;
 
-    this.listaAreas             = Array.isArray(recursos?.listaareas) ? recursos.listaareas : [];
-    this.listaMaquinas          = Array.isArray(recursos?.listamaquinas) ? recursos.listamaquinas : [];
-    this.listaDepartamentos     = Array.isArray(recursos?.listadepartamentos) ? recursos.listadepartamentos : [];
-    this.listaEmpleados         = Array.isArray(recursos?.listaempleados) ? recursos.listaempleados : [];
-    this.listatipoMantenimiento = Array.isArray(recursos?.listatipomantenimiento) ? recursos.listatipomantenimiento : [];
-    this.listatipoOrden         = Array.isArray(recursos?.listatipoorden) ? recursos.listatipoorden : [];
-    this.listaprioridadOrden    = Array.isArray(recursos?.listaprioridadorden) ? recursos.listaprioridadorden : [];
-    this.listacatalogoMaquina   = Array.isArray(recursos?.listacatalogomaquina) ? recursos.listacatalogomaquina : [];
+    this.listaAreas              = Array.isArray(recursos?.listaareas) ? recursos.listaareas : [];
+    this.listaMaquinas           = Array.isArray(recursos?.listamaquinas) ? recursos.listamaquinas : [];
+    this.listaDepartamentos      = Array.isArray(recursos?.listadepartamentos) ? recursos.listadepartamentos : [];
+    this.listaEmpleados          = Array.isArray(recursos?.listaempleados) ? recursos.listaempleados : [];
+    this.listatipoMantenimiento  = Array.isArray(recursos?.listatipomantenimiento) ? recursos.listatipomantenimiento : [];
+    this.listatipoOrden          = Array.isArray(recursos?.listatipoorden) ? recursos.listatipoorden : [];
+    this.listaprioridadOrden     = Array.isArray(recursos?.listaprioridadorden) ? recursos.listaprioridadorden : [];
+    this.listacatalogoMaquina    = Array.isArray(recursos?.listacatalogomaquina) ? recursos.listacatalogomaquina : [];
     
     this.ch.detectChanges();
   }
 
   protected onFileSelected(event: any) {
+    if (this.pkOrden !== null && !this.puedeEditar) return;
     const selectedFiles = event.target.files;
 
     for (let file of selectedFiles) {
@@ -169,7 +202,8 @@ export class RegistrarOrden {
 
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.images.push({id_eviden_order: 0,
+        this.images.push({
+          id_eviden_order: 0,
           url_evidence_image: e.target.result
         });
         this.ch.detectChanges();
@@ -180,6 +214,8 @@ export class RegistrarOrden {
   }
 
   protected eliminarEvidenciaOrden(index: number, id_eviden_order: number): void {
+    if (this.pkOrden !== null && !this.puedeEditar) return;
+
     this.messages.mensajeConfirmacionCustom(
       '¿Está seguro de eliminar la evidencia del orden?', 'question', 'Eliminar evidencia'
     ).then(
@@ -205,7 +241,7 @@ export class RegistrarOrden {
   }
 
   protected registrarOrden(): void {
-    if (!this.pkOrden && this.formOrden.invalid) {
+    if (this.formOrden.invalid) {
       this.messages.mensajeGenerico('Aún hay campos vacíos o inválidos.', 'info', 'Campos requeridos');
       return;
     }
@@ -218,10 +254,9 @@ export class RegistrarOrden {
       this.messages.mensajeEsperar();
 
       const formData = new FormData();
-
       Object.keys(this.formOrden.value).forEach(key => {
-						formData.append(key, this.formOrden.value[key]);
-					});
+        formData.append(key, this.formOrden.value[key]);
+      });
 
       this.files.forEach(file => {
         formData.append('images[]', file);
@@ -242,62 +277,86 @@ export class RegistrarOrden {
   }
 
   protected actualizarOrden(): void {
-    if (this.formOrden.invalid) {
-      this.messages.mensajeGenerico('Aún hay campos vacíos o que no cumplen con la estructura correcta.',
-        'info', 'Los campos requeridos están marcados con un *'
+    if (!this.puedeEditar) {
+      this.messages.mensajeGenerico(
+        'No tienes el permiso del administrador, contacta al administrador para que te lo autorice.',
+        'error',
+        'Acceso denegado'
       );
       return;
     }
 
-    this.messages.mensajeConfirmacionCustom('¿Está seguro de continuar con la actualización del orden?',
-      'question', 'Actualizar orden').then(
-        res => {
-          if (!res.isConfirmed) return;
+    if (this.formOrden.invalid) {
+      this.messages.mensajeGenerico(
+        'Aún hay campos vacíos o que no cumplen con la estructura correcta.',
+        'info', 
+        'Los campos requeridos están marcados con un *'
+      );
+      return;
+    }
 
-          this.messages.mensajeEsperar();
+    this.messages.mensajeConfirmacionCustom(
+      '¿Está seguro de continuar con la actualización del orden?',
+      'question', 
+      'Actualizar orden'
+    ).then(res => {
+      if (!res.isConfirmed) return;
 
-          const formData = new FormData();
+      this.messages.mensajeEsperar();
 
-          Object.keys(this.formOrden.value).forEach(key => {
-            formData.append(key, this.formOrden.value[key]);
-          });
+      const formData = new FormData();
+      Object.keys(this.formOrden.value).forEach(key => {
+        formData.append(key, this.formOrden.value[key]);
+      });
 
-          formData.append('pkOrden', String(this.pkOrden));
+      formData.append('pkOrden', String(this.pkOrden));
 
-          if (this.files && this.files.length > 0) {
-            this.files.forEach(file => {
-              formData.append('images[]', file);
-            });
+      if (this.files && this.files.length > 0) {
+        this.files.forEach(file => {
+          formData.append('images[]', file);
+        });
+      }
+
+      this.ordenes.actualizarOrden(formData).subscribe({
+        next: (respuesta: any) => {
+          const id = respuesta?.pkOrden || this.pkOrden;
+          if (!id) {
+            this.messages.mensajeGenerico('No se pudo obtener el ID del orden.', 'error');
+            return;
           }
 
-          this.ordenes.actualizarOrden(formData).subscribe({
-            next: (respuesta: any) => {
-              const id = respuesta?.pkOrden || this.pkOrden;
-              if (!id) {this.messages.mensajeGenerico('No se pudo obtener el ID del orden.', 'error');
-                return;
-              }
-
-              this.obtenerDetalleOrden(id).then(() => {
-                this.messages.mensajeGenerico(respuesta.mensajes, 'success', respuesta.title);
-              });
-            },
-            error: (error) => {
-              this.messages.mensajeGenerico('Ocurrió un error al actualizar el orden.', 'error'
-              );
-            }
+          this.obtenerDetalleOrden(id).then(() => {
+            this.messages.mensajeGenerico(respuesta.mensajes, 'success', respuesta.title);
           });
-        });
+        },
+        error: (error) => {
+          const mensajeTexto = error?.error?.mensaje || 'Ocurrió un error al actualizar el orden.';
+          const tituloTexto = error?.error?.title || 'Acceso denegado';
+          this.messages.mensajeGenerico(mensajeTexto, 'error', tituloTexto);
+        }
+      });
+    });
   }
 
-    protected abrirAsignar(): void { this.modal.abrirModalConComponente(AsignarOrden, {pkOrden: this.pkOrden, folio: `ORD-${this.pkOrden}`, onAsignacionExitosa: () => {
-          this.obtenerDetalleOrden(this.pkOrden); }}, 'md-modal');
+  protected abrirAsignar(): void {
+    if (!this.puedeEditar) return;
+
+    this.modal.abrirModalConComponente(AsignarOrden, {
+      pkOrden: this.pkOrden, 
+      folio: `ORD-${this.pkOrden}`, 
+      onAsignacionExitosa: () => {
+        this.obtenerDetalleOrden(this.pkOrden); 
+      }
+    }, 'md-modal');
   }
+
   get cambiosForm(): boolean {
     return this.formOrden.dirty || this.images.length > 0;
   }
 
   public cerrarModal(): void {
-    if (!this.cambiosForm) {this.modal.cerrarModal();
+    if (!this.cambiosForm) {
+      this.modal.cerrarModal();
       return;
     }
 

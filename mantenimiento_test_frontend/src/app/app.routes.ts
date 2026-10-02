@@ -11,6 +11,7 @@ import { ConsultaTipoOrden } from './admin/modules/catalogos/tipo-orden/consulta
 import { ConsultaTipoMantenimiento } from './admin/modules/catalogos/tipo-mantenimiento/consulta-tipo-mantenimiento/consulta-tipo-mantenimiento';
 import { ConsultarCatmaquinas } from './admin/modules/catalogos/catmaquinas/consultar-catmaquinas/consultar-catmaquinas';
 import { ConsultaOrdenes } from './admin/modules/ordenes/consulta-ordenes/consulta-ordenes';
+import { ChatOrdenesComponent } from './admin/modules/ordenes/chat-orders/chat-orders';
 
 export const routes: Routes = [
 	{
@@ -66,6 +67,11 @@ export const routes: Routes = [
 			{
 				path: 'consulta-ordenes',
 				component: ConsultaOrdenes
+			},
+
+			{
+    			path: 'chat-ordenes/:pkOrden',
+    			component: ChatOrdenesComponent
 			}
 		]
 	}

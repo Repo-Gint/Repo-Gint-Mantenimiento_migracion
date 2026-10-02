@@ -1,0 +1,222 @@
+.dashboard-container {
+    background-color: #f4f6f9;
+    color: #333d48;
+}
+
+.badge-pill-light {
+    background-color: #e9ecef;
+    color: #495057;
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.metric-card-light {
+    background-color: #ffffff;
+    border: 1px solid #e3e6ed;
+    border-radius: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.metric-card-light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
+}
+.metric-icon-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.filter-light-card {
+    background-color: #ffffff;
+    border: 1px solid #e3e6ed;
+    border-radius: 12px;
+}
+
+.form-label-light {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Estilos mejorados para el dropdown del checklist de Status */
+.custom-select-btn {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 0.88rem;
+    color: #212529;
+}
+.custom-select-btn:after {
+    display: none !important; /* Elimina la flecha predeterminada duplicada de Bootstrap */
+}
+.custom-radio-item {
+    transition: background-color 0.15s ease-in-out;
+    border: 1px solid transparent;
+}
+.custom-radio-item:hover {
+    background-color: #f8f9fa;
+    border-color: #e9ecef;
+}
+.custom-radio-item input[type="radio"]:checked + label {
+    color: #0d6efd !important;
+    font-weight: 600;
+}
+
+.table-light-card {
+    background-color: #ffffff;
+    border: 1px solid #e3e6ed;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-light-header th {
+    background-color: #2c3e50 !important;
+    color: #ffffff !important;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 14px 12px;
+    border: none;
+}
+
+.table.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.03);
+}
+
+.avatar-circle-light {
+    width: 28px;
+    height: 28px;
+    background-color: #e2e8f0;
+    color: #0d6efd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.75rem;
+}
+
+.badge-pill-mantenimiento-light {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.badge-priority-light {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+.priority-urgent-light {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+}
+.priority-normal-light {
+    background-color: #cff4fc;
+    color: #055160;
+    border: 1px solid #b6effb;
+}
+
+.btn-action-light {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    color: #495057;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.btn-edit-light:hover {
+    background-color: #0d6efd;
+    color: #fff;
+    border-color: #0d6efd;
+    transform: translateY(-2px);
+}
+.btn-delete-light:hover {
+    background-color: #dc3545;
+    color: #fff;
+    border-color: #dc3545;
+    transform: translateY(-2px);
+}
+.btn-chat-light:hover {
+    background-color: #198754;
+    color: #fff;
+    border-color: #198754;
+    transform: translateY(-2px);
+}
+
+/* Buscador Súper Animado */
+.search-animated-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+}
+
+.search-animated-box:focus-within {
+    background-color: #ffffff;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.12);
+    transform: translateY(-1px);
+}
+
+/* Insignias con Animación de Pulso para Urgencias */
+.badge-priority-animated {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.priority-urgent-pulse {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+    animation: pulse-urgent 2s infinite;
+}
+
+@keyframes pulse-urgent {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(220, 53, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+}
+
+.priority-normal-badge {
+    background-color: #e7f1ff;
+    color: #084298;
+    border: 1px solid #b6d4fe;
+}

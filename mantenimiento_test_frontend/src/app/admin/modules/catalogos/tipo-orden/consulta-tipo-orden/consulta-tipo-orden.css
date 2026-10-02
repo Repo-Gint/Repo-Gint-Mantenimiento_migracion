@@ -1,0 +1,89 @@
+.fs-7 { font-size: 0.85rem; }
+
+/* Switch Pill */
+.status-segment-switch {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+}
+
+.status-segment-switch .btn {
+    border: none;
+    color: #64748b;
+    font-size: 0.813rem;
+    font-weight: 500;
+    box-shadow: none !important;
+}
+
+.status-segment-switch .btn.active-pill {
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+.status-segment-switch .btn:hover:not(.active-pill) {
+    color: #1e293b;
+    background-color: #f1f5f9;
+}
+
+/* Colores Suaves para Badges e Íconos */
+.bg-light-primary { background-color: rgba(59, 130, 246, 0.1); }
+.bg-light-success { background-color: rgba(16, 185, 129, 0.1); }
+.bg-light-danger  { background-color: rgba(239, 68, 68, 0.1); }
+
+.bg-success-subtle { background-color: #d1fae5 !important; }
+.text-success { color: #047857 !important; }
+
+.bg-danger-subtle { background-color: #fee2e2 !important; }
+.text-danger { color: #b91c1c !important; }
+
+/* Botones Animados */
+.btn-animated {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-animated:hover {
+    transform: translateY(-2px);
+}
+
+.btn-animated:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.btn-exportar {
+    background-color: #10b981;
+    color: #ffffff;
+    border: none;
+    font-size: 0.813rem;
+}
+
+.btn-exportar:hover {
+    background-color: #059669;
+    color: #ffffff;
+    box-shadow: 0 6px 15px -3px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Interacción en filas y acciones */
+.row-hover-effect {
+    transition: background-color 0.2s ease;
+}
+
+.row-hover-effect:hover {
+    background-color: #f8fafc !important;
+}
+
+.btn-action {
+    transition: all 0.2s ease;
+    border-radius: 0.5rem !important;
+}
+
+.btn-action:hover {
+    transform: scale(1.15);
+}
+
+.color-dot-animated {
+    transition: transform 0.2s ease;
+}
+
+.color-dot-animated:hover {
+    transform: scale(1.3);
+}

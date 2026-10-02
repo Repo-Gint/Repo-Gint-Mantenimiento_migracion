@@ -1,0 +1,130 @@
+/* Borde superior azul institucional */
+.modal-content {
+    border-top: 4px solid #3b82f6 !important;
+}
+
+.fs-7 { font-size: 0.85rem; }
+.fs-xxs { font-size: 0.7rem; }
+.cursor-pointer { cursor: pointer; }
+
+/* Custom Input Groups */
+.input-group-custom {
+    border: 1.5px solid #cbd5e1;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: #ffffff;
+}
+
+.input-group-custom:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.input-group-custom .form-control {
+    border: none;
+    font-size: 0.875rem;
+}
+
+/* Estado de Error (Rojo Animado) */
+.input-group-custom.is-invalid-group {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2 !important;
+    animation: shakeError 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.input-group-custom.is-invalid-group:focus-within {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18) !important;
+}
+
+/* Estado de Éxito (Verde Animado) */
+.input-group-custom.is-valid-group {
+    border-color: #10b981 !important;
+    background-color: #f0fdf4 !important;
+}
+
+.input-group-custom.is-valid-group:focus-within {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18) !important;
+}
+
+.input-group-custom.is-invalid-group .input-group-text,
+.input-group-custom.is-invalid-group .form-control,
+.input-group-custom.is-valid-group .input-group-text,
+.input-group-custom.is-valid-group .form-control {
+    background-color: transparent !important;
+}
+
+/* Animación de la Palomita Verde */
+@keyframes checkPop {
+    0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+    70% { transform: scale(1.2) rotate(0deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.animate-check-pop {
+    animation: checkPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes shakeError {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+    40%, 60% { transform: translate3d(3px, 0, 0); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.animate-pulse { animation: pulse 1.5s infinite; }
+
+.animate-fade-in { animation: fadeIn 0.25s ease-in-out; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-3px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Botones Animados */
+.btn-animated {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-animated:hover { transform: translateY(-2px); }
+.btn-animated:active { transform: translateY(0) scale(0.98); }
+
+.btn-cancel {
+    background-color: #f1f5f9;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-cancel:hover {
+    background-color: #fee2e2;
+    color: #dc2626 !important;
+    border-color: #fca5a5;
+}
+
+.btn-primary-custom {
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-primary-custom:hover {
+    background-color: #1d4ed8;
+    box-shadow: 0 6px 15px -3px rgba(37, 99, 235, 0.4) !important;
+}
+
+.btn-warning-custom {
+    background-color: #f59e0b;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-warning-custom:hover {
+    background-color: #d97706;
+    box-shadow: 0 6px 15px -3px rgba(245, 158, 11, 0.4) !important;
+}

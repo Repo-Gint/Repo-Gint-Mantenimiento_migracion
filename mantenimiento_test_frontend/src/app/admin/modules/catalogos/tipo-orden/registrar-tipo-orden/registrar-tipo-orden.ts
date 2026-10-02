@@ -42,8 +42,57 @@ export class RegistrarTipoOrden {
     });
   }
 
-  public async obtenerDetalleTipoOrden(pktipoOrden: number): Promise<any> {
+  // Método auxiliar para sincronizar la selección de color nativa
+  protected seleccionarColor(colorHex: string): void {
+    this.formtipoOrden.get('color')?.setValue(colorHex);
+    this.formtipoOrden.get('color')?.markAsTouched();
+    this.formtipoOrden.get('color')?.markAsDirty();
+  }
 
+  // Verifica si un campo es inválido para activar bordes rojos
+  protected campoEsInvalido(nombreCampo: string): boolean {
+    const campo = this.formtipoOrden.get(nombreCampo);
+    return !!(campo && campo.invalid && (campo.touched || campo.dirty));
+  }
+
+  // Verifica si el campo es válido para mostrar la palomita verde animada
+  protected campoEsValido(nombreCampo: string): boolean {
+    const campo = this.formtipoOrden.get(nombreCampo);
+    return !!(campo && campo.valid && (campo.touched || campo.dirty));
+  }
+
+  // Genera el mensaje dinámico de error
+  protected obtenerMensajeError(nombreCampo: string): string {
+    const campo = this.formtipoOrden.get(nombreCampo);
+    if (!campo || !campo.errors) return '';
+
+    if (campo.errors['required']) return 'Este campo es obligatorio.';
+    if (campo.errors['pattern']) {
+      if (nombreCampo === 'color') return 'Formato HEX inválido (Ej: #EF4444).';
+      return 'Solo se permiten letras y espacios.';
+    }
+    return 'Campo inválido.';
+  }
+
+  // Genera la lista con los nombres legibles de los campos faltantes
+  private obtenerCamposInvalidosTexto(): string {
+    const camposNombres: { [key: string]: string } = {
+      type_orders: 'Tipo de Orden',
+      color: 'Color'
+    };
+
+    const pendientes: string[] = [];
+    Object.keys(this.formtipoOrden.controls).forEach(key => {
+      const control = this.formtipoOrden.get(key);
+      if (control && control.invalid) {
+        pendientes.push(camposNombres[key] || key);
+      }
+    });
+
+    return pendientes.length > 0 ? pendientes.join(', ') : '';
+  }
+
+  public async obtenerDetalleTipoOrden(pktipoOrden: number): Promise<any> {
     return this.tipoOrdenes.obtenerDetalleTipoOrden(pktipoOrden).toPromise().then(
       respuesta => {
         const tipoOrden = respuesta.tipoOrdenes;
@@ -53,10 +102,14 @@ export class RegistrarTipoOrden {
   }
 
   protected registrarTipoOrden(): void {
-    
     if (this.formtipoOrden.invalid) {
-      this.messages.mensajeGenerico('Aún hay campos vacíos o que no cumplen con la estructura correcta.',
-        'info', 'Los campos requeridos están marcados con un *'
+      this.formtipoOrden.markAllAsTouched();
+      const camposFaltantes = this.obtenerCamposInvalidosTexto();
+
+      this.messages.mensajeGenerico(
+        `Por favor verifica los siguientes campos: ${camposFaltantes}.`,
+        'info',
+        'Campos incompletos o incorrectos'
       );
       return;
     }
@@ -87,12 +140,19 @@ export class RegistrarTipoOrden {
 
   protected actualizarTipoOrden(): void {
     if (this.formtipoOrden.invalid) {
-      this.messages.mensajeGenerico('Aún hay campos vacíos o que no cumplen con la estructura correcta.', 'info', 'Los campos requeridos están marcados con un *');
+      this.formtipoOrden.markAllAsTouched();
+      const camposFaltantes = this.obtenerCamposInvalidosTexto();
+
+      this.messages.mensajeGenerico(
+        `Por favor verifica los siguientes campos: ${camposFaltantes}.`,
+        'info',
+        'Campos incompletos o incorrectos'
+      );
       return;
     }
 
-    this.messages.mensajeConfirmacionCustom('¿Está seguro de continuar con la actualización del tipo de mantenimiento?',
-      'question', 'Actualizar tipo de mantenimiento').then(
+    this.messages.mensajeConfirmacionCustom('¿Está seguro de continuar con la actualización del tipo de orden?',
+      'question', 'Actualizar tipo de orden').then(
         res => {
           if (!res.isConfirmed) return;
 

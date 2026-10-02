@@ -1,50 +1,132 @@
-<div class="modal-body dashboard">
-    <div class="pagetitle">
-        <h4 class="t-bold">
-            {{pktipoOrden == null ? 'Registrar' : 'Actualizar'}} tipo de orden
-        </h4>
-        <nav>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">Moneda</li>
-                <li class="breadcrumb-item active"> {{pktipoOrden == null ? 'Registrar' : 'Actualizar'}} tipo de orden</li>
-            </ol>
-        </nav>
+<div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+    <!-- Encabezado con línea superior azul y botón de cierre -->
+    <div class="modal-header border-0 pb-0 pt-4 px-4 position-relative">
+        <div class="w-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <h4 class="fw-bold text-dark mb-1 fs-5">
+                    {{pktipoOrden == null ? 'Registrar' : 'Actualizar'}} tipo de orden
+                </h4>
+                <button type="button" class="btn-close text-muted shadow-none" aria-label="Close" (click)="cerrarModal()"></button>
+            </div>
+            
+            <nav class="d-flex align-items-center gap-2">
+                <ol class="breadcrumb mb-0 fs-7">
+                    <li class="breadcrumb-item text-muted">Tipo Orden</li>
+                    <li class="breadcrumb-item active fw-medium text-secondary">
+                        {{pktipoOrden == null ? 'Registrar' : 'Actualizar'}} tipo de orden
+                    </li>
+                </ol>
+            </nav>
+        </div>
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <form [formGroup]="formtipoOrden" class="row g-3" autocomplete="off">
-                        <div class="col-lg-6">
-                            <label for="type_orders" class="form-label" >Tipo de Orden:</label>
+    <!-- Cuerpo del Formulario -->
+    <div class="modal-body p-4">
+        <div class="card border border-light-subtle rounded-4 bg-light-subtle shadow-none">
+            <div class="card-body p-4">
+                <form [formGroup]="formtipoOrden" class="row g-4" autocomplete="off">
+                    
+                    <!-- Campo 1: Tipo de Orden -->
+                    <div class="col-lg-6">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="type_orders" class="form-label fw-bold text-dark fs-7 mb-0">Tipo de Orden:</label>
+                            <span class="badge bg-primary-subtle text-primary fs-xxs fw-bold px-2 py-1 rounded">REQUERIDO</span>
+                        </div>
+                        <div class="input-group input-group-custom" 
+                             [class.is-invalid-group]="campoEsInvalido('type_orders')"
+                             [class.is-valid-group]="campoEsValido('type_orders')">
+                            <span class="input-group-text bg-white border-end-0 text-muted ps-3">
+                                <i class="bi bi-file-earmark-text fs-6"></i>
+                            </span>
                             <input id="type_orders" type="text"
-                             class="form-control form-control-sm" placeholder="Escribe el tipo de Orden"
+                                class="form-control border-start-0 ps-2 shadow-none" 
+                                placeholder="Escribe el tipo de Orden"
                                 formControlName="type_orders">
-                        </div>
+                            
+                            <!-- Icono de Error -->
+                            <span class="input-group-text bg-white border-start-0 pe-3" *ngIf="campoEsInvalido('type_orders')">
+                                <i class="bi bi-exclamation-circle-fill text-danger fs-6 animate-pulse"></i>
+                            </span>
 
-                        <div class="col-lg-6">
-                            <label for="color" class="form-label" >Color:</label>
+                            <!-- Icono de Éxito (Palomita Animada) -->
+                            <span class="input-group-text bg-white border-start-0 pe-3" *ngIf="campoEsValido('type_orders')">
+                                <i class="bi bi-check-circle-fill text-success fs-6 animate-check-pop"></i>
+                            </span>
+                        </div>
+                        
+                        <!-- Mensaje de error dinámico -->
+                        <div *ngIf="campoEsInvalido('type_orders')" class="text-danger fs-xxs mt-1 fw-semibold d-flex align-items-center gap-1 animate-fade-in">
+                            <i class="bi bi-x-circle-fill"></i>
+                            <span>{{ obtenerMensajeError('type_orders') }}</span>
+                        </div>
+                        <small *ngIf="!campoEsInvalido('type_orders')" class="text-muted d-block mt-1 fs-xxs">
+                            Identificador único para clasificación de órdenes en el sistema.
+                        </small>
+                    </div>
+
+                    <!-- Campo 2: Color -->
+                    <div class="col-lg-6">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="color" class="form-label fw-bold text-dark fs-7 mb-0">Color:</label>
+                            <span class="text-muted fs-xxs fw-semibold">HEX / SCADA UI</span>
+                        </div>
+                        <div class="input-group input-group-custom" 
+                             [class.is-invalid-group]="campoEsInvalido('color')"
+                             [class.is-valid-group]="campoEsValido('color')">
+                            <span class="input-group-text bg-white border-end-0 ps-3 pe-1">
+                                <input type="color" class="form-control form-control-color border-0 p-0 rounded-circle" 
+                                    style="width: 22px; height: 22px; cursor: pointer;"
+                                    [value]="formtipoOrden.get('color')?.value || '#EF4444'"
+                                    (input)="seleccionarColor($any($event.target).value)">
+                            </span>
                             <input id="color" type="text"
-                             class="form-control form-control-sm" placeholder="Escribe el color"
+                                class="form-control border-start-0 ps-2 shadow-none fw-semibold" 
+                                placeholder="#EF4444"
                                 formControlName="color">
+                            
+                            <!-- Icono de Error -->
+                            <span class="input-group-text bg-white border-start-0 pe-3" *ngIf="campoEsInvalido('color')">
+                                <i class="bi bi-exclamation-circle-fill text-danger fs-6 animate-pulse"></i>
+                            </span>
+
+                            <!-- Icono de Éxito (Palomita Animada) -->
+                            <span class="input-group-text bg-white border-start-0 pe-3" *ngIf="campoEsValido('color')">
+                                <i class="bi bi-check-circle-fill text-success fs-6 animate-check-pop"></i>
+                            </span>
                         </div>
 
-            
-                    </form>
-                </div>
+                        <!-- Mensaje de error dinámico -->
+                        <div *ngIf="campoEsInvalido('color')" class="text-danger fs-xxs mt-1 fw-semibold d-flex align-items-center gap-1 animate-fade-in">
+                            <i class="bi bi-x-circle-fill"></i>
+                            <span>{{ obtenerMensajeError('color') }}</span>
+                        </div>
+                    </div>
+
+                </form>
             </div>
         </div>
     </div>
-</div>
-<div class="modal-footer">
-    <button *ngIf="pktipoOrden == null" class="btn btn-sm btn-primary" (click)="registrarTipoOrden()">
-        Registrar
-    </button> 
-        <button *ngIf="pktipoOrden != null" class="btn btn-sm btn-warning" (click)="actualizarTipoOrden()">
-        Actualizar
-    </button>
-    <button class="btn btn-sm btn-danger" (click)="cerrarModal()">
-        {{cambiosForm || pktipoOrden != null ? 'Cancelar' : 'Cerrar'}}
-    </button>
+
+    <!-- Pie del Modal con Botones Animados -->
+    <div class="modal-footer border-top-0 pt-0 pb-4 px-4 d-flex justify-content-end gap-2">
+        <button class="btn btn-animated btn-cancel rounded-pill px-4 py-2 text-secondary fw-semibold d-inline-flex align-items-center gap-2" 
+                (click)="cerrarModal()">
+            <i class="bi bi-x-circle fs-6"></i>
+            <span>{{cambiosForm || pktipoOrden != null ? 'Cancelar' : 'Cerrar'}}</span>
+        </button>
+
+        <button *ngIf="pktipoOrden == null" 
+                class="btn btn-animated btn-primary-custom rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm" 
+                (click)="registrarTipoOrden()">
+            <i class="bi bi-check-circle-fill fs-6"></i>
+            <span>Registrar</span>
+        </button> 
+
+        <button *ngIf="pktipoOrden != null" 
+                class="btn btn-animated btn-warning-custom rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm" 
+                (click)="actualizarTipoOrden()">
+            <i class="bi bi-arrow-repeat fs-6"></i>
+            <span>Actualizar</span>
+        </button>
+    </div>
 </div>

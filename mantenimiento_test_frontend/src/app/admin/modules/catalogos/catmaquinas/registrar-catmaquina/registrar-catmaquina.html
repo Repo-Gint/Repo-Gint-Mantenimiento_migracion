@@ -1,41 +1,68 @@
-<div class="modal-body dashboard">
-    <div class="pagetitle">
-        <h4 class="t-bold">
-            {{pkCatalogoMaquina == null ? 'Registrar' : 'Actualizar'}} catalogo maquina
-        </h4>
-        <nav>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">Maquina</li>
-                <li class="breadcrumb-item active"> {{pkCatalogoMaquina == null ? 'Registrar' : 'Actualizar'}} catalogo maquina</li>
-            </ol>
-        </nav>
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <form [formGroup]="formCatMaquina" class="row g-3" autocomplete="off">
-                        
-                        <div class="col-lg-6">
-                            <label for="cat_machines" class="form-label" >Catalogo Maquina:</label>
-                            <input id="cat_machines" type="text" class="form-control form-control-sm" placeholder="Catalogo Maquina" formControlName="cat_machines">
-                        </div>
-
-                    </form>
+<div class="modal-body dashboard p-4">
+    <!-- Header Corporativo Estilo MES/SCADA -->
+    <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+        <div class="d-flex align-items-center">
+            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3 me-3 fs-4">
+                <i class="bi bi-boxes"></i>
+            </div>
+            <div>
+                <div class="text-uppercase text-muted fw-bold small tracking-wider">
+                    CATÁLOGO MAESTRO • ISO 55000 • REF-09B
                 </div>
+                <h4 class="fw-bold text-dark mb-1">
+                    {{ pkCatalogoMaquina == null ? 'Registrar' : 'Actualizar' }} catálogo máquina
+                </h4>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-hdd-network me-1"></i> Máquina / <span class="text-dark fw-medium">{{ pkCatalogoMaquina == null ? 'Registrar' : 'Actualizar' }} catálogo máquina</span>
+                </p>
             </div>
         </div>
     </div>
+
+    <!-- Banner Informativo -->
+    <div class="alert alert-primary bg-primary bg-opacity-10 border-0 rounded-3 p-3 mb-4 d-flex gap-3 align-items-start">
+        <i class="bi bi-info-circle-fill text-primary fs-5 mt-1"></i>
+        <div>
+            <h6 class="fw-bold text-dark mb-1 small text-uppercase">Clasificación Estructurada de Activos</h6>
+            <p class="text-muted small mb-0">
+                La familia o catálogo define los estándares de criticidad, hojas de ruta de mantenimiento preventivo y frecuencias de inspección recomendadas para los equipos vinculados.
+            </p>
+        </div>
+    </div>
+
+    <form [formGroup]="formCatMaquina" class="row g-3" autocomplete="off">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="cat_machines" class="form-label fw-bold text-dark small mb-0">
+                    Catálogo Máquina: <span class="text-danger">*</span>
+                </label>
+                <span class="text-muted fs-xxs fw-medium">
+                    {{ formCatMaquina.get('cat_machines')?.value?.length || 0 }} / 60 caracteres
+                </span>
+            </div>
+            <div class="input-group input-group-sm shadow-xs">
+                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-cpu"></i></span>
+                <input id="cat_machines" type="text" class="form-control form-control-sm border-start-0 shadow-none" 
+                       placeholder="Ej. Rectificadora, Prensa, CNC..." formControlName="cat_machines" maxlength="60">
+            </div>
+            <div class="form-text text-muted fs-xxs mt-1">
+                Especifica la tipología genérica del parque industrial (ej. Rectificadora, Prensa, CNC).
+            </div>
+        </div>
+    </form>
 </div>
-<div class="modal-footer">
-    <button *ngIf="pkCatalogoMaquina == null" class="btn btn-sm btn-primary" (click)="registrarCatalogoMaquina()">
-        Registrar
-    </button> 
-        <button *ngIf="pkCatalogoMaquina != null" class="btn btn-sm btn-warning" (click)="actualizarCatalogoMaquina()">
-        Actualizar
-    </button>
-    <button class="btn btn-sm btn-danger" (click)="cerrarModal()">
-        {{cambiosForm || pkCatalogoMaquina != null ? 'Cancelar' : 'Cerrar'}}
-    </button>
+
+<div class="modal-footer bg-light px-4 py-3 d-flex justify-content-between align-items-center">
+    <span class="text-muted small">Campos marcados con <span class="text-danger">*</span> son obligatorios</span>
+    <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary px-3 transition-all hover-scale" (click)="cerrarModal()">
+            {{ cambiosForm || pkCatalogoMaquina != null ? 'Cancelar' : 'Cerrar' }}
+        </button>
+        <button *ngIf="pkCatalogoMaquina == null" class="btn btn-sm btn-primary px-4 fw-medium shadow-sm transition-all hover-scale d-flex align-items-center gap-1" (click)="registrarCatalogoMaquina()">
+            <i class="bi bi-check-lg"></i> Registrar catálogo
+        </button> 
+        <button *ngIf="pkCatalogoMaquina != null" class="btn btn-sm btn-warning px-4 fw-medium shadow-sm text-dark transition-all hover-scale d-flex align-items-center gap-1" (click)="actualizarCatalogoMaquina()">
+            <i class="bi bi-arrow-repeat"></i> Actualizar catálogo
+        </button>
+    </div>
 </div>

@@ -1,56 +1,170 @@
-<div class="modal-body dashboard">
-    <div class="pagetitle">
-        <h4 class="t-bold">
-            {{pktipoMantenimiento == null ? 'Registrar' : 'Actualizar'}} tipo de mantenimiento
-        </h4>
-        <nav>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">Moneda</li>
-                <li class="breadcrumb-item active"> {{pktipoMantenimiento == null ? 'Registrar' : 'Actualizar'}} tipo de mantenimiento</li>
-            </ol>
-        </nav>
+<div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+    <!-- Encabezado -->
+    <div class="modal-header border-0 pb-0 pt-4 px-4 position-relative">
+        <div class="w-100">
+            <div class="d-flex align-items-center justify-content-between">
+                <h4 class="fw-bold text-dark mb-1 fs-5">
+                    {{pktipoMantenimiento == null ? 'Registrar' : 'Actualizar'}} tipo de mantenimiento
+                </h4>
+                <button type="button" class="btn-close text-muted shadow-none" aria-label="Close" (click)="cerrarModal()"></button>
+            </div>
+            
+            <nav class="d-flex align-items-center gap-2">
+                <ol class="breadcrumb mb-0 fs-7">
+                    <li class="breadcrumb-item text-muted">Tipo Mantenimiento</li>
+                    <li class="breadcrumb-item active fw-medium text-secondary">
+                        {{pktipoMantenimiento == null ? 'Registrar' : 'Actualizar'}} tipo de mantenimiento
+                    </li>
+                </ol>
+            </nav>
+        </div>
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <form [formGroup]="formtipoMantenimiento" class="row g-3" autocomplete="off">
-                        <div class="col-lg-6">
-                            <label for="type_maintenances" class="form-label" >Tipo de Mantenimiento:</label>
+    <!-- Cuerpo del Formulario -->
+    <div class="modal-body p-4">
+        <div class="card border border-light-subtle rounded-4 bg-light-subtle shadow-none">
+            <div class="card-body p-4">
+                <form [formGroup]="formtipoMantenimiento" class="row g-4" autocomplete="off">
+                    
+                    <!-- Campo 1: Tipo de Mantenimiento -->
+                    <div class="col-lg-6">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="type_maintenances" class="form-label fw-bold text-dark fs-7 mb-0">Tipo de Mantenimiento:</label>
+                            <span class="badge bg-primary-subtle text-primary fs-xxs fw-bold px-2 py-1 rounded">REQUERIDO</span>
+                        </div>
+                        <div class="input-group input-group-custom" 
+                             [class.is-invalid-group]="campoEsInvalido('type_maintenances')"
+                             [class.is-valid-group]="campoEsValido('type_maintenances')">
+                            <span class="input-group-text bg-white border-end-0 text-muted ps-3">
+                                <i class="bi bi-gear fs-6"></i>
+                            </span>
                             <input id="type_maintenances" type="text"
-                             class="form-control form-control-sm" placeholder="Escribe el tipo de Mantenimiento"
+                                class="form-control border-start-0 ps-2 shadow-none" 
+                                placeholder="Mantenimiento Correctivo Crítico"
                                 formControlName="type_maintenances">
-                        </div>
+                            
+                            <!-- Icono de Error -->
+                            <span class="input-group-text bg-white border-start-0 pe-3" *ngIf="campoEsInvalido('type_maintenances')">
+                                <i class="bi bi-exclamation-circle-fill text-danger fs-6 animate-pulse"></i>
+                            </span>
 
-                        <div class="col-lg-6">
-                            <label for="color" class="form-label" >Color:</label>
-                            <input id="color" type="text"
-                             class="form-control form-control-sm" placeholder="Escribe el color"
-                                formControlName="color">
-                        </div>
-
-                        <div class="col-lg-6">
-                            <label for="acronym" class="form-label" >Abreviatura:</label>
-                            <input id="acronym" type="text"
-                             class="form-control form-control-sm" placeholder="Escribe la Abeviatura"
-                                formControlName="acronym">
+                            <!-- Icono de Éxito (Palomita Animada) -->
+                            <span class="input-group-text bg-white border-start-0 pe-3" *ngIf="campoEsValido('type_maintenances')">
+                                <i class="bi bi-check-circle-fill text-success fs-6 animate-check-pop"></i>
+                            </span>
                         </div>
                         
-                    </form>
-                </div>
+                        <div *ngIf="campoEsInvalido('type_maintenances')" class="text-danger fs-xxs mt-1 fw-semibold d-flex align-items-center gap-1 animate-fade-in">
+                            <i class="bi bi-x-circle-fill"></i>
+                            <span>{{ obtenerMensajeError('type_maintenances') }}</span>
+                        </div>
+                        <small *ngIf="!campoEsInvalido('type_maintenances')" class="text-muted d-block mt-1 fs-xxs">
+                            Identificador para categorización en órdenes de trabajo y reportes OEE.
+                        </small>
+                    </div>
+
+                    <!-- Campo 2: Color -->
+                    <div class="col-lg-6">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="color" class="form-label fw-bold text-dark fs-7 mb-0">Color:</label>
+                            <span class="text-muted fs-xxs fw-semibold">HEX / SCADA UI</span>
+                        </div>
+                        <div class="input-group input-group-custom" 
+                             [class.is-invalid-group]="campoEsInvalido('color')"
+                             [class.is-valid-group]="campoEsValido('color')">
+                            <span class="input-group-text bg-white border-end-0 ps-3 pe-1">
+                                <input type="color" class="form-control form-control-color border-0 p-0 rounded-circle" 
+                                    style="width: 22px; height: 22px; cursor: pointer;"
+                                    [value]="formtipoMantenimiento.get('color')?.value || '#EF4444'"
+                                    (input)="seleccionarColor($any($event.target).value)">
+                            </span>
+                            <input id="color" type="text"
+                                class="form-control border-start-0 ps-2 shadow-none fw-semibold" 
+                                placeholder="#EF4444"
+                                formControlName="color">
+                            
+                            <!-- Icono de Error -->
+                            <span class="input-group-text bg-white border-start-0 pe-3" *ngIf="campoEsInvalido('color')">
+                                <i class="bi bi-exclamation-circle-fill text-danger fs-6 animate-pulse"></i>
+                            </span>
+
+                            <!-- Icono de Éxito (Palomita Animada) -->
+                            <span class="input-group-text bg-white border-start-0 pe-3" *ngIf="campoEsValido('color')">
+                                <i class="bi bi-check-circle-fill text-success fs-6 animate-check-pop"></i>
+                            </span>
+                        </div>
+
+                        <div *ngIf="campoEsInvalido('color')" class="text-danger fs-xxs mt-1 fw-semibold d-flex align-items-center gap-1 animate-fade-in">
+                            <i class="bi bi-x-circle-fill"></i>
+                            <span>{{ obtenerMensajeError('color') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Campo 3: Abreviatura -->
+                    <div class="col-lg-6">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="acronym" class="form-label fw-bold text-dark fs-7 mb-0">Abreviatura:</label>
+                            <span class="text-muted fs-xxs">Máx. 5 caracteres</span>
+                        </div>
+                        <div class="input-group input-group-custom" 
+                             [class.is-invalid-group]="campoEsInvalido('acronym')"
+                             [class.is-valid-group]="campoEsValido('acronym')">
+                            <span class="input-group-text bg-white border-end-0 text-muted ps-3">
+                                <i class="bi bi-type-h1 fs-6"></i>
+                            </span>
+                            <input id="acronym" type="text"
+                                class="form-control border-start-0 ps-2 shadow-none fw-bold text-uppercase" 
+                                placeholder="COR-C"
+                                formControlName="acronym">
+                            
+                            <!-- Chip Preview & Icono de Éxito -->
+                            <span class="input-group-text bg-white border-start-0 pe-3 gap-2" *ngIf="campoEsValido('acronym')">
+                                <span class="badge border text-success border-success-subtle bg-success-subtle rounded px-2 py-1 fs-xxs fw-bold">
+                                    {{ formtipoMantenimiento.get('acronym')?.value }}
+                                </span>
+                                <i class="bi bi-check-circle-fill text-success fs-6 animate-check-pop"></i>
+                            </span>
+
+                            <!-- Icono de Error -->
+                            <span class="input-group-text bg-white border-start-0 pe-3" *ngIf="campoEsInvalido('acronym')">
+                                <i class="bi bi-exclamation-circle-fill text-danger fs-6 animate-pulse"></i>
+                            </span>
+                        </div>
+
+                        <div *ngIf="campoEsInvalido('acronym')" class="text-danger fs-xxs mt-1 fw-semibold d-flex align-items-center gap-1 animate-fade-in">
+                            <i class="bi bi-x-circle-fill"></i>
+                            <span>{{ obtenerMensajeError('acronym') }}</span>
+                        </div>
+                        <small *ngIf="!campoEsInvalido('acronym')" class="text-muted d-block mt-1 fs-xxs">
+                            Identificador condensado para cronogramas Gantt y tableros Kanban.
+                        </small>
+                    </div>
+
+                </form>
             </div>
         </div>
     </div>
-</div>
-<div class="modal-footer">
-    <button *ngIf="pktipoMantenimiento == null" class="btn btn-sm btn-primary" (click)="registrarTipoMantenimiento()">
-        Registrar
-    </button> 
-        <button *ngIf="pktipoMantenimiento != null" class="btn btn-sm btn-warning" (click)="actualizartipoMantenimiento()">
-        Actualizar
-    </button>
-    <button class="btn btn-sm btn-danger" (click)="cerrarModal()">
-        {{cambiosForm || pktipoMantenimiento != null ? 'Cancelar' : 'Cerrar'}}
-    </button>
+
+    <!-- Pie del Modal -->
+    <div class="modal-footer border-top-0 pt-0 pb-4 px-4 d-flex justify-content-end gap-2">
+        <button class="btn btn-animated btn-cancel rounded-pill px-4 py-2 text-secondary fw-semibold d-inline-flex align-items-center gap-2" 
+                (click)="cerrarModal()">
+            <i class="bi bi-x-circle fs-6"></i>
+            <span>{{cambiosForm || pktipoMantenimiento != null ? 'Cancelar' : 'Cerrar'}}</span>
+        </button>
+
+        <button *ngIf="pktipoMantenimiento == null" 
+                class="btn btn-animated btn-primary-custom rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm" 
+                (click)="registrarTipoMantenimiento()">
+            <i class="bi bi-check-circle-fill fs-6"></i>
+            <span>Registrar</span>
+        </button> 
+
+        <button *ngIf="pktipoMantenimiento != null" 
+                class="btn btn-animated btn-warning-custom rounded-pill px-4 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm" 
+                (click)="actualizartipoMantenimiento()">
+            <i class="bi bi-arrow-repeat fs-6"></i>
+            <span>Actualizar</span>
+        </button>
+    </div>
 </div>

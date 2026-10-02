@@ -16,6 +16,7 @@ export class RegistrarDepartamento {
   @Input() pkDepartamento: any = null;
 
   protected formDepartamento!: FormGroup;
+  protected submitted: boolean = false; // Bandera para activar validaciones visuales
 
   constructor (
     private modal: ModalService,
@@ -44,10 +45,8 @@ export class RegistrarDepartamento {
   }
 
   public async obtenerDetalleDepartamento(pkDepartamento: number): Promise<any> {
-
     return this.departamentos.obtenerDetalleDepartamento(pkDepartamento).toPromise().then(
       respuesta => {
-
         const departamento = respuesta.departamento;
 
         this.formDepartamento.get('Departament_ES')?.setValue(departamento.Departament_ES);
@@ -57,19 +56,40 @@ export class RegistrarDepartamento {
     );
   }
 
-  protected registrarDepartamento(): void {
+  // Método auxiliar para detectar exactamente qué campos faltan o fallan
+  private validarCamposFormulario(): boolean {
+    this.submitted = true;
+    this.formDepartamento.markAllAsTouched();
 
     if (this.formDepartamento.invalid) {
-      this.messages.mensajeGenerico('Aún hay campos vacíos o que no cumplen con la estructura correcta.',
-				'info', 'Los campos requeridos están marcados con un *'
-			);
-			return;
-		}
+      let camposFaltantes: string[] = [];
+
+      if (this.formDepartamento.get('Departament_ES')?.invalid) {
+        camposFaltantes.push('• <b>Departamento (ES)</b> (Obligatorio / Solo letras)');
+      }
+      if (this.formDepartamento.get('Departament_EN')?.invalid) {
+        camposFaltantes.push('• <b>Departamento (EN)</b> (Obligatorio / Solo letras)');
+      }
+      if (this.formDepartamento.get('Acronym')?.invalid) {
+        camposFaltantes.push('• <b>Acronym (Abreviatura)</b> (Obligatorio / Solo letras)');
+      }
+
+      this.messages.mensajeGenerico(
+        `Por favor, complete o corrija los siguientes campos requeridos:<br><br>${camposFaltantes.join('<br>')}`,
+        'warning',
+        'Campos incompletos o con formato erróneo'
+      );
+      return false;
+    }
+    return true;
+  }
+
+  protected registrarDepartamento(): void {
+    if (!this.validarCamposFormulario()) return;
 
     this.messages.mensajeConfirmacionCustom('¿Está seguro de continuar con el registro del departamento?',
-				'question', 'Registrar departamento'
-			).then(res=> {
-
+        'question', 'Registrar departamento'
+      ).then(res => {
         if (!res.isConfirmed) return;
         this.messages.mensajeEsperar();
 
@@ -77,7 +97,6 @@ export class RegistrarDepartamento {
 
         this.departamentos.registrarDepartamento(departamento).toPromise().then(
           respuesta => {
-
             this.pkDepartamento = respuesta.pkDepartamento;
             this.ch.markForCheck();
 
@@ -88,14 +107,11 @@ export class RegistrarDepartamento {
             this.messages.mensajeGenerico('error', 'error');
           }
         );
-      })
+      });
   }
 
   protected actualizarDepartamento(): void {
-    if (this.formDepartamento.invalid) {
-      this.messages.mensajeGenerico('Aún hay campos vacíos o que no cumplen con la estructura correcta.', 'info', 'Los campos requeridos están marcados con un *');
-      return;
-    }
+    if (!this.validarCamposFormulario()) return;
 
     this.messages.mensajeConfirmacionCustom('¿Está seguro de continuar con la actualización del departamento?',
         'question', 'Actualizar departamento').then(
@@ -111,38 +127,37 @@ export class RegistrarDepartamento {
 
             this.departamentos.actualizarDepartamento(data).toPromise().then(
               respuesta => {
-
                 this.obtenerDetalleDepartamento(this.pkDepartamento).then(() => {
                   this.messages.mensajeGenerico(respuesta.mensaje, 'success', respuesta.title)
                 });
               }, error => {
                 this.messages.mensajeGenerico('error', 'error')
               }
-            )
+            );
           }
         )
   }
 
-	get cambiosForm(): boolean {
-		return this.formDepartamento.dirty;
-	}
+  get cambiosForm(): boolean {
+    return this.formDepartamento.dirty;
+  }
 
-	public cerrarModal(): void {
-		if (!this.cambiosForm) {
-			this.modal.cerrarModal();
-			return;
-		}
+  public cerrarModal(): void {
+    if (!this.cambiosForm) {
+      this.modal.cerrarModal();
+      return;
+    }
 
-		this.messages.mensajeConfirmacionCustom(
-			'¿Está seguro de cerrar sin guardar cambios?',
-			'question',
-			'Cancelar registro'
-		).then(
-			res => {
-				if (!res.isConfirmed) return;
+    this.messages.mensajeConfirmacionCustom(
+      '¿Está seguro de cerrar sin guardar cambios?',
+      'question',
+      'Cancelar registro'
+    ).then(
+      res => {
+        if (!res.isConfirmed) return;
 
-				this.modal.cerrarModal();
-			}
-		)
-	}
+        this.modal.cerrarModal();
+      }
+    )
+  }
 }

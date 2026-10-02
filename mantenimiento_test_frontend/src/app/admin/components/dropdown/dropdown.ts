@@ -83,6 +83,12 @@ export class DropdownComponent implements OnInit, OnChanges {
     this.updateSelectedCount();
   }
 
+  // Método auxiliar para eliminar elemento desde el chip del botón
+  protected removeOption(option: any) {
+    option.checked = false;
+    this.updateSelectedCount();
+  }
+
   protected filterOptions(event: Event) {
     this.searchText = (event.target as HTMLInputElement).value;
 

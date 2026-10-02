@@ -1,73 +1,68 @@
 <?php
 
-        namespace App\Repositories\Admin\Catalogos;
-        use App\Models\CatDepartament;
-        use Illuminate\Support\Facades\DB;
+namespace App\Repositories\Admin\Catalogos;
 
-        class DepartamentosRepository
-        {
-            public function registrarDepartamento(array $departamentos) {
-                $registro = new CatDepartament();
-                $registro->Departament_ES  = $departamentos['Departament_ES'];
-                $registro->Departament_EN  = $departamentos['Departament_EN'];
-                $registro->Acronym         = $departamentos['Acronym'];
-                $registro->active          = 1;
-                $registro->save();
+use App\Models\CatDepartament;
+use Illuminate\Support\Facades\DB;
 
-                return $registro->id_departaments;
-            }
+class DepartamentosRepository
+{
+    public function registrarDepartamento(array $departamentos) {
+        $registro = new CatDepartament();
+        $registro->Departament_ES  = $departamentos['Departament_ES'];
+        $registro->Departament_EN  = $departamentos['Departament_EN'];
+        $registro->Acronym         = $departamentos['Acronym'];
+        $registro->active          = 1;
+        $registro->save();
 
-            public function obtenerListaDepartamentos() {
-                $query = CatDepartament::select(
-                    'id_departaments', 
-                    'Departament_ES', 
-                    'Departament_EN',
-                    'Acronym', 
-                    'Active', 
-                    DB::raw("
-                                            CASE
-                                            WHEN Active = 1 THEN 'Activo'
-                                            ELSE 'Inactivo'
-                                            END as estado    
-                    ")
-                );
+        return $registro->id_departaments;
+    }
 
-                return $query->get();
-            }
+    public function obtenerListaDepartamentos() {
+        $query = CatDepartament::select(
+            'id_departaments', 
+            'Departament_ES', 
+            'Departament_EN',
+            'Acronym', 
+            'Active', 
+            DB::raw("
+                CASE
+                WHEN Active = 1 THEN 'Activo'
+                ELSE 'Inactivo'
+                END as estado    
+            ")
+        );
 
-            public function obtenerDetalleDepartamento($pkDepartamento) {
-                $query = CatDepartament::select(
-                    'id_departaments', 
-                    'Departament_ES', 
-                    'Departament_EN', 
-                    'Acronym', 
-                    'Active'
-                )
+        return $query->get();
+    }
 
-                ->where([
-                    ['id_departaments', $pkDepartamento], 
-                    ['Active', 1]
-                ]);
+    public function obtenerDetalleDepartamento($pkDepartamento) {
+        $query = CatDepartament::select(
+            'id_departaments', 
+            'Departament_ES', 
+            'Departament_EN', 
+            'Acronym', 
+            'Active'
+        )
+        ->where('id_departaments', $pkDepartamento);
 
-                return $query->get();
-            }
+        return $query->get();
+    }
 
-            public function actualizarDepartamento($id, $departamento) {
-                $actualizar = CatDepartament::findOrFail($id);
+    public function actualizarDepartamento($id, $departamento) {
+        $actualizar = CatDepartament::findOrFail($id);
 
-                $actualizar->Departament_ES = $departamento['Departament_ES'];
-                $actualizar->Departament_EN = $departamento['Departament_EN'];
-                $actualizar->Acronym        = $departamento['Acronym'];
-                $actualizar->save();
-            }
+        $actualizar->Departament_ES = $departamento['Departament_ES'];
+        $actualizar->Departament_EN = $departamento['Departament_EN'];
+        $actualizar->Acronym        = $departamento['Acronym'];
+        $actualizar->save();
+    }
 
-            public function cambiarStatusDepartamento($pkDepartamento) {
-                $departamentos = CatDepartament::findOrFail($pkDepartamento);
-                $departamentos->Active = $departamentos->Active ? 0 :1;
-                $departamentos->save();
+    public function cambiarStatusDepartamento($pkDepartamento) {
+        $departamentos = CatDepartament::findOrFail($pkDepartamento);
+        $departamentos->Active = $departamentos->Active ? 0 : 1;
+        $departamentos->save();
 
-                return $departamentos->Active;
-            }
-
-        }
-      
+        return $departamentos->Active;
+    }
+}

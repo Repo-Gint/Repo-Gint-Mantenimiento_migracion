@@ -1,0 +1,28 @@
+.fs-xxs {
+    font-size: 0.65rem;
+}
+
+.tracking-wider {
+    letter-spacing: 0.08em;
+    font-size: 0.7rem;
+}
+
+.modal-body {
+    background-color: #ffffff;
+}
+
+/* Transiciones y efectos animados en botones */
+.transition-all {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Estilos de inputs enfocados */
+.form-control:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12);
+}

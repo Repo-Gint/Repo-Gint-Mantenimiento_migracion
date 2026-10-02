@@ -1,98 +1,246 @@
-<div class="pagetitle">
-    <h1>Ordenes</h1>
-    <nav>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">Ordenes</li>
-            <li class="breadcrumb-item active">Consulta Ordenes</li>
-        </ol>
-    </nav>
-</div>
+<div class="dashboard-container py-2">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <h1 class="h3 fw-bold text-dark mb-0">Órdenes</h1>
+                <span class="badge badge-pill-light">Mantenimiento General</span>
+            </div>
+            <nav>
+                <ol class="breadcrumb mb-0 bg-transparent p-0 small">
+                    <li class="breadcrumb-item text-muted">Órdenes</li>
+                    <li class="breadcrumb-item active text-primary">Consulta Órdenes</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-light-custom btn-sm px-3 shadow-sm">
+                <i class="bi bi-clock-history me-1"></i> Bitácora
+            </button>
+        </div>
+    </div>
 
-<section class="section dashboard">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body row g-3 col-4">
-                    <label for="area" class="form-label">Area:</label>
-                    <select id="area" class="form-select form-select-sm" [(ngModel)]="id_area" (change)="busquedaFiltros()">
-                        <option *ngFor="let area of listaAreas" [value]="area.id_area">
-                            {{ area.area }}
-                        </option>
-                        <option style="display: none; visibility: hidden;" value="">Selecciona una opción
-                        </option>
-                    </select>
-                    
-                    <label class="form-label">Status:</label>
-                    <div class="dropdown w-100">
-
-                        <button class="form-select form-select-sm text-start" type="button" data-bs-toggle="dropdown">
-                            {{ getStatusNombre(id_status) || 'Selecciona una opción' }}
-                        </button>
-
-                        <div class="dropdown-menu w-100 p-2">
-
-                            <div *ngFor="let status of listaStatus" class="form-check">
-
-                                <input class="form-check-input" type="radio" name="status"
-                                    [value]="status.id_status_order" [(ngModel)]="id_status"
-                                    (change)="busquedaFiltros()" id="status{{status.id_status_order}}">
-
-                                <label class="form-check-label w-100" for="status{{status.id_status_order}}">
-                                    {{ status.status }}
-                                </label>
-                            </div>
-                        </div>
+    <!-- Metric Cards Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="metric-card-light p-3 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small text-uppercase fw-semibold">Total de Órdenes</span>
+                    <div class="metric-icon-box bg-primary-subtle text-primary">
+                        <i class="bi bi-file-earmark-text"></i>
                     </div>
+                </div>
+                <h2 class="text-dark fw-bold mb-1">{{ datosTabla.length || 0 }}</h2>
+                <span class="text-success small"><i class="bi bi-arrow-up-short"></i> Registradas este ciclo</span>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="metric-card-light p-3 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small text-uppercase fw-semibold">Órdenes Activas</span>
+                    <div class="metric-icon-box bg-warning-subtle text-warning">
+                        <i class="bi bi-exclamation-circle"></i>
+                    </div>
+                </div>
+                <h2 class="text-dark fw-bold mb-1">{{ datosTabla.length || 0 }}</h2>
+                <span class="text-muted small">Requieren atención operativa</span>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="metric-card-light p-3 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small text-uppercase fw-semibold">Mantenimientos Urgentes</span>
+                    <div class="metric-icon-box bg-danger-subtle text-danger">
+                        <i class="bi bi-shield-exclamation"></i>
+                    </div>
+                </div>
+                <h2 class="text-dark fw-bold mb-1">02</h2>
+                <span class="text-danger small">Línea de producción NAVE-1</span>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="metric-card-light p-3 shadow-sm">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small text-uppercase fw-semibold">Tiempo Promedio Cierre</span>
+                    <div class="metric-icon-box bg-success-subtle text-success">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                </div>
+                <h2 class="text-dark fw-bold mb-1">3.4 h</h2>
+                <span class="text-success small">-18% vs mes pas.</span>
+            </div>
+        </div>
+    </div>
 
-                    <div class="botonera">
-                        <button class="btn btn-success btn-sm"> Exportar</button>
+    <!-- Filters Bar Card con Buscador Animado y 4 Columnas -->
+    <div class="filter-light-card p-3 mb-4 shadow-sm">
+        <div class="row align-items-end g-3">
+            <!-- Filtro Área -->
+            <div class="col-md-3">
+                <label class="form-label-light">Área:</label>
+                <div class="dropdown custom-dropdown w-100">
+                    <button class="form-select form-select-sm text-start d-flex justify-content-between align-items-center shadow-none custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="text-truncate">{{ getAreaNombre(id_area) || 'Selecciona una opción' }}</span>
+                    </button>
+                    <div class="dropdown-menu w-100 p-2 shadow-lg border-0 rounded-3" style="max-height: 250px; overflow-y: auto;">
+                        <div *ngFor="let area of listaAreas" class="form-check custom-radio-item py-2 px-3 my-1 rounded-2">
+                            <input class="form-check-input" type="radio" name="area" [value]="area.id_area" [(ngModel)]="id_area" (change)="busquedaFiltros()" id="area{{area.id_area}}">
+                            <label class="form-check-label text-dark ms-2 w-100 fw-medium" for="area{{area.id_area}}" style="cursor: pointer;">
+                                {{ area.area }}
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-12" style="margin-top: 20px !important;">
-            <table class="table table-striped table-hover text-center">
-                <thead>
-                    <tr>
-                        <th>Folio</th>
-                        <th>Maquina</th>
-                        <th>Departamento</th>
-                        <th>Area</th>
-                        <th>Solicitante</th>
-                        <th>Tipo.Mantenimiento</th>
-                        <th>Tipo.Orden</th>
-                        <th>Prioridad</th>
-                        <th>Status</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="text-center">
-                <tr *ngFor="let orden of datosTabla">
-                    <td>{{ orden.folio }}</td>
-                    <td>{{ orden.machines }}</td>
-                    <td>{{ orden.Departament_ES }}</td>
-                    <td>{{ orden.area }}</td>
-                    <td>{{ orden.Name }}</td>
-                    <td>{{ orden.type_maintenances }}</td>
-                    <td>{{ orden.type_orders }}</td>
-                    <td>{{ orden.priority }}</td>
-                    <td>
-                        <i class="bi" [ngClass]="getStatusIcon(orden.status)"></i>
-                        {{ orden.status }}
-                    </td>
-                    <td class="text-medium">
-            <button class="btn btn-sm btn-outline-primary me-1"
-                (click)="abrirModalRegistrarOrdenes(orden.id_order)">
-                <i class="bi bi-pencil"></i>
-            </button>
 
-            <button class="btn btn-sm btn-outline-primary" (click)="cancelarOrden(orden.id_order)">
-                <i class="bi bi-x-circle text-danger"></i>
-            </button>
-        </td>
-    </tr>
-</tbody>
-            </table>
+            <!-- Filtro Status -->
+            <div class="col-md-3">
+                <label class="form-label-light">Status:</label>
+                <div class="dropdown custom-dropdown w-100">
+                    <button class="form-select form-select-sm text-start d-flex justify-content-between align-items-center shadow-none custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="text-truncate">{{ getStatusNombre(id_status) || 'Selecciona una opción' }}</span>
+                    </button>
+                    <div class="dropdown-menu w-100 p-2 shadow-lg border-0 rounded-3" style="max-height: 250px; overflow-y: auto;">
+                        <div *ngFor="let status of listaStatus" class="form-check custom-radio-item py-2 px-3 my-1 rounded-2">
+                            <input class="form-check-input" type="radio" name="status" [value]="status.id_status_order" [(ngModel)]="id_status" (change)="busquedaFiltros()" id="status{{status.id_status_order}}">
+                            <label class="form-check-label text-dark ms-2 w-100 fw-medium" for="status{{status.id_status_order}}" style="cursor: pointer;">
+                                {{ status.status }}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buscador Súper Animado -->
+            <div class="col-md-3">
+                <label class="form-label-light">Buscar:</label>
+                <div class="input-group input-group-sm search-animated-box">
+                    <span class="input-group-text bg-transparent border-end-0 text-muted ps-3">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control border-start-0 shadow-none bg-transparent ps-2" placeholder="Folio, máquina, técnico..." [(ngModel)]="textoBusqueda" (input)="paginaActual = 1">
+                    <button *ngIf="textoBusqueda" class="btn btn-link text-muted border-0 text-decoration-none pe-3" type="button" (click)="textoBusqueda = ''">
+                        <i class="bi bi-x-circle-fill"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botón Exportar -->
+            <div class="col-md-3 d-flex justify-content-md-end">
+                <button class="btn btn-success btn-sm px-4 shadow-sm w-100">
+                    <i class="bi bi-file-earmark-excel me-1"></i> Exportar
+                </button>
+            </div>
         </div>
     </div>
-</section>
+
+    <!-- Table Container Card con Paginación de 5 en 5 -->
+    <div class="table-light-card shadow-sm">
+        <div class="p-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2 bg-white">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-pill p-1"><i class="bi bi-circle-fill fs-xxs"></i></span>
+                <h6 class="text-dark mb-0 fw-bold">ÓRDENES DE TRABAJO ACTIVAS</h6>
+                <span class="badge bg-light text-muted small px-2 border">{{ ordenesFiltradas.length }} resultados</span>
+            </div>
+            <span class="text-muted small">Actualizado hace: 1min <i class="bi bi-arrow-repeat ms-1 cursor-pointer"></i></span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 text-center">
+                <thead>
+                    <tr class="table-light-header">
+                        <th class="ps-3 text-start">FOLIO</th>
+                        <th class="text-start">MÁQUINA</th>
+                        <th>DEPARTAMENTO</th>
+                        <th>ÁREA</th>
+                        <th>SOLICITANTE</th>
+                        <th>TIPO MANTENIMIENTO</th>
+                        <th>TIPO ORDEN</th>
+                        <th>PRIORIDAD</th>
+                        <th class="pe-3">ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let orden of ordenesPaginadas">
+                        <td class="ps-3 text-start fw-bold text-primary">
+                            <i class="bi bi-file-text me-1 text-secondary"></i> {{ orden.folio }}
+                        </td>
+                        <td class="text-start">
+                            <div class="fw-semibold text-dark">{{ orden.machines }}</div>
+                            <small class="text-muted">SN: Gen-Machine</small>
+                        </td>
+                        <td><span class="text-secondary">{{ orden.Departament_ES }}</span></td>
+                        <td>
+                            <span class="badge bg-light border text-dark px-2 py-1">
+                                <i class="bi bi-geo-alt me-1 text-primary"></i> {{ orden.area }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2 justify-content-center">
+                                <div class="avatar-circle-light">{{ (orden.Name || 'U').charAt(0) }}</div>
+                                <span class="text-dark">{{ orden.Name }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge-pill-mantenimiento-light">
+                                <i class="bi bi-tools me-1"></i> {{ orden.type_maintenances }}
+                            </span>
+                        </td>
+                        <td><span class="text-secondary">{{ orden.type_orders }}</span></td>
+                        <td>
+                            <!-- Insignia de Prioridad / Status Animada con Iconos Bootstrap -->
+                            <span class="badge-priority-animated" [ngClass]="{
+                                'priority-urgent-pulse': orden.priority?.toLowerCase() === 'urgente',
+                                'priority-normal-badge': orden.priority?.toLowerCase() !== 'urgente'
+                            }">
+                                <i class="bi" [ngClass]="orden.priority?.toLowerCase() === 'urgente' ? 'bi-exclamation-octagon-fill text-danger' : 'bi-shield-check text-primary'"></i>
+                                {{ orden.priority }}
+                            </span>
+                        </td>
+                        <td class="pe-3">
+                            <div class="d-flex justify-content-center gap-1">
+                                <button class="btn-action-light btn-edit-light" (click)="abrirModalRegistrarOrdenes(orden.id_order)" title="Editar Orden">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn-action-light btn-delete-light" (click)="cancelarOrden(orden.id_order)" title="Cancelar Orden">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                                <button class="btn-action-light btn-chat-light" (click)="abrirChatOrden(orden.id_order)" title="Chat de Orden">
+                                    <i class="bi bi-chat-dots"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr *ngIf="ordenesPaginadas.length === 0">
+                        <td colspan="9" class="text-center py-5 text-muted">
+                            <i class="bi bi-folder2-open fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                            No se encontraron órdenes con los filtros o búsqueda especificada.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer Pagination Dinámico (De 5 en 5) -->
+        <div class="p-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2 bg-white">
+            <span class="text-muted small">
+                Mostrando {{ ordenesPaginadas.length > 0 ? (paginaActual - 1) * itemsPorPagina + 1 : 0 }} 
+                a {{ (paginaActual - 1) * itemsPorPagina + ordenesPaginadas.length }} 
+                de {{ ordenesFiltradas.length }} órdenes registradas
+            </span>
+            <div class="pagination-light mb-0 d-flex gap-1 align-items-center">
+                <button class="btn btn-sm btn-outline-secondary px-2 py-1" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">
+                    <i class="bi bi-chevron-left"></i> Anterior
+                </button>
+                <ng-container *ngFor="let p of [].constructor(totalPaginas); let i = index">
+                    <button class="btn btn-sm px-3 py-1" [ngClass]="paginaActual === (i + 1) ? 'btn-primary shadow-sm' : 'btn-outline-secondary'" (click)="cambiarPagina(i + 1)">
+                        {{ i + 1 }}
+                    </button>
+                </ng-container>
+                <button class="btn btn-sm btn-outline-secondary px-2 py-1" [disabled]="paginaActual === totalPaginas || totalPaginas === 0" (click)="cambiarPagina(paginaActual + 1)">
+                    Siguiente <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
