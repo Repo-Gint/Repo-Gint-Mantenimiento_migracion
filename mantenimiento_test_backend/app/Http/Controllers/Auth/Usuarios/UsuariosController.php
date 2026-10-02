@@ -159,4 +159,12 @@ public function registrarUsuario(Request $request)
             ], 500);
         }
     }
+
+    public function obtenerPermisosUsuarioActual(Request $request) {
+    try {
+        return $this->usuariosService->obtenerPermisosUsuarioActual($request);
+    } catch (\Throwable $error) {
+        return response()->json(['mensaje' => 'Ocurrió un error interno'], 500);
+    }
+}
 }

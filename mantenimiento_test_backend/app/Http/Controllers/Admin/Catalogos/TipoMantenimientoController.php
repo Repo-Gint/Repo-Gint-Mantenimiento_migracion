@@ -20,16 +20,9 @@ class TipoMantenimientoController extends Controller
         try {
             return $this->tipoMantenimientoService->registrarTipoMantenimiento($request->all());
         } catch (\Throwable $error) {
-            Log::alert('*********************************************');
             Log::alert('Error al registrar el Tipo de Mantenimiento');
             Log::alert($error);
-            return response()->json(
-                [
-                    'error' => $error,
-                    'mensaje' => 'Ocurrió un error interno'
-                ],
-                500
-            );
+            return response()->json(['error' => $error, 'mensaje' => 'Ocurrió un error interno'], 500);
         }
     }
 
