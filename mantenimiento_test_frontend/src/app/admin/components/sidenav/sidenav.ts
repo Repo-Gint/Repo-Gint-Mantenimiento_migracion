@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, HostBinding } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { UsuariosService } from '../../services/api/usuarios/usuarios';
@@ -26,6 +26,14 @@ export class Sidenav implements OnInit {
   protected permisosUsuario: string[] = [];
   protected rolUsuario: number = 1;
 
+  // VARIABLE PARA CONTROLAR LA ANIMACIÓN DEL MENÚ
+  protected isMenuOpen: boolean = false;
+
+  // ESTO ASIGNA LA CLASE 'nav-open' DIRECTAMENTE AL COMPONENTE <app-sidenav>
+  @HostBinding('class.nav-open') get openClass() {
+    return this.isMenuOpen;
+  }
+
   constructor(
     private usuarios: UsuariosService,
     private messages: MessagesService,
@@ -38,9 +46,11 @@ export class Sidenav implements OnInit {
     await this.cargarPermisosUsuario();
   }
 
-  /**
-   * Carga los permisos y rol del usuario actual al iniciar el Sidenav
-   */
+  // FUNCIÓN PARA ABRIR/CERRAR EL SIDENAV
+  protected toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
   private async cargarPermisosUsuario(): Promise<void> {
     try {
       const respuesta: any = await this.usuarios.obtenerPermisosUsuarioActual().toPromise();
@@ -53,9 +63,6 @@ export class Sidenav implements OnInit {
     }
   }
 
-  /**
-   * Verifica si el usuario actual posee el permiso o rol requerido para mostrar el módulo
-   */
   protected tienePermiso(slug: string): boolean {
     const esAdminOTecnico = (this.rolUsuario === 2 || this.rolUsuario === 3);
     return esAdminOTecnico || this.permisosUsuario.includes(slug);

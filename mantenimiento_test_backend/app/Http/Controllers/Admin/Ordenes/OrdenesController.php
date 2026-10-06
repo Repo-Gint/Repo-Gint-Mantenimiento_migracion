@@ -64,27 +64,49 @@ class OrdenesController extends Controller
     }
 
     public function cancelarOrden(Request $request, int $id_order)
-    {
-        try {
-            // BLOQUEO ESTRICTO POR API DE PERMISOS
-            if (!$this->ordenesService->verificarPermisoUsuario($request, 'cancelar_orden')) {
-                return response()->json([
-                    'title'   => 'Acceso denegado',
-                    'mensaje' => 'No tienes el permiso del administrador, contacta al administrador para que te lo autorice.'
-                ], 403);
-            }
-
-            return $this->ordenesService->cancelarOrden($id_order);
-        } catch (\Throwable $error) {
-            Log::alert('*********************************************');
-            Log::alert('Error al cancelar orden');
-            Log::alert($error->getMessage());
-
+{
+    try {
+        // BLOQUEO ESTRICTO POR API DE PERMISOS
+        if (!$this->ordenesService->verificarPermisoUsuario($request, 'cancelar_orden')) {
             return response()->json([
-                'mensaje' => $error->getMessage()
-            ], 400);
+                'title'   => 'Acceso denegado',
+                'mensaje' => 'No tienes el permiso del administrador, contacta al administrador para que te lo autorice.'
+            ], 403);
         }
+
+        return $this->ordenesService->cancelarOrden($id_order);
+    } catch (\Throwable $error) {
+        Log::alert('*********************************************');
+        Log::alert('Error al cancelar orden');
+        Log::alert($error->getMessage());
+
+        return response()->json([
+            'mensaje' => $error->getMessage()
+        ], 400);
     }
+}
+
+public function eliminarOrden(Request $request, int $id_order)
+{
+    try {
+        // Validación de permisos estricta
+        if (!$this->ordenesService->verificarPermisoUsuario($request, 'eliminar_orden')) {
+            return response()->json([
+                'title'   => 'Acceso denegado',
+                'mensaje' => 'No tienes el permiso para eliminar órdenes. Contacta al administrador.'
+            ], 403);
+        }
+
+        return $this->ordenesService->eliminarOrden($id_order);
+    } catch (\Throwable $error) {
+        Log::alert('Error al eliminar orden ' . $id_order);
+        Log::alert($error->getMessage());
+
+        return response()->json([
+            'mensaje' => 'Ocurrió un error al intentar eliminar la orden.'
+        ], 400);
+    }
+}
 
     public function obtenerStatusOrdenes() {
         try {

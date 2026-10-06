@@ -49,6 +49,7 @@ class OrdenesRepository
     {
         $orden = Tblorders::findOrFail($id_order);
         $orden->cancellation_date = Carbon::now();
+        $orden->id_status_order = 4;
         $orden->save();
         return $orden;
     }
@@ -346,5 +347,11 @@ class OrdenesRepository
         )
         ->where('cat_solution_order.id_order', $id_order)
         ->first();
+}
+
+public function eliminarOrden(int $id_order)
+{
+    $orden = Tblorders::findOrFail($id_order);
+    return $orden->delete();
 }
 }

@@ -14,12 +14,13 @@ import { LoginService } from '../services/login/login';
 })
 export class Login implements OnInit {
   protected formLogin!: FormGroup;
+  protected mostrarPassword: boolean = false;
 
   constructor (
-    private fb: FormBuilder, 
+    private fb:           FormBuilder, 
     private loginService: LoginService,
-    private router: Router,
-    private messages: MessagesService
+    private router:       Router,
+    private messages:     MessagesService
   ) {}
 
   ngOnInit(): void {
@@ -28,17 +29,19 @@ export class Login implements OnInit {
 
   private crearFormLogin(): void {
     this.formLogin = this.fb.group({
-      busines_mail:   [null, [Validators.required,Validators.email,Validators.pattern('[a-zA-Zá-úÁ-Ú0-9 .,-_:@#$%&+{}()?¿!¡\n]*')]],
-			password: [null, [Validators.required,Validators.pattern('[a-zA-Zá-úÁ-Ú0-9 .,-_:@#$%&+{}()?¿!¡\n]*')]]
+      busines_mail: [null, [Validators.required, Validators.email, Validators.pattern('[a-zA-Zá-úÁ-Ú0-9 .,-_:@#$%&+{}()?¿!¡\n]*')]],
+      password:     [null, [Validators.required, Validators.pattern('[a-zA-Zá-úÁ-Ú0-9 .,-_:@#$%&+{}()?¿!¡\n]*')]]
     });
+  }
+
+  protected toggleMostrarPassword(): void {
+    this.mostrarPassword = !this.mostrarPassword;
   }
 
   protected iniciarSesion(): void {
     if (this.formLogin.invalid) {
-      this.messages.mensajeGenerico(
-        'Aún hay campos vacíos o que no cumplen con la estructura correcta',
-        'info', 
-        'Los campos requeridos están marcados con un *'
+      this.messages.mensajeGenerico('Aún hay campos vacíos o que no cumplen con la estructura correcta',
+        'info', 'Los campos requeridos están marcados con un *'
       );
       return;
     }
@@ -47,8 +50,6 @@ export class Login implements OnInit {
       busines_mail: this.formLogin.value.busines_mail, 
       password: this.formLogin.value.password,
     };
-
-    this.messages.mensajeEsperar();
 
     this.messages.mensajeEsperar();
 
@@ -71,10 +72,10 @@ export class Login implements OnInit {
         this.router.navigate(['/']);
       },
 
-      error=> {
+      error => {
         this.messages.cerrarMensajes();
         this.messages.mensajeGenerico(
-          'Ocurrio un error al Iniciar Sessión',
+          'Ocurrio un error al Iniciar Sesión',
           'error'
         );
       }

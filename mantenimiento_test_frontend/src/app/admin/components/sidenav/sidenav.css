@@ -1,3 +1,201 @@
+/* =======================================================
+   ELIMINAR LA FRANJA AZUL DE FONDO DEFINITIVAMENTE
+   ======================================================= */
+
+/* Anula el fondo del componente contenedor de Angular */
+:host {
+  display: block !important;
+  background-color: transparent !important;
+  background: none !important;
+}
+
+/* Colapsa y quita el fondo azul de la cuadrícula de la plantilla */
+#layoutSidenav,
+#layoutSidenav_nav,
+#layoutSidenav #layoutSidenav_nav {
+  background-color: transparent !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Fuerza al contenedor principal de la vista a recuperar todo el ancho libre */
+#layoutSidenav #layoutSidenav_content {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  width: 100% !important;
+  left: 0 !important;
+}
+
+/* =======================================================
+   MENÚ FLOTANTE CURVO (SLIDING MENU)
+   ======================================================= */
+
+#layoutSidenav_nav {
+  position: fixed !important;
+  top: 56px !important; /* Altura de tu navbar superior */
+  left: 0 !important;
+  width: 350px !important;
+  height: calc(100vh - 56px) !important;
+  
+  /* Se oculta dejando la curva asomando a la izquierda */
+  transform: translateX(-280px) !important; 
+  transition: all 800ms cubic-bezier(.8, 0, .33, 1) !important;
+  border-radius: 0% 0% 100% 50% !important;
+  
+  background-color: #004060 !important; /* Tu color oscuro */
+  z-index: 1050 !important;
+  overflow: visible !important;
+}
+
+/* Estado abierto: Despliega el menú sobre la pantalla */
+#layoutSidenav_nav.nav-open {
+  transform: translateX(0px) !important;
+  border-radius: 0% 0% 0% 0% !important;
+  box-shadow: 6px 0 25px rgba(36, 54, 219, 0.4) !important;
+}
+
+/* Botón Hamburguesa */
+.menu-btn {
+  position: absolute;
+  top: 24px;              /* Alineado con los títulos del menú */
+  right: 25px;            /* Margen cómodo a la derecha */
+  width: 28px;
+  height: 24px;
+  cursor: pointer;
+  z-index: 1060;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.menu-btn .line {
+  padding: 0;
+  width: 100%;
+  background: #ffffff;
+  height: 3px;
+  border-radius: 2px;
+  transition: all 500ms cubic-bezier(.9, 0, .33, 1);
+  transform-origin: center; /* Asegura rotación desde el centro exacto */
+}
+
+.menu-btn .line.line--1 {transform: rotate(0) translateY(0);}
+.menu-btn .line.line--1.line-cross {
+  transform: translateY(10.5px) rotate(45deg);
+  background: #ffb703;
+}
+
+.menu-btn .line.line--2 { 
+  opacity: 1;
+  transform: scaleX(1); 
+}
+
+.menu-btn .line.line--2.line-fade-out { 
+  opacity: 0;
+  transform: scaleX(0); /* Oculta suavemente sin desplazar */
+}
+
+.menu-btn .line.line--3 { 
+  transform: rotate(0) translateY(0); 
+}
+
+.menu-btn .line.line--3.line-cross {
+  transform: translateY(-10.5px) rotate(-45deg);
+  background: #ffb703;
+}
+
+/* Contenido Interno del Sidenav */
 .sb-sidenav {
-    height: 100vh;
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sb-sidenav-menu {
+  opacity: 0;
+  transform: translateX(-100px);
+  transition: all 900ms cubic-bezier(.9, 0, .33, 1);
+  padding-right: 60px;
+}
+
+#layoutSidenav_nav.nav-open .sb-sidenav-menu {
+  opacity: 1;
+  transform: translateX(0px);
+}
+
+/* =======================================================
+   ANIMACIONES Y MEJORAS VISUALES DE LAS OPCIONES DEL MENU
+   ======================================================= */
+
+/* 1. Transición suave en los enlaces principales */
+.sb-sidenav .nav-link {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  border-radius: 6px;
+  margin: 2px 10px;
+  padding: 10px 14px !important;
+}
+
+/* Efecto al pasar el cursor (Hover) */
+.sb-sidenav .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  transform: translateX(6px); /* Desplazamiento sutil hacia la derecha */
+  color: #ffb703 !important;  /* Amarillo de tu paleta */
+}
+
+/* 2. Animación e interacción de los Iconos */
+.sb-sidenav .nav-link i,
+.sb-sidenav .nav-link .bi {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  display: inline-block;
+}
+
+.sb-sidenav .nav-link:hover i,
+.sb-sidenav .nav-link:hover .bi {
+  transform: scale(1.2) rotate(-5deg); /* Ligero rebote del icono */
+  color: #ffb703 !important;
+}
+
+/* 3. Animación de la flechita colapsable (Caret) */
+.sb-sidenav-collapse-arrow i {
+  transition: transform 0.3s ease !important;
+}
+
+.sb-sidenav .nav-link:not(.collapsed) .sb-sidenav-collapse-arrow i {
+  transform: rotate(180deg) !important; /* Giro suave al desplegar */
+  color: #ffb703 !important;
+}
+
+/* 4. Submenús desplegables (Opciones secundarias) */
+.sb-sidenav-menu-nested {
+  padding-left: 1.2rem !important;
+  border-left: 2px solid rgba(255, 183, 3, 0.3); /* Línea guía de submenú */
+  margin-left: 1.5rem !important;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.sb-sidenav-menu-nested .nav-link {
+  font-size: 0.9rem !important;
+  padding: 8px 12px !important;
+  opacity: 0.85;
+  transition: all 0.25s ease-in-out !important;
+}
+
+.sb-sidenav-menu-nested .nav-link:hover {
+  opacity: 1;
+  background-color: rgba(255, 183, 3, 0.12) !important;
+  transform: translateX(8px);
+  color: #ffffff !important;
+}
+
+/* Indicador lateral activo en la opción seleccionada */
+.sb-sidenav .nav-link.active,
+.sb-sidenav-menu-nested .nav-link.active {
+  background-color: rgba(255, 183, 3, 0.18) !important;
+  color: #ffb703 !important;
+  font-weight: 700;
+  border-left: 3px solid #ffb703;
 }

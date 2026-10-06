@@ -151,14 +151,25 @@ class OrdenesService
         ]);
     }
 
-    public function cancelarOrden(int $id_order) {
-        $ordenes = $this->ordenesRepository->cancelarOrden($id_order);
+    public function cancelarOrden(int $id_order) 
+{
+    $ordenes = $this->ordenesRepository->cancelarOrden($id_order);
 
-        return response([
-            'ordenes' => $ordenes,
-            'mensaje' => 'Se ha cancelado la orden con exito'
-        ]);
-    }
+    return response()->json([
+        'ordenes' => $ordenes,
+        'mensaje' => 'Se ha cancelado la orden con éxito'
+    ], 200);
+}
+
+public function eliminarOrden(int $id_order)
+{
+    $this->ordenesRepository->eliminarOrden($id_order);
+
+    return response()->json([
+        'mensaje' => 'La orden ha sido eliminada correctamente.',
+        'title'   => 'Se elimino la orden con éxito'
+    ], 200);
+}
 
     public function obtenerStatusOrdenes() {
         $ordenes = $this->ordenesRepository->obtenerStatusOrdenes();

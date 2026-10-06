@@ -1,13 +1,175 @@
-.bg-image-vertical {
-position: relative;
-overflow: hidden;
-background-repeat: no-repeat;
-background-position: right center;
-background-size: auto 100%;
+/* =========================================================
+   RESPONSIVIDAD Y COBERTURA COMPLETA DE PANTALLA
+   ========================================================= */
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #034079;
 }
 
-@media (min-width: 1025px) {
-.h-custom-2 {
-height: 100%;
+.img-cover {
+  object-fit: cover !important;
+  object-position: center !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
+
+/* =========================================================
+   CAMPOS DE TEXTO E ICONOS
+   ========================================================= */
+
+.animated-input-group {
+  position: relative;
+}
+
+.form-floating-custom {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.form-floating-custom .input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #8c98a4;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.form-floating-custom .toggle-password-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #8c98a4;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  z-index: 3;
+}
+
+.form-floating-custom .toggle-password-icon:hover {
+  color: #034079;
+}
+
+.custom-input {
+  width: 100%;
+  height: 58px;
+  padding: 24px 42px 6px 45px !important;
+  font-size: 0.95rem;
+  color: #212529;
+  background-color: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-floating-custom label {
+  position: absolute;
+  left: 45px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.95rem;
+  color: #6c757d;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-input:focus,
+.custom-input:not(:placeholder-shown) {
+  background-color: #ffffff;
+  border-color: #034079;
+  box-shadow: 0 4px 12px rgba(3, 64, 121, 0.12);
+}
+
+.custom-input:focus ~ label,
+.custom-input:not(:placeholder-shown) ~ label {
+  top: 14px;
+  transform: translateY(0);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #034079;
+}
+
+.custom-input:focus ~ .input-icon,
+.custom-input:not(:placeholder-shown) ~ .input-icon {
+  color: #034079;
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* =========================================================
+   BOTÓN Y ANIMACIÓN WRAPPER
+   ========================================================= */
+
+.wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.link_wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.my-login-btn {
+  width: 100%;
+  height: 55px;
+  background-color: #ffb703 !important;
+  color: #034079 !important;
+  border: 3px solid #ffb703 !important;
+  border-radius: 0 !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  z-index: 2;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #ffb703;
+  position: absolute;
+  top: 7px;
+  right: 15px;
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+  background-color: #fff;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon svg {
+  width: 18px;
+  height: 18px;
+  fill: #ffb703;
+  transform: rotate(-45deg);
+  transition: all 0.3s ease-in-out;
+}
+
+.link_wrapper:hover .my-login-btn {
+  background-color: transparent !important;
+  color: #ffb703 !important;
+  width: calc(100% - 30px);
+}
+
+.link_wrapper:hover .icon {
+  opacity: 1;
+  right: 5px;
 }

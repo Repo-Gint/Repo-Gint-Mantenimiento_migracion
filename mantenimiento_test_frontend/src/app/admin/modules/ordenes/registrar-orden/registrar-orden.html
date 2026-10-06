@@ -1,182 +1,403 @@
-<div class="modal-body dashboard"> 
-    <div class="pagetitle"> 
-        <h4 class="t-bold"> {{ pkOrden == null ? 'Registrar' : 'Actualizar'}} orden </h4> 
+<div class="modal-body modal-orden-container p-4"> 
+  
+  <!-- Encabezado y Breadcrumb -->
+  <div class="pagetitle mb-4"> 
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <h4 class="m-0 fw-bold title-highlight">
+        <i class="bi bi-journal-plus me-2 text-primary-custom"></i>
+        {{ pkOrden == null ? 'Registrar' : 'Actualizar'}} orden
+      </h4> 
+      <span class="badge badge-status" [ngClass]="pkOrden == null ? 'bg-accent' : 'bg-info-custom'">
+        {{ pkOrden == null ? 'Nueva Solicitud' : 'Modo Edición' }}
+      </span>
+    </div>
 
-        <nav> 
-            <ol class="breadcrumb"> 
-                <li class="breadcrumb-item">Ordenes</li> 
-                <li class="breadcrumb-item active"> 
-                    {{ pkOrden == null ? 'Registrar' : 'Actualizar'}} orden 
-                </li> 
-            </ol> 
-        </nav> 
-    </div> 
+    <nav class="mt-2"> 
+      <ol class="breadcrumb m-0"> 
+        <li class="breadcrumb-item">Órdenes</li> 
+        <li class="breadcrumb-item active"> 
+          {{ pkOrden == null ? 'Registrar' : 'Actualizar'}} orden 
+        </li> 
+      </ol> 
+    </nav> 
+  </div> 
 
-    <div class="row"> 
-        <div class="col-12"> 
-            <div class="card"> 
-                <div class="card-body"> 
+  <!-- Formulario Principal -->
+  <div class="card card-custom-animated border-0 shadow-sm"> 
+    <div class="card-body p-4"> 
 
-                    <form [formGroup]="formOrden" class="row g-3" autocomplete="off"> 
+      <form [formGroup]="formOrden" class="row g-4" autocomplete="off"> 
 
-                        <div class="col-lg-4"> 
-                            <label class="form-label">Tipo de Orden:</label> 
-                            <select class="form-select form-select-sm" formControlName="id_type_orders"> 
-                                <option *ngFor="let tipoOrden of listatipoOrden" [value]="tipoOrden.id_type_orders"> 
-                                    {{ tipoOrden.type_orders }} 
-                                </option> 
-                                <option style="display: none; visibility: hidden;" value=""> 
-                                    Selecciona una opción 
-                                </option> 
-                            </select> 
-                        </div> 
+        <!-- SELECTOR 3D: Tipo de Orden -->
+        <div class="col-md-6 col-lg-4"> 
+          <div class="custom-dropdown-container position-relative">
+            <div class="form-floating-custom" (click)="toggleDropdown('tipoOrden')">
+              <i class="bi bi-tag-fill input-icon"></i>
+              <div class="custom-select-trigger">
+                {{ obtenerNombreSeleccionado('id_type_orders', listatipoOrden, 'id_type_orders', 'type_orders') }}
+              </div>
+              <label>Tipo de Orden</label>
+            </div>
 
-                        <div class="col-lg-4"> 
-                            <label class="form-label">Area:</label> 
-                            <select class="form-select form-select-sm" formControlName="id_area"> 
-                                <option *ngFor="let area of listaAreas" [value]="area.id_area"> 
-                                    {{ area.area }} 
-                                </option> 
-                                <option style="display: none; visibility: hidden;" value=""> 
-                                    Selecciona una opción 
-                                </option> 
-                            </select> 
-                        </div> 
-
-                        <div class="col-lg-4"> 
-                            <label class="form-label">Cat.Maquina:</label> 
-                            <select class="form-select form-select-sm" formControlName="id_cat_machines"> 
-                                <option *ngFor="let catmaquina of listacatalogoMaquina" [value]="catmaquina.id_cat_machines"> 
-                                    {{ catmaquina.cat_machines }} 
-                                </option> 
-                                <option style="display: none; visibility: hidden;" value=""> 
-                                    Selecciona una opción 
-                                </option> 
-                            </select> 
-                        </div> 
-
-                        <div class="col-lg-4"> 
-                            <label class="form-label">Maquina:</label> 
-                            <select class="form-select form-select-sm" formControlName="id_machines"> 
-                                <option *ngFor="let maquina of listaMaquinas" [value]="maquina.id_machines"> 
-                                    {{ maquina.machines }} 
-                                </option> 
-                                <option style="display: none; visibility: hidden;" value=""> 
-                                    Selecciona una opción 
-                                </option> 
-                            </select> 
-                        </div> 
-
-                        <div class="col-lg-4"> 
-                            <label class="form-label">Departamento:</label> 
-                            <select class="form-select form-select-sm" formControlName="id_departaments"> 
-                                <option *ngFor="let departamento of listaDepartamentos" [value]="departamento.id_departaments"> 
-                                    {{ departamento.Departament_ES }} 
-                                </option> 
-                                <option style="display: none; visibility: hidden;" value=""> 
-                                    Selecciona una opción 
-                                </option> 
-                            </select> 
-                        </div> 
-
-                        <!-- Campo Solicitante visible solo para Administradores y Técnicos -->
-                        <div class="col-lg-4" *ngIf="esAdminOTecnico"> 
-                            <label class="form-label">Solicitante:</label> 
-                            <select class="form-select form-select-sm" formControlName="id_employee"> 
-                                <option *ngFor="let empleado of listaEmpleados" [value]="empleado.id_employee"> 
-                                    {{ empleado.Name }} 
-                                </option> 
-                                <option style="display: none; visibility: hidden;" value=""> 
-                                    Selecciona una opción 
-                                </option> 
-                            </select> 
-                        </div> 
-
-                        <div class="col-lg-6"> 
-                            <label class="form-label">Tipo de Mantenimiento:</label> 
-                            <select class="form-select form-select-sm" formControlName="id_type_maintenances"> 
-                                <option *ngFor="let tipoMantenimiento of listatipoMantenimiento" [value]="tipoMantenimiento.id_type_maintenances"> 
-                                    {{ tipoMantenimiento.type_maintenances }} 
-                                </option> 
-                                <option style="display: none; visibility: hidden;" value=""> Selecciona una opción </option> 
-                            </select> 
-                        </div> 
-
-                        <div class="col-lg-4"> 
-                            <label class="form-label">Prioridad:</label> 
-                            <select class="form-select form-select-sm" formControlName="id_priority"> 
-                                <option *ngFor="let prioridadOrden of listaprioridadOrden" [value]="prioridadOrden.id_priority"> 
-                                    {{ prioridadOrden.priority }} 
-                                </option> 
-                                <option style="display: none; visibility: hidden;" value=""> Selecciona una opción</option> 
-                            </select> 
-                        </div> 
-
-                        <div class="col-lg-12"> 
-                            <label class="form-label">Descripción:</label> 
-                            <textarea class="form-control form-control-sm" rows="3" formControlName="problem_description"> 
-                            </textarea> 
-                        </div> 
-
-                        <div class="col-lg-12 mt-3"> 
-                            <label class="form-label">Evidencias:</label> 
-
-                            <div class="mb-2"> 
-                                <button type="button" class="btn btn-sm btn-primary" (click)="fileInput.click()"> 
-                                    Agregar imagen 
-                                </button> 
-
-                                <input #fileInput type="file" multiple accept="image/*" (change)="onFileSelected($event)" hidden> 
-                            </div> 
-
-                            <div class="d-flex flex-wrap gap-3">
-                                <div *ngFor="let img of images; let i = index" class="position-relative">
-                                    <img [src]="img.url_evidence_image" width="120" height="120" class="rounded border" style="object-fit: cover;">
-
-                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" (click)="eliminarEvidenciaOrden(i, img.id_eviden_order)" style="padding: 2px 6px;">
-                                        <i class="bi bi-x"></i>
-                                    </button>
-                                </div>
-                            </div> 
-                        </div> 
-
-                        <div class="col-lg-12" *ngIf="pkOrden != null"> 
-                            <label class="form-label">
-                                {{ (usuariosAsignados.length || 0) > 1 ? 'Usuarios asignados:' : 'Usuario asignado:' }}
-                            </label>
-                            <div>
-                                <span *ngFor="let nombre of usuariosAsignados; let i = index">
-                                    {{ nombre }}<span *ngIf="i < usuariosAsignados.length - 1">, </span>
-                                </span>
-                            </div>
-                        </div>
-
-                    </form> 
-
-                </div> 
-            </div> 
+            <!-- Menú Desplegable con Checkboxes 3D -->
+            <div class="custom-dropdown-menu" *ngIf="dropdownAbierto === 'tipoOrden'">
+              <label class="flipBox" *ngFor="let item of listatipoOrden">
+                <input type="checkbox" 
+                       [checked]="formOrden.get('id_type_orders')?.value === item.id_type_orders"
+                       (change)="seleccionarOpcion('id_type_orders', item.id_type_orders)" />
+                <span class="flipBox_boxOuter">
+                  <span class="flipBox_box">
+                    <div></div><div></div><div></div><div></div><div></div><div></div>
+                  </span>
+                </span>
+                <span class="flipBox_shadow"></span>
+                <span>{{ item.type_orders }}</span>
+              </label>
+            </div>
+          </div>
         </div> 
+
+        <!-- SELECTOR 3D: Área -->
+        <div class="col-md-6 col-lg-4"> 
+          <div class="custom-dropdown-container position-relative">
+            <div class="form-floating-custom" (click)="toggleDropdown('area')">
+              <i class="bi bi-geo-alt-fill input-icon"></i>
+              <div class="custom-select-trigger">
+                {{ obtenerNombreSeleccionado('id_area', listaAreas, 'id_area', 'area') }}
+              </div>
+              <label>Área</label>
+            </div>
+
+            <div class="custom-dropdown-menu" *ngIf="dropdownAbierto === 'area'">
+              <label class="flipBox" *ngFor="let item of listaAreas">
+                <input type="checkbox" 
+                       [checked]="formOrden.get('id_area')?.value === item.id_area"
+                       (change)="seleccionarOpcion('id_area', item.id_area)" />
+                <span class="flipBox_boxOuter">
+                  <span class="flipBox_box">
+                    <div></div><div></div><div></div><div></div><div></div><div></div>
+                  </span>
+                </span>
+                <span class="flipBox_shadow"></span>
+                <span>{{ item.area }}</span>
+              </label>
+            </div>
+          </div>
+        </div> 
+
+        <!-- SELECTOR 3D: Catálogo Máquina -->
+        <div class="col-md-6 col-lg-4"> 
+          <div class="custom-dropdown-container position-relative">
+            <div class="form-floating-custom" (click)="toggleDropdown('catMaquina')">
+              <i class="bi bi-cpu-fill input-icon"></i>
+              <div class="custom-select-trigger">
+                {{ obtenerNombreSeleccionado('id_cat_machines', listacatalogoMaquina, 'id_cat_machines', 'cat_machines') }}
+              </div>
+              <label>Cat. Máquina</label>
+            </div>
+
+            <div class="custom-dropdown-menu" *ngIf="dropdownAbierto === 'catMaquina'">
+              <label class="flipBox" *ngFor="let item of listacatalogoMaquina">
+                <input type="checkbox" 
+                       [checked]="formOrden.get('id_cat_machines')?.value === item.id_cat_machines"
+                       (change)="seleccionarOpcion('id_cat_machines', item.id_cat_machines)" />
+                <span class="flipBox_boxOuter">
+                  <span class="flipBox_box">
+                    <div></div><div></div><div></div><div></div><div></div><div></div>
+                  </span>
+                </span>
+                <span class="flipBox_shadow"></span>
+                <span>{{ item.cat_machines }}</span>
+              </label>
+            </div>
+          </div>
+        </div> 
+
+        <!-- SELECTOR 3D: Máquina -->
+        <div class="col-md-6 col-lg-4"> 
+          <div class="custom-dropdown-container position-relative">
+            <div class="form-floating-custom" (click)="toggleDropdown('maquina')">
+              <i class="bi bi-tools input-icon"></i>
+              <div class="custom-select-trigger">
+                {{ obtenerNombreSeleccionado('id_machines', listaMaquinas, 'id_machines', 'machines') }}
+              </div>
+              <label>Máquina</label>
+            </div>
+
+            <div class="custom-dropdown-menu" *ngIf="dropdownAbierto === 'maquina'">
+              <label class="flipBox" *ngFor="let item of listaMaquinas">
+                <input type="checkbox" 
+                       [checked]="formOrden.get('id_machines')?.value === item.id_machines"
+                       (change)="seleccionarOpcion('id_machines', item.id_machines)" />
+                <span class="flipBox_boxOuter">
+                  <span class="flipBox_box">
+                    <div></div><div></div><div></div><div></div><div></div><div></div>
+                  </span>
+                </span>
+                <span class="flipBox_shadow"></span>
+                <span>{{ item.machines }}</span>
+              </label>
+            </div>
+          </div>
+        </div> 
+
+        <!-- SELECTOR 3D: Departamento -->
+        <div class="col-md-6 col-lg-4"> 
+          <div class="custom-dropdown-container position-relative">
+            <div class="form-floating-custom" (click)="toggleDropdown('departamento')">
+              <i class="bi bi-building-fill input-icon"></i>
+              <div class="custom-select-trigger">
+                {{ obtenerNombreSeleccionado('id_departaments', listaDepartamentos, 'id_departaments', 'Departament_ES') }}
+              </div>
+              <label>Departamento</label>
+            </div>
+
+            <div class="custom-dropdown-menu" *ngIf="dropdownAbierto === 'departamento'">
+              <label class="flipBox" *ngFor="let item of listaDepartamentos">
+                <input type="checkbox" 
+                       [checked]="formOrden.get('id_departaments')?.value === item.id_departaments"
+                       (change)="seleccionarOpcion('id_departaments', item.id_departaments)" />
+                <span class="flipBox_boxOuter">
+                  <span class="flipBox_box">
+                    <div></div><div></div><div></div><div></div><div></div><div></div>
+                  </span>
+                </span>
+                <span class="flipBox_shadow"></span>
+                <span>{{ item.Departament_ES }}</span>
+              </label>
+            </div>
+          </div>
+        </div> 
+
+        <!-- SELECTOR 3D: Solicitante (Solo Admin/Técnico) -->
+        <div class="col-md-6 col-lg-4" *ngIf="esAdminOTecnico"> 
+          <div class="custom-dropdown-container position-relative">
+            <div class="form-floating-custom" (click)="toggleDropdown('empleado')">
+              <i class="bi bi-person-fill input-icon"></i>
+              <div class="custom-select-trigger">
+                {{ obtenerNombreSeleccionado('id_employee', listaEmpleados, 'id_employee', 'Name') }}
+              </div>
+              <label>Solicitante</label>
+            </div>
+
+            <div class="custom-dropdown-menu" *ngIf="dropdownAbierto === 'empleado'">
+              <label class="flipBox" *ngFor="let item of listaEmpleados">
+                <input type="checkbox" 
+                       [checked]="formOrden.get('id_employee')?.value === item.id_employee"
+                       (change)="seleccionarOpcion('id_employee', item.id_employee)" />
+                <span class="flipBox_boxOuter">
+                  <span class="flipBox_box">
+                    <div></div><div></div><div></div><div></div><div></div><div></div>
+                  </span>
+                </span>
+                <span class="flipBox_shadow"></span>
+                <span>{{ item.Name }}</span>
+              </label>
+            </div>
+          </div>
+        </div> 
+
+        <!-- SELECTOR 3D: Tipo Mantenimiento -->
+        <div class="col-md-6 col-lg-6"> 
+          <div class="custom-dropdown-container position-relative">
+            <div class="form-floating-custom" (click)="toggleDropdown('tipoMantenimiento')">
+              <i class="bi bi-wrench-adjustable-circle-fill input-icon"></i>
+              <div class="custom-select-trigger">
+                {{ obtenerNombreSeleccionado('id_type_maintenances', listatipoMantenimiento, 'id_type_maintenances', 'type_maintenances') }}
+              </div>
+              <label>Tipo de Mantenimiento</label>
+            </div>
+
+            <div class="custom-dropdown-menu" *ngIf="dropdownAbierto === 'tipoMantenimiento'">
+              <label class="flipBox" *ngFor="let item of listatipoMantenimiento">
+                <input type="checkbox" 
+                       [checked]="formOrden.get('id_type_maintenances')?.value === item.id_type_maintenances"
+                       (change)="seleccionarOpcion('id_type_maintenances', item.id_type_maintenances)" />
+                <span class="flipBox_boxOuter">
+                  <span class="flipBox_box">
+                    <div></div><div></div><div></div><div></div><div></div><div></div>
+                  </span>
+                </span>
+                <span class="flipBox_shadow"></span>
+                <span>{{ item.type_maintenances }}</span>
+              </label>
+            </div>
+          </div>
+        </div> 
+
+        <!-- SELECTOR 3D: Prioridad -->
+        <div class="col-md-6 col-lg-6"> 
+          <div class="custom-dropdown-container position-relative">
+            <div class="form-floating-custom" (click)="toggleDropdown('prioridad')">
+              <i class="bi bi-exclamation-triangle-fill input-icon"></i>
+              <div class="custom-select-trigger">
+                {{ obtenerNombreSeleccionado('id_priority', listaprioridadOrden, 'id_priority', 'priority') }}
+              </div>
+              <label>Prioridad</label>
+            </div>
+
+            <div class="custom-dropdown-menu" *ngIf="dropdownAbierto === 'prioridad'">
+              <label class="flipBox" *ngFor="let item of listaprioridadOrden">
+                <input type="checkbox" 
+                       [checked]="formOrden.get('id_priority')?.value === item.id_priority"
+                       (change)="seleccionarOpcion('id_priority', item.id_priority)" />
+                <span class="flipBox_boxOuter">
+                  <span class="flipBox_box">
+                    <div></div><div></div><div></div><div></div><div></div><div></div>
+                  </span>
+                </span>
+                <span class="flipBox_shadow"></span>
+                <span>{{ item.priority }}</span>
+              </label>
+            </div>
+          </div>
+        </div> 
+
+        <!-- Descripción Adaptable con auto-height -->
+        <div class="col-12"> 
+          <div class="form-floating-custom">
+            <i class="bi bi-card-text input-icon textarea-icon"></i>
+            <textarea #problemTextarea
+                      class="custom-textarea" 
+                      rows="3" 
+                      formControlName="problem_description" 
+                      id="problem_description" 
+                      placeholder=" "
+                      (input)="adjustTextareaHeight($event)"></textarea>
+            <label for="problem_description">Descripción del problema</label>
+          </div>
+        </div> 
+
+        <!-- Dropzone de Carga de Archivos -->
+        <div class="col-12"> 
+          <label class="section-label mb-2 fw-semibold text-dark">
+            <i class="bi bi-images me-2 text-accent"></i>Evidencias Fotográficas
+          </label> 
+
+          <div class="file-upload__upload" 
+               [class.drag]="isDragging"
+               (dragover)="onDragOver($event)"
+               (dragleave)="onDragLeave($event)"
+               (drop)="onDrop($event)"
+               (click)="fileInput.click()">
+            
+            <div class="file-upload__input-sphere file-upload__first-sphere"></div>
+            <div class="file-upload__input-sphere file-upload__second-sphere"></div>
+
+            <input #fileInput type="file" multiple accept="image/*" (change)="onFileSelected($event)" hidden />
+
+            <div class="file-upload__icon-glow mb-2">
+              <i class="bi bi-cloud-arrow-up-fill text-accent display-5"></i>
+            </div>
+
+            <p class="file-upload__input-title m-0 fw-semibold text-white">
+              Drag & drop your files here or <span class="text-accent fw-bold underline-hover">Browse</span>
+            </p>
+
+            <span class="file-upload__input-text text-white-50 mt-1">50 Mb max file size</span>
+          </div>
+
+          <!-- Lista de Archivos Cargados con Barra de Progreso Animada -->
+          <div class="file-upload__bottom active mt-4" *ngIf="images.length > 0">
+            <h6 class="file-upload__bottom-title fw-bold text-primary-custom mb-3">
+              Uploading
+            </h6>
+
+            <div class="file-upload__list d-flex flex-column gap-2">
+              <div *ngFor="let img of images; let i = index" class="file-upload__item d-flex align-items-center gap-3 p-3 rounded-3">
+                
+                <div class="file-upload__item-icon" (click)="abrirPreviewImagen(img.url_evidence_image)">
+                  <img [src]="img.url_evidence_image" class="file-icon-img rounded" alt="evidence-preview">
+                </div>
+
+                <div class="file-upload__item-info flex-grow-1">
+                  <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="file-name text-dark fw-bold text-truncate" style="max-width: 200px;">
+                      {{ img.nombreArchivo || ('Evidencia_' + (i + 1) + '.jpg') }}
+                    </span>
+                    <span class="file-upload__item-size text-muted small">
+                      {{ img.tamanoTexto || '1.27 Mb' }}
+                    </span>
+                  </div>
+
+                  <div class="file-upload__item-progress my-1">
+                    <div class="file-upload__item-progress-bar" [style.width.%]="img.progreso || 100"></div>
+                  </div>
+
+                  <div class="file-upload__number-progress text-muted small">
+                    <span class="file-upload__item-number fw-semibold">{{ img.progreso || 100 }}%</span> done
+                  </div>
+                </div>
+
+                <div class="file-upload__icon-box d-flex align-items-center gap-2">
+                  <div class="file-upload__done-btn text-success" *ngIf="(img.progreso || 100) >= 100">
+                    <i class="bi bi-check-circle-fill fs-5"></i>
+                  </div>
+
+                  <button type="button" class="btn btn-sm btn-light border rounded-circle p-1" (click)="abrirPreviewImagen(img.url_evidence_image)" title="Ver imagen">
+                    <i class="bi bi-search text-primary"></i>
+                  </button>
+
+                  <button type="button" 
+                          class="btn btn-sm btn-light border rounded-circle p-1" 
+                          (click)="$event.stopImmediatePropagation(); $event.preventDefault(); eliminarEvidenciaOrden(i, img.id_eviden_order)" 
+                          title="Eliminar evidencia">
+                    <i class="bi bi-x-lg text-danger"></i>
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div> 
+        </div> 
+
+        <!-- Usuarios Asignados (En edición) -->
+        <div class="col-12" *ngIf="pkOrden != null"> 
+          <div class="assigned-users-box p-3 rounded">
+            <label class="fw-bold mb-1 text-primary-custom">
+              <i class="bi bi-person-check-fill me-2"></i>
+              {{ (usuariosAsignados.length || 0) > 1 ? 'Usuarios asignados:' : 'Usuario asignado:' }}
+            </label>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              <span *ngFor="let nombre of usuariosAsignados" class="badge badge-user">
+                <i class="bi bi-person-badge me-1"></i>{{ nombre }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </form> 
+
     </div> 
+  </div> 
 </div> 
 
-<div class="modal-footer"> 
-    <!-- Botón Registrar (Nueva orden) -->
-    <button *ngIf="pkOrden == null" class="btn btn-sm btn-primary" (click)="registrarOrden()"> 
-        Registrar 
-    </button>
-    
-    <!-- Botón Asignar: Solo si existe orden y tiene permiso de edición -->
-    <button *ngIf="pkOrden != null && puedeEditar" class="btn btn-sm btn-primary" (click)="abrirAsignar()">
-        Asignar a
-    </button>
+<!-- Footer con Botones -->
+<div class="modal-footer px-4 py-3 bg-light border-0 d-flex justify-content-end gap-2"> 
+  <button class="btn btn-custom-cancel" (click)="cerrarModal()"> 
+    <i class="bi bi-x-circle me-1"></i>
+    {{ cambiosForm || pkOrden != null ? 'Cancelar' : 'Cerrar' }} 
+  </button> 
 
-    <!-- Botón Actualizar: Solo si existe orden y tiene permiso de edición -->
-    <button *ngIf="pkOrden != null && puedeEditar" class="btn btn-sm btn-warning" (click)="actualizarOrden()">
-        Actualizar
-    </button>
+  <button *ngIf="pkOrden == null" class="btn btn-custom-primary" (click)="registrarOrden()"> 
+    <i class="bi bi-check-circle me-1"></i>Registrar 
+  </button>
+  
+  <button *ngIf="pkOrden != null && puedeEditar" class="btn btn-custom-info" (click)="abrirAsignar()">
+    <i class="bi bi-person-plus me-1"></i>Asignar a
+  </button>
 
-    <!-- Botón Cancelar / Cerrar -->
-    <button class="btn btn-sm btn-danger" (click)="cerrarModal()"> 
-        {{ cambiosForm || pkOrden != null ? 'Cancelar' : 'Cerrar' }} 
-    </button> 
+  <button *ngIf="pkOrden != null && puedeEditar" class="btn btn-custom-warning" (click)="actualizarOrden()">
+    <i class="bi bi-arrow-repeat me-1"></i>Actualizar
+  </button>
+</div>
+
+<!-- Lightbox Modal Para Previsualización de Imagen -->
+<div class="image-lightbox-backdrop" *ngIf="imagenSeleccionadaZoom" (click)="cerrarPreviewImagen()">
+  <div class="image-lightbox-content" (click)="$event.stopPropagation()">
+    <img [src]="imagenSeleccionadaZoom" class="lightbox-img">
+    <button type="button" class="btn-close-lightbox" (click)="cerrarPreviewImagen()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
 </div>

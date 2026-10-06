@@ -70,4 +70,8 @@ export class OrdenesService {
   public obtenerListaMonedas(): Observable<any> {
     return this.http.get<any>(`${api}/monedas/obtenerListaMonedas`);
   }
+
+  public eliminarOrden(id_order: number): Observable<any> {
+    return this.http.delete<any>(`${api}/ordenes/eliminarOrden/${id_order}`);
+  }
 }

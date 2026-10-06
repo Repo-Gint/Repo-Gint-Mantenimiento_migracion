@@ -1,40 +1,71 @@
-<section class="vh-100 d-flex align-items-center" style="background-color: #034079;">
-  <div class="container py-5">
-    <div class="row d-flex justify-content-center align-items-center">
+<section class="min-vh-100 d-flex align-items-center justify-content-center p-0 p-sm-3" style="background-color: #034079;">
+  <div class="container-fluid container-xl">
+    <div class="row d-flex justify-content-center align-items-center min-vh-100 py-3">
       <div class="col-12 col-xl-11">
-        <div class="card shadow" style="border-radius: 1rem; overflow: hidden;">
-          <div class="row g-0 align-items-center">
+        <div class="card shadow-lg border-0" style="border-radius: 1rem; overflow: hidden;">
+          <div class="row g-0 align-items-stretch">
             
-            <div class="col-md-6 d-none d-md-block">
+            <!-- Imagen lateral -->
+            <div class="col-md-6 d-none d-md-block position-relative">
               <img src="assets/images/fondo_login.jpg" 
                    alt="Login image" 
-                   class="w-100" 
-                   style="height: 100%; min-height: 550px; object-fit: fill; object-position: center; display: block;">
+                   class="w-100 h-100 img-cover">
             </div>
             
-            <div class="col-md-6 d-flex align-items-center" style="background-color: #ffffff;">
+            <!-- Formulario -->
+            <div class="col-md-6 d-flex align-items-center bg-white">
               <div class="card-body p-4 p-lg-5 text-black w-100">
 
                 <form [formGroup]="formLogin" autocomplete="off">
 
                   <div class="text-center mb-4">
-                    <img src="assets/images/logo.png" class="img-fluid logo-img" style="max-height: 100px;">
+                    <img src="assets/images/logo.png" class="img-fluid logo-img" style="max-height: 90px;">
                   </div>
 
-                  <div class="form-floating mb-3">
-                    <input class="form-control" type="busines_mail" id="busines_mailInput" formControlName="busines_mail" placeholder="name@example.com">
-                    <label for="busines_mailInput">Correo</label>
+                  <!-- Campo Correo Animado -->
+                  <div class="animated-input-group mb-4">
+                    <div class="form-floating-custom">
+                      <i class="bi bi-envelope-fill input-icon"></i>
+                      <input type="email" 
+                             id="busines_mailInput" 
+                             class="custom-input" 
+                             formControlName="busines_mail" 
+                             placeholder=" " />
+                      <label for="busines_mailInput">Correo electrónico</label>
+                    </div>
                   </div>
 
-                  <div class="form-floating mb-4">
-                    <input class="form-control" type="password" id="passwordInput" formControlName="password" placeholder="Password">
-                    <label for="passwordInput">Contraseña</label>
+                  <!-- Campo Contraseña Animado -->
+                  <div class="animated-input-group mb-4">
+                    <div class="form-floating-custom">
+                      <i class="bi bi-lock-fill input-icon"></i>
+                      <input [type]="mostrarPassword ? 'text' : 'password'" 
+                             id="passwordInput" 
+                             class="custom-input" 
+                             formControlName="password" 
+                             placeholder=" " />
+                      <label for="passwordInput">Contraseña</label>
+                      <i class="bi" 
+                         [ngClass]="mostrarPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'" 
+                         class="toggle-password-icon" 
+                         (click)="toggleMostrarPassword()"></i>
+                    </div>
                   </div>
 
+                  <!-- Botón de Inicio de Sesión -->
                   <div class="d-grid gap-2">
-                    <button class="btn btn-lg fw-bold" style="background-color: #ffb703; color: #034079;" (click)="iniciarSesion()">
-                      Iniciar Sesión
-                    </button>
+                    <div class="wrapper">
+                      <div class="link_wrapper">
+                        <button type="button" class="btn btn-lg fw-bold my-login-btn" (click)="iniciarSesion()">
+                          Iniciar Sesión
+                        </button>
+                        <div class="icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268.832 268.832">
+                            <path d="M265.17 125.577l-80-80c-4.88-4.88-12.796-4.88-17.677 0-4.882 4.882-4.882 12.796 0 17.678l58.66 58.66H12.5c-6.903 0-12.5 5.598-12.5 12.5 0 6.903 5.597 12.5 12.5 12.5h213.654l-58.66 58.662c-4.88 4.882-4.88 12.796 0 17.678 2.44 2.44 5.64 3.66 8.84 3.66s6.398-1.22 8.84-3.66l79.997-80c4.883-4.882 4.883-12.796 0-17.678z"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                 </form>

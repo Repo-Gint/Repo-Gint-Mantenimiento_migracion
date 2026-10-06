@@ -42,7 +42,7 @@
                         <i class="bi bi-exclamation-circle"></i>
                     </div>
                 </div>
-                <h2 class="text-dark fw-bold mb-1">{{ datosTabla.length || 0 }}</h2>
+                <h2 class="text-dark fw-bold mb-1">{{ ordenesFiltradas.length || 0 }}</h2>
                 <span class="text-muted small">Requieren atención operativa</span>
             </div>
         </div>
@@ -98,7 +98,7 @@
                 <label class="form-label-light">Status:</label>
                 <div class="dropdown custom-dropdown w-100">
                     <button class="form-select form-select-sm text-start d-flex justify-content-between align-items-center shadow-none custom-select-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="text-truncate">{{ getStatusNombre(id_status) || 'Selecciona una opción' }}</span>
+                        <span class="text-truncate">{{ id_status == 4 ? 'Cancelado' : (getStatusNombre(id_status) || 'Selecciona una opción') }}</span>
                     </button>
                     <div class="dropdown-menu w-100 p-2 shadow-lg border-0 rounded-3" style="max-height: 250px; overflow-y: auto;">
                         <div *ngFor="let status of listaStatus" class="form-check custom-radio-item py-2 px-3 my-1 rounded-2">
@@ -188,7 +188,7 @@
                         </td>
                         <td><span class="text-secondary">{{ orden.type_orders }}</span></td>
                         <td>
-                            <!-- Insignia de Prioridad / Status Animada con Iconos Bootstrap -->
+                            <!-- Insignia de Prioridad / Status Animada -->
                             <span class="badge-priority-animated" [ngClass]="{
                                 'priority-urgent-pulse': orden.priority?.toLowerCase() === 'urgente',
                                 'priority-normal-badge': orden.priority?.toLowerCase() !== 'urgente'
@@ -199,12 +199,22 @@
                         </td>
                         <td class="pe-3">
                             <div class="d-flex justify-content-center gap-1">
+                                <!-- Editar -->
                                 <button class="btn-action-light btn-edit-light" (click)="abrirModalRegistrarOrdenes(orden.id_order)" title="Editar Orden">
                                     <i class="bi bi-pencil"></i>
                                 </button>
+                                
+                                <!-- Cancelar -->
                                 <button class="btn-action-light btn-delete-light" (click)="cancelarOrden(orden.id_order)" title="Cancelar Orden">
                                     <i class="bi bi-x-lg"></i>
                                 </button>
+
+                                <!-- Borrar/Eliminar -->
+                                <button class="btn-action-light btn-delete-light text-danger" (click)="eliminarOrden(orden.id_order)" title="Eliminar Orden">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+
+                                <!-- Chat / Bitácora -->
                                 <button class="btn-action-light btn-chat-light" (click)="abrirChatOrden(orden.id_order)" title="Chat de Orden">
                                     <i class="bi bi-chat-dots"></i>
                                 </button>

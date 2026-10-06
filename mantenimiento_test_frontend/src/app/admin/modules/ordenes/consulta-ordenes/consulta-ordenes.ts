@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ModalService } from '../../../services/modal/modal';
 import { MessagesService } from '../../../services/messages/messages';
@@ -7,7 +7,6 @@ import { OrdenesService } from '../../../services/api/ordenes/ordenes';
 import { AreasService } from '../../../services/api/areas/areas';
 import { UsuariosService } from '../../../services/api/usuarios/usuarios';
 import { RegistrarOrden } from '../registrar-orden/registrar-orden';
-import { ChatOrdenesComponent } from '../chat-orders/chat-orders';
 import { Router } from '@angular/router';
 
 @Component({
@@ -17,9 +16,8 @@ import { Router } from '@angular/router';
   templateUrl: './consulta-ordenes.html',
   styleUrl: './consulta-ordenes.css',
 })
-export class ConsultaOrdenes {
+export class ConsultaOrdenes implements OnInit, OnDestroy {
   protected datosTabla: any = [];
-
   private intervalo: any;
 
   protected listaAreas: any[] = [];
@@ -28,15 +26,20 @@ export class ConsultaOrdenes {
   protected id_area: any = '';
   protected id_status: any = '';
 
-  // Banderas de permisos controladas estrictamente por la API
   protected puedeEditar: boolean = false;
   protected puedeCancelar: boolean = false;
+  protected puedeEliminar: boolean = false;
+
+  // Propiedades para buscador y paginación
+  protected textoBusqueda: string = '';
+  protected paginaActual: number = 1;
+  protected itemsPorPagina: number = 5;
 
   constructor(
-    private modal:     ModalService,
+    private modal: ModalService,
     private messages: MessagesService,
-    private ch:       ChangeDetectorRef,
-    private areas:    AreasService,
+    private ch: ChangeDetectorRef,
+    private areas: AreasService,
     private ordenes: OrdenesService,
     private usuarios: UsuariosService,
     private router: Router,
@@ -56,6 +59,12 @@ export class ConsultaOrdenes {
     this.repetitiveInstruction(); 
   }
 
+  ngOnDestroy(): void {
+    if (this.intervalo) {
+      clearInterval(this.intervalo);
+    }
+  }
+
   private async verificarPermisosUsuario(): Promise<void> {
     try {
       const respuesta: any = await this.usuarios.obtenerPermisosUsuarioActual().toPromise();
@@ -65,9 +74,11 @@ export class ConsultaOrdenes {
       const esAdminOTecnico = (rolUsuario === 2 || rolUsuario === 3);
       this.puedeEditar = esAdminOTecnico || permisos.includes('editar_orden');
       this.puedeCancelar = esAdminOTecnico || permisos.includes('cancelar_orden');
+      this.puedeEliminar = esAdminOTecnico || permisos.includes('eliminar_orden');
     } catch (error) {
       this.puedeEditar = false;
       this.puedeCancelar = false;
+      this.puedeEliminar = false;
     }
   }
 
@@ -85,7 +96,7 @@ export class ConsultaOrdenes {
   private async obtenerStatusOrdenes(): Promise<any> {
     return this.ordenes.obtenerStatusOrdenes().toPromise().then(
       respuesta => {
-        this.listaStatus = respuesta.ordenes;
+        this.listaStatus = respuesta.ordenes || [];
         this.ch.markForCheck();
       }
     );
@@ -94,10 +105,10 @@ export class ConsultaOrdenes {
   private async obtenerListaAreas(): Promise<any> {
     return this.areas.obtenerListaAreas().toPromise().then(
       respuesta => {
-        this.listaAreas = respuesta.areas;
+        this.listaAreas = respuesta.areas || [];
         this.ch.markForCheck();
       }
-    )
+    );
   }
 
   protected async busquedaFiltros(): Promise<any> {
@@ -129,7 +140,6 @@ export class ConsultaOrdenes {
   }
 
   protected cancelarOrden(id_order: number): void {
-    // Candado de seguridad por API
     if (!this.puedeCancelar) {
       this.messages.mensajeGenerico(
         'No tienes el permiso del administrador, contacta al administrador para que te lo autorice.',
@@ -164,20 +174,58 @@ export class ConsultaOrdenes {
     });
   }
 
+  protected eliminarOrden(id_order: number): void {
+    if (!this.puedeEliminar) {
+      this.messages.mensajeGenerico(
+        'No tienes permisos para eliminar órdenes. Contacta al administrador.',
+        'error',
+        'Acceso denegado'
+      );
+      return;
+    }
+
+    this.messages.mensajeConfirmacionCustom(
+      '¿Está seguro de que desea eliminar permanentemente esta orden? Esta acción no se puede deshacer.',
+      'warning',
+      'Eliminar orden'
+    ).then(res => {
+      if (!res.isConfirmed) return;
+
+      this.messages.mensajeEsperar();
+
+      this.ordenes.eliminarOrden(id_order).subscribe({
+        next: (respuesta: any) => {
+          this.messages.mensajeGenerico(
+            respuesta.mensaje || 'Orden eliminada con éxito',
+            'success',
+            'Eliminado'
+          );
+          this.ObtenerListaGeneralOrdenes();
+        },
+        error: (error) => {
+          this.messages.mensajeGenerico(
+            error?.error?.mensaje || 'Ocurrió un error al eliminar la orden.',
+            'error'
+          );
+        }
+      });
+    });
+  }
+
   getStatusIcon(status: string): string {
     switch (status?.toLowerCase()) {
       case 'pendiente':
+      case 'abierto':
         return 'bi-hourglass-split text-warning';
       case 'en proceso':
         return 'bi-gear-fill text-primary';
-      case 'en espera':
-        return 'bi-pause-circle-fill text-secondary';
       case 'terminado':
+      case 'finalizado':
         return 'bi-check-circle-fill text-success';
       case 'cancelado':
         return 'bi-x-circle-fill text-danger';
       default:
-        return 'bi-question-circle text-dark';
+        return 'bi-question-circle text-muted';
     }
   }
 
@@ -186,8 +234,12 @@ export class ConsultaOrdenes {
     return s ? s.status : '';
   }
 
+  getAreaNombre(id: any): string {
+    const a = this.listaAreas?.find(x => x.id_area == id);
+    return a ? a.area : '';
+  }
+
   public abrirModalRegistrarOrdenes(pkOrden: number | null = null): void {
-    // Candado de seguridad por API
     if (!this.puedeEditar) {
       this.messages.mensajeGenerico(
         'No tienes el permiso del administrador, contacta al administrador para que te lo autorice.',
@@ -197,7 +249,6 @@ export class ConsultaOrdenes {
       return;
     }
 
-    // Permitimos que pkOrden sea null (para registrar una nueva orden)
     if (pkOrden !== null && (!pkOrden || String(pkOrden) === 'undefined')) {
       console.warn('Se intentó abrir el modal con un ID de orden inválido.');
       return;
@@ -209,6 +260,7 @@ export class ConsultaOrdenes {
 
     this.modal.abrirModalConComponente(RegistrarOrden, data, 'lg-modal');
   }
+
   public abrirChatOrden(pkOrden: number): void {
     if (!pkOrden || String(pkOrden) === 'undefined') {
       console.warn('Se intentó abrir el chat con un ID de orden inválido.');
@@ -218,13 +270,6 @@ export class ConsultaOrdenes {
     this.router.navigate(['/chat-ordenes', pkOrden]);
   }
 
-
-  // --- NUEVAS PROPIEDADES PARA BUSCADOR Y PAGINACIÓN DE 5 EN 5 ---
-  protected textoBusqueda: string = '';
-  protected paginaActual: number = 1;
-  protected itemsPorPagina: number = 5;
-
-  // --- GETTER PARA FILTRAR ÓRDENES POR BÚSQUEDA ---
   get ordenesFiltradas() {
     if (!this.textoBusqueda || this.textoBusqueda.trim() === '') {
       return this.datosTabla;
@@ -243,7 +288,6 @@ export class ConsultaOrdenes {
     );
   }
 
-  // --- GETTER PARA PAGINAR EXACTAMENTE 5 ÓRDENES POR PÁGINA ---
   get ordenesPaginadas() {
     const inicio = (this.paginaActual - 1) * this.itemsPorPagina;
     return this.ordenesFiltradas.slice(inicio, inicio + this.itemsPorPagina);
@@ -257,10 +301,5 @@ export class ConsultaOrdenes {
     if (pagina < 1 || pagina > this.totalPaginas) return;
     this.paginaActual = pagina;
     this.ch.markForCheck();
-  }
-
-  getAreaNombre(id: any): string {
-    const a = this.listaAreas?.find(x => x.id_area == id);
-    return a ? a.area : '';
   }
 }

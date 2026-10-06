@@ -17,11 +17,12 @@ export class AsignarOrden {
 
   @Input() pkOrden: any = null;
   @Input() folio: any = null;
+  @Input() onAsignacionExitosa?: () => void; // Callback para notificar al padre
 
   protected formOrden!: FormGroup;
-  protected listaUsuarios: any [] = [];
-  
-  
+  protected listaUsuarios: any[] = [];
+  protected yaTeniaUsuariosAsignados: boolean = false;
+
   constructor(
     private modal:    ModalService,
     private messages: MessagesService,
@@ -31,20 +32,21 @@ export class AsignarOrden {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    this.formOrden = this.fb.group({idUsuario: [[], Validators.required]});
+    this.formOrden = this.fb.group({ idUsuario: [[], Validators.required] });
     this.messages.mensajeEsperar();
     await this.obtenerUsuariosAsignacion();
     this.messages.cerrarMensajes();
   }
 
-
   private async obtenerUsuariosAsignacion(): Promise<void> {
-    return this.ordenes.obtenerUsuariosAsignacion (this.pkOrden).toPromise().then(
+    return this.ordenes.obtenerUsuariosAsignacion(this.pkOrden).toPromise().then(
       respuesta => {
-        this.listaUsuarios = respuesta.usuarios;
+        this.listaUsuarios = respuesta.usuarios || [];
+        this.yaTeniaUsuariosAsignados = this.listaUsuarios.some(u => u.checked === true);
         this.ch.detectChanges();
-      }, error => {
-        this.messages.mensajeGenerico('error', 'error');
+      }, 
+      error => {
+        this.messages.mensajeGenerico('Ocurrió un error al cargar los usuarios.', 'error');
       }
     );
   }
@@ -59,9 +61,9 @@ export class AsignarOrden {
       .join(', ');
   }
 
-   public asignarOrden(): void {
+  public asignarOrden(): void {
     const nombres = this.getNombresSeleccionados();
-    const esReasignacion = this.pkOrden != null;
+    const esReasignacion = this.yaTeniaUsuariosAsignados;
 
     const accion = esReasignacion ? 'reasignar' : 'asignar';
     const titulo = esReasignacion ? 'Reasignar orden' : 'Asignar orden';
@@ -83,12 +85,16 @@ export class AsignarOrden {
 
       this.ordenes.asignarOrden(data).toPromise().then(
         (respuesta: any) => {
+          this.messages.mensajeGenerico(respuesta.mensaje || 'Proceso completado con éxito', 'success');
+          
+          // Ejecutamos el callback para recargar los usuarios en el modal principal al instante
+          if (this.onAsignacionExitosa) {
+            this.onAsignacionExitosa();
+          }
 
-          this.messages.mensajeGenerico(respuesta.mensaje, 'success' );
           this.modal.cerrarModal();
-
-        }, error => {
-
+        }, 
+        error => {
           this.messages.mensajeGenerico(error?.error?.mensaje || 'Ocurrió un error', 'error');
         }
       );

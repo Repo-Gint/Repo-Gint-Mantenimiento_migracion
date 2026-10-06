@@ -27,8 +27,8 @@
 
 <div class="modal-footer">
     <button class="btn btn-sm btn-primary" (click)="asignarOrden()">
-        {{ pkOrden != null ? 'Reasignar' : 'Asignar' }}
-    </button>
+    {{ yaTeniaUsuariosAsignados ? 'Reasignar' : 'Asignar' }}
+</button>
 
     <button class="btn btn-sm btn-danger" (click)="cerrarModal()">
         Cancelar

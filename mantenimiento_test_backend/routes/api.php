@@ -28,17 +28,18 @@ Route::post('/usuarios/login', [UsuariosController::class, 'login']);
 Route::middleware([AuthTokenMiddleware::class])->group(function () {
     
     // Órdenes
-    Route::get('/ordenes/obtenerRecursosRegistroOrden',                      [OrdenesController::class, 'obtenerRecursosRegistroOrden']); 
-    Route::post('/ordenes/registrarOrden',                                   [OrdenesController::class, 'registrarOrden']);
-    Route::post('/ordenes/ObtenerListaGeneralOrdenes',                       [OrdenesController::class, 'ObtenerListaGeneralOrdenes']); 
-    Route::get('/ordenes/obtenerDetalleOrden/{pkOrden}',                     [OrdenesController::class, 'obtenerDetalleOrden']);
-    Route::post('/ordenes/asignarOrden',                                     [OrdenesController::class, 'asignarOrden']);
-    Route::post('/ordenes/actualizarOrden',                                  [OrdenesController::class, 'actualizarOrden']);
-    Route::get('/ordenes/obtenerStatusOrdenes',                              [OrdenesController::class, 'obtenerStatusOrdenes']);
-    Route::delete('/ordenes/eliminarEvidenciaOrden/{id_eviden_order}',       [OrdenesController::class, 'eliminarEvidenciaOrden']);
+    Route::get('/ordenes/obtenerRecursosRegistroOrden',                                  [OrdenesController::class, 'obtenerRecursosRegistroOrden']); 
+    Route::post('/ordenes/registrarOrden',                                               [OrdenesController::class, 'registrarOrden']);
+    Route::post('/ordenes/ObtenerListaGeneralOrdenes',                                   [OrdenesController::class, 'ObtenerListaGeneralOrdenes']); 
+    Route::get('/ordenes/obtenerDetalleOrden/{pkOrden}',                                 [OrdenesController::class, 'obtenerDetalleOrden']);
+    Route::post('/ordenes/asignarOrden',                                                 [OrdenesController::class, 'asignarOrden']);
+    Route::post('/ordenes/actualizarOrden',                                              [OrdenesController::class, 'actualizarOrden']);
+    Route::get('/ordenes/obtenerStatusOrdenes',                                          [OrdenesController::class, 'obtenerStatusOrdenes']);
+    Route::delete('/ordenes/eliminarEvidenciaOrden/{id_eviden_order}',                   [OrdenesController::class, 'eliminarEvidenciaOrden']);
     Route::get('/ordenes/obtenerMaquinasPorAreaYCategoria/{pkArea}/{pkCatalogoMaquina}', [OrdenesController::class, 'obtenerMaquinasPorAreaYCategoria']);
-    Route::get('ordenes/cancelarOrden/{id}',                                 [OrdenesController::class, 'cancelarOrden']);
-    Route::get('/ordenes/obtenerUsuariosAsignacion/{pkOrden}',               [OrdenesController::class, 'obtenerUsuariosAsignacion']);
+    Route::post('/ordenes/cancelarOrden/{id_order}',                                     [OrdenesController::class, 'cancelarOrden']);
+    Route::get('/ordenes/obtenerUsuariosAsignacion/{pkOrden}',                          [OrdenesController::class, 'obtenerUsuariosAsignacion']);
+    Route::delete('/ordenes/eliminarOrden/{id_order}',                                   [OrdenesController::class, 'eliminarOrden']);
 
     // Chat y Solución de Órdenes
     Route::get('/ordenes/obtenerMensajesOrden/{id_order}',                   [OrdenesController::class, 'obtenerMensajesOrden']);

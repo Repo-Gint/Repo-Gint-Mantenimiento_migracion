@@ -10869,16 +10869,40 @@ body {
   z-index: 1038;
   transform: translateX(-225px);
 }
+/* =======================================================
+   MARGEN SUPERIOR PARA SEPARAR EL CONTENIDO DEL NAVBAR
+   ======================================================= */
+
 #layoutSidenav #layoutSidenav_content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-width: 0;
-  flex-grow: 1;
-  min-height: calc(100vh - 56px);
-  margin-left: -225px;
-  margin-top: 56px !important;
+  padding-top: 2rem !important; /* Incrementa a 2rem o 2.5rem hasta que el título baje lo suficiente */
+  padding-left: 80px !important;
+  width: calc(100% - 80px) !important;
+  margin-left: 0 !important;
+  transition: all 800ms cubic-bezier(.8, 0, .33, 1) !important;
+  box-sizing: border-box !important;
+}
+
+/* Mantiene el empuje dinámico cuando abres el menú */
+#layoutSidenav app-sidenav.nav-open ~ #layoutSidenav_content,
+#layoutSidenav app-sidenav:has(#layoutSidenav_nav.nav-open) ~ #layoutSidenav_content {
+  padding-left: 360px !important;
+  width: calc(100% - 360px) !important;
+}
+
+
+/* Espaciado superior para todas las vistas cargadas en el router-outlet */
+#layoutSidenav_content .contenido,
+#layoutSidenav_content main {
+  padding-top: 1.5rem !important; /* Espacio extra vertical debajo de la barra azul */
+  box-sizing: border-box !important;
+}
+
+/* Ajuste para pantallas pequeñas */
+@media (max-width: 768px) {
+  #layoutSidenav #layoutSidenav_content.nav-open {
+    padding-left: 310px !important;
+    width: calc(100% - 310px) !important;
+  }
 }
 
 #layoutSidenav_nav {

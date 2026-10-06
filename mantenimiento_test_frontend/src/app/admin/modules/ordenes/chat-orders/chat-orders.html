@@ -1,178 +1,227 @@
-<div class="pagetitle text-light mb-4">
-    <h1><i class="bi bi-clipboard-data me-2"></i> Mantenimiento > Órdenes > <strong class="text-info">{{ datosTabla[0]?.folio_orden || 'Detalle' }}</strong></h1>
-</div>
-
 <section class="section dashboard container-fluid p-0">
-    <div class="row g-4">
-        
-        <!-- ================= COLUMNA IZQUIERDA: Datos y Detalles ================= -->
-        <div class="col-lg-5 col-xl-4">
-            
-            <!-- Tarjeta: Datos de la orden -->
-            <div class="card bg-dark text-light border-secondary mb-4 shadow-sm rounded-3">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title text-info m-0"><i class="bi bi-sliders me-2"></i> Datos de la orden</h5>
-                        <!-- Badge Dinámico según cat_status_order -->
-                        <span *ngFor="let orden of datosTabla" class="badge px-3 py-2 fw-bold" [style.background-color]="orden.color || '#0d6efd'" style="color: #fff;">
-                            {{ orden.status }}
-                        </span>
-                    </div>
-                    
-                    <div *ngFor="let orden of datosTabla">
-                        <!-- Selector de Estatus para cambiar dinámicamente -->
-                        <div class="mb-3 p-2 rounded border border-secondary bg-black bg-opacity-25">
-                            <label class="text-secondary d-block fw-bold text-uppercase mb-1" style="font-size: 10px;">Cambiar Estatus de la Orden</label>
-                            <select class="form-select form-select-sm bg-dark text-light border-secondary" [(ngModel)]="orden.id_status_order" (change)="cambiarEstatusOrden(orden)">
-                                <option [value]="1">Abierto</option>
-                                <option [value]="2">En proceso</option>
-                                <option [value]="3">Finalizado</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-2 p-2 rounded border border-secondary bg-black bg-opacity-25">
-                            <small class="text-secondary d-block fw-bold text-uppercase" style="font-size: 10px;">Tipo de Orden</small>
-                            <span class="text-light">{{ orden.type_orders }}</span>
-                        </div>
-                        <div class="mb-2 p-2 rounded border border-secondary bg-black bg-opacity-25">
-                            <small class="text-secondary d-block fw-bold text-uppercase" style="font-size: 10px;">Departamento</small>
-                            <span class="text-light">{{ orden.Departament_ES }}</span>
-                        </div>
-                        <div class="mb-2 p-2 rounded border border-secondary bg-black bg-opacity-25">
-                            <small class="text-secondary d-block fw-bold text-uppercase" style="font-size: 10px;">Mantenimiento</small>
-                            <span class="text-light">{{ orden.type_maintenances }}</span>
-                        </div>
-                        <div class="mb-2 p-2 rounded border border-secondary bg-black bg-opacity-25">
-                            <small class="text-secondary d-block fw-bold text-uppercase" style="font-size: 10px;">Prioridad</small>
-                            <span class="badge bg-warning text-dark mt-1">{{ orden.priority }}</span>
-                        </div>
-                        <div class="mb-2 p-2 rounded border border-secondary bg-black bg-opacity-25">
-                            <small class="text-secondary d-block fw-bold text-uppercase" style="font-size: 10px;">Personal Asignado</small>
-                            <span class="text-light fw-bold d-block">{{ orden.usuario }}</span>
-                            <small class="text-muted">{{ orden.busines_mail }}</small>
-                        </div>
-                        <div class="mb-2 p-2 rounded border border-secondary bg-black bg-opacity-25">
-                            <small class="text-secondary d-block fw-bold text-uppercase" style="font-size: 10px;">Máquina</small>
-                            <span class="text-light">{{ orden.machines }}</span>
-                        </div>
-                    </div>
-                </div>
+  <div class="row g-4">
+    
+    <!-- ================= COLUMNA IZQUIERDA: Datos y Detalles ================= -->
+    <div class="col-lg-5 col-xl-4">
+      
+      <!-- Tarjeta: Datos de la orden -->
+      <div class="card card-custom-light mb-4 p-3 animated-card">
+        <div class="card-body p-0">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title m-0"><i class="bi bi-sliders me-2 text-primary"></i> Datos de la orden</h5>
+            <span *ngFor="let orden of datosTabla" class="badge px-3 py-2 fw-bold badge-status-anim" [style.background-color]="orden.color || '#0d6efd'" style="color: #fff;">
+              {{ orden.status }}
+            </span>
+          </div>
+          
+          <div *ngFor="let orden of datosTabla" class="d-flex flex-column gap-2">
+            <div class="p-2 info-box-light">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="info-box-label mb-0">Cambiar Estatus de la Orden</label>
+                <small *ngIf="esOrdenFinalizada" class="text-warning fw-bold" style="font-size: 10px;"><i class="bi bi-lock-fill"></i> Bloqueado</small>
+              </div>
+              <select class="form-select form-select-sm form-select-custom-light" 
+                      [(ngModel)]="orden.id_status_order" 
+                      (change)="cambiarEstatusOrden(orden)"
+                      [disabled]="esOrdenFinalizada">
+                <option [value]="1">Abierto</option>
+                <option [value]="2">En proceso</option>
+                <option [value]="3">Finalizado</option>
+              </select>
             </div>
 
-            <!-- Tarjeta: Detalles del Reporte -->
-            <div class="card bg-dark text-light border-secondary shadow-sm rounded-3">
-                <div class="card-body" *ngFor="let orden of datosTabla">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title text-info m-0"><i class="bi bi-file-text me-2"></i> Detalles del Reporte</h5>
-                        <span class="badge bg-warning text-dark px-2 py-1">Falla Reportada</span>
-                    </div>
-                    <div class="mb-2 p-2 rounded border border-secondary bg-black bg-opacity-25">
-                        <small class="text-secondary d-block fw-bold text-uppercase" style="font-size: 10px;">Folio de Orden</small>
-                        <strong class="text-info">{{ orden.folio_orden }}</strong>
-                    </div>
-                    <div class="mb-2 p-2 rounded border border-secondary bg-black bg-opacity-25">
-                        <small class="text-secondary d-block fw-bold text-uppercase" style="font-size: 10px;">Descripción del Problema</small>
-                        <p class="text-light mb-0 fst-italic" style="font-size: 13px;">"{{ orden.problem_description }}"</p>
-                    </div>
-                </div>
+            <div class="p-2 info-box-light">
+              <small class="info-box-label d-block">Tipo de Orden</small>
+              <span class="info-box-value">{{ orden.type_orders }}</span>
             </div>
-
+            <div class="p-2 info-box-light">
+              <small class="info-box-label d-block">Departamento</small>
+              <span class="info-box-value">{{ orden.Departament_ES }}</span>
+            </div>
+            <div class="p-2 info-box-light">
+              <small class="info-box-label d-block">Mantenimiento</small>
+              <span class="info-box-value">{{ orden.type_maintenances }}</span>
+            </div>
+            <div class="p-2 info-box-light">
+              <small class="info-box-label d-block">Prioridad</small>
+              <span class="badge bg-warning text-dark mt-1">{{ orden.priority }}</span>
+            </div>
+            <div class="p-2 info-box-light">
+              <small class="info-box-label d-block">Personal Asignado</small>
+              <span class="info-box-value d-block">{{ orden.usuario }}</span>
+              <small class="text-muted" style="font-size: 11px;">{{ orden.busines_mail }}</small>
+            </div>
+            <div class="p-2 info-box-light">
+              <small class="info-box-label d-block">Máquina</small>
+              <span class="info-box-value">{{ orden.machines }}</span>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <!-- ================= COLUMNA DERECHA: Historial y Chat ================= -->
-        <div class="col-lg-7 col-xl-8">
-            <div class="card bg-dark text-light border-secondary shadow-sm rounded-3 h-100">
-                <div class="card-body d-flex flex-column">
-                    
-                    <!-- Header del Historial -->
-                    <div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-3 mb-3">
-                        <div>
-                            <h5 class="text-info m-0"><i class="bi bi-chat-dots me-2"></i> Historial de mensajes</h5>
-                            <small class="text-muted">Timeline de conversación • Bitácora de mantenimiento activa</small>
-                        </div>
-                        <div>
-                            <span class="badge badge-online me-2"><i class="bi bi-circle-fill small me-1"></i> En línea</span>
-                            <button class="btn btn-sm btn-outline-secondary text-light"><i class="bi bi-filter"></i> Filtrar</button>
-                        </div>
-                    </div>
-
-                    <!-- Timeline de Mensajes -->
-                    <div class="chat-timeline flex-grow-1 mb-4 pe-2">
-                        <div *ngFor="let mensaje of mensajesOrden" class="message-bubble mb-3 p-3 rounded border border-secondary">
-                            <div class="message-info d-flex justify-content-between text-muted small mb-2">
-                                <span><strong class="text-light">{{ mensaje.remitente_nombre || mensaje.remitente }}</strong></span>
-                                <span>{{ mensaje.created_at || mensaje.send_date }}</span>
-                            </div>
-                            <p class="mb-0 text-light">{{ mensaje.content || mensaje.mensaje }}</p>
-                        </div>
-                        <div *ngIf="mensajesOrden.length === 0" class="text-center text-muted py-5">
-                            <i class="bi bi-chat-square-text display-4 d-block mb-2 text-secondary"></i>
-                            No hay mensajes registrados en esta orden.
-                        </div>
-                    </div>
-
-                    <!-- Sección de Respuesta (Chat Reply) -->
-                    <div class="chat-reply-section border-top border-secondary pt-3 mt-auto" [formGroup]="formChat">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-reply me-2 text-info"></i>
-                            <span class="fw-bold text-light">Responder a esta orden</span>
-                        </div>
-                        <div class="mb-3">
-                            <input type="text" class="form-control bg-black text-light border-secondary mb-2" placeholder="Asunto del mensaje..." formControlName="subject">
-                            <textarea class="form-control bg-black text-light border-secondary" rows="3" placeholder="Escribe aquí tu informe técnico de mantenimiento..." formControlName="content"></textarea>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <button type="button" class="btn btn-outline-secondary btn-sm text-light"><i class="bi bi-paperclip me-1"></i> Adjuntar</button>
-                            <button type="button" class="btn btn-primary px-4" (click)="enviarMensaje()"><i class="bi bi-send me-1"></i> Enviar</button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+      <!-- Tarjeta: Detalles del Reporte -->
+      <div class="card card-custom-light p-3 animated-card">
+        <div class="card-body p-0" *ngFor="let orden of datosTabla">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title m-0"><i class="bi bi-file-text me-2 text-primary"></i> Detalles del Reporte</h5>
+            <span class="badge bg-warning text-dark px-2 py-1">Falla Reportada</span>
+          </div>
+          <div class="p-2 info-box-light mb-2">
+            <small class="info-box-label d-block">Folio de Orden</small>
+            <strong class="text-primary fs-6">{{ orden.folio_orden }}</strong>
+          </div>
+          <div class="p-2 info-box-light">
+            <small class="info-box-label d-block">Descripción del Problema</small>
+            <p class="text-dark mb-0 fst-italic" style="font-size: 13px;">"{{ orden.problem_description }}"</p>
+          </div>
         </div>
+      </div>
 
     </div>
+
+    <!-- ================= COLUMNA DERECHA: Historial y Chat ================= -->
+    <div class="col-lg-7 col-xl-8">
+      <div class="card card-custom-light p-3 h-100 animated-card">
+        <div class="card-body p-0 d-flex flex-column">
+          
+          <!-- Header del Historial -->
+          <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
+            <div>
+              <h5 class="card-title m-0"><i class="bi bi-chat-dots me-2 text-primary"></i> Historial de mensajes</h5>
+              <small class="text-muted">Timeline de conversación • Bitácora de mantenimiento activa</small>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge badge-online me-1"><i class="bi bi-circle-fill small me-1"></i> En línea</span>
+            </div>
+          </div>
+
+          <!-- Timeline de Mensajes -->
+          <div class="chat-timeline flex-grow-1 mb-4 pe-2">
+            
+            <ng-container *ngFor="let mensaje of mensajesOrden; let i = index">
+              
+              <!-- Separador de Día (Se muestra sólo cuando cambia la fecha) -->
+              <div *ngIf="mostrarSeparadorFecha(i)" class="chat-date-separator text-center my-3">
+                <span class="badge bg-light text-secondary border fw-normal px-3 py-1 shadow-sm">
+                  <i class="bi bi-calendar3 me-1"></i> {{ mensaje.created_at || mensaje.send_date | date:'dd MMMM, yyyy' }}
+                </span>
+              </div>
+
+              <!-- Burbuja de Mensaje -->
+              <div class="message-bubble px-3 py-2" 
+                   [class.mb-3]="i === mensajesOrden.length - 1 || mostrarRemitente(i + 1)"
+                   [class.mb-1]="!mostrarRemitente(i + 1)"
+                   [class.message-bubble--out]="mensaje.es_admin"
+                   [class.message-bubble--in]="!mensaje.es_admin">
+                
+                <!-- Encabezado del Remitente (Sólo si cambia de remitente o es el primer mensaje) -->
+                <div *ngIf="mostrarRemitente(i)" class="message-header d-flex justify-content-between align-items-center mb-1">
+                  <strong class="sender-name" [class.text-white]="mensaje.es_admin" [class.text-primary]="!mensaje.es_admin">
+                    {{ mensaje.remitente_nombre || mensaje.remitente }}
+                  </strong>
+                </div>
+
+                <!-- Cuerpo del Mensaje y Hora a la derecha -->
+                <div class="message-content-wrapper d-flex justify-content-between align-items-end gap-3">
+                  <p class="mb-0 message-text">{{ mensaje.content || mensaje.mensaje }}</p>
+                  <span class="message-time" [class.text-white-50]="mensaje.es_admin" [class.text-muted]="!mensaje.es_admin">
+                    {{ obtenerHora(mensaje.created_at || mensaje.send_date) }}
+                  </span>
+                </div>
+
+              </div>
+
+            </ng-container>
+
+            <!-- Indicador de Escritura Animado -->
+            <div *ngIf="cargandoMensajes || enviandoMensajeState" class="cb-typing-container mb-3">
+              <div class="cb-typing-bubble">
+                <span class="cb-dot" style="--i:0"></span>
+                <span class="cb-dot" style="--i:1"></span>
+                <span class="cb-dot" style="--i:2"></span>
+              </div>
+            </div>
+
+            <div *ngIf="mensajesOrden.length === 0 && !cargandoMensajes" class="text-center text-muted py-5 empty-chat-state">
+              <i class="bi bi-chat-square-text display-4 d-block mb-2 text-secondary"></i>
+              No hay mensajes registrados en esta orden.
+            </div>
+          </div>
+
+          <!-- Sección de Respuesta -->
+          <ng-container *ngIf="!esOrdenFinalizada; else chatFinalizadoTemplate">
+            <div class="chat-reply-section border-top pt-3 mt-auto" [formGroup]="formChat">
+              <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-reply me-2 text-primary fs-5"></i>
+                <span class="fw-bold text-dark">Responder a esta orden</span>
+              </div>
+              <div class="mb-3">
+                <input type="text" class="form-control mb-2 input-animated" placeholder="Asunto del mensaje..." formControlName="subject">
+                <textarea class="form-control input-animated" rows="3" placeholder="Escribe aquí tu informe técnico de mantenimiento..." formControlName="content"></textarea>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <button type="button" class="btn btn-outline-secondary btn-sm btn-attach-custom"><i class="bi bi-paperclip me-1"></i> Adjuntar</button>
+                <button type="button" class="btn btn-send-custom" (click)="enviarMensaje()">
+                  <i class="bi bi-send me-1"></i> Enviar
+                </button>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-template #chatFinalizadoTemplate>
+            <div class="chat-closed-banner p-3 text-center rounded mt-auto">
+              <i class="bi bi-lock-fill text-warning fs-4 d-block mb-1"></i>
+              <span class="fw-bold d-block mb-1">Esta orden ha sido finalizada</span>
+              <small>El hilo de mensajes está cerrado y solo se permite la consulta del historial registrado.</small>
+            </div>
+          </ng-template>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
 </section>
 
 <!-- ================= MODAL DE SOLUCIÓN Y FINALIZACIÓN ================= -->
 <div class="modal fade" id="modalSolucionOrden" tabindex="-1" aria-hidden="true" #modalSolucion>
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content bg-dark text-light border-secondary">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title text-info"><i class="bi bi-check2-circle me-2"></i> Registrar Solución y Finalizar Orden</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" [formGroup]="formSolucion">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label text-secondary small">Moneda</label>
-                        <select class="form-select bg-black text-light border-secondary" formControlName="id_coin">
-                            <option [ngValue]="null" disabled>Seleccione una moneda...</option>
-                            <option *ngFor="let moneda of listaMonedas" [value]="moneda.id_coins">{{ moneda.coin }}</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-secondary small">Costo de la Orden</label>
-                        <input type="number" class="form-control bg-black text-light border-secondary" formControlName="order_cost" placeholder="0.00">
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label text-secondary small">Resolución del Problema</label>
-                        <textarea class="form-control bg-black text-light border-secondary" rows="3" formControlName="resolution" placeholder="Detalle la solución aplicada..."></textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-secondary small">Refacciones (Spare Parts)</label>
-                        <textarea class="form-control bg-black text-light border-secondary" rows="2" formControlName="spare_parts" placeholder="Refacciones utilizadas..."></textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-secondary small">Materiales</label>
-                        <textarea class="form-control bg-black text-light border-secondary" rows="2" formControlName="materials" placeholder="Materiales utilizados..."></textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer border-secondary">
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success px-4" (click)="guardarSolucion()">Guardar y Finalizar</button>
-            </div>
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow modal-animated">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title text-primary fw-bold"><i class="bi bi-check2-circle me-2"></i> Registrar Solución y Finalizar Orden</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" [formGroup]="formSolucion">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label text-secondary small fw-bold">Moneda</label>
+            <select class="form-select" formControlName="id_coin">
+              <option [ngValue]="null" disabled>Seleccione una moneda...</option>
+              <option *ngFor="let moneda of listaMonedas" [value]="moneda.id_coins">{{ moneda.coin }}</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-secondary small fw-bold">Costo de la Orden</label>
+            <input type="number" class="form-control" formControlName="order_cost" placeholder="0.00">
+          </div>
+          <div class="col-12">
+            <label class="form-label text-secondary small fw-bold">Resolución del Problema</label>
+            <textarea class="form-control" rows="3" formControlName="resolution" placeholder="Detalle la solución aplicada..."></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-secondary small fw-bold">Refacciones (Spare Parts)</label>
+            <textarea class="form-control" rows="2" formControlName="spare_parts" placeholder="Refacciones utilizadas..."></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label text-secondary small fw-bold">Materiales</label>
+            <textarea class="form-control" rows="2" formControlName="materials" placeholder="Materiales utilizados..."></textarea>
+          </div>
         </div>
+      </div>
+      <div class="modal-footer border-top">
+        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success px-4" (click)="guardarSolucion()">Guardar y Finalizar</button>
+      </div>
     </div>
+  </div>
 </div>
