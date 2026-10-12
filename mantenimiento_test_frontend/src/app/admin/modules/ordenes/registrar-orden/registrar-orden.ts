@@ -18,18 +18,19 @@ export class RegistrarOrden implements OnInit {
   @Input() pkOrden: any = null;
   @ViewChild('problemTextarea') problemTextarea!: ElementRef<HTMLTextAreaElement>;
 
-  protected formOrden!: FormGroup;
+  protected formOrden!:      FormGroup;
   protected esAdminOTecnico: boolean = false;
-  protected puedeEditar: boolean = false;
+  protected puedeEditar:     boolean = false;
+  protected idStatusOrder:   number | null = null;
 
-  protected listaAreas:           any[] = [];
-  protected listaMaquinas:        any[] = [];
-  protected listaDepartamentos:   any[] = [];
-  protected listaEmpleados:       any[] = [];
+  protected listaAreas:             any[] = [];
+  protected listaMaquinas:          any[] = [];
+  protected listaDepartamentos:     any[] = [];
+  protected listaEmpleados:         any[] = [];
   protected listatipoMantenimiento: any[] = [];
-  protected listatipoOrden:       any[] = [];
-  protected listaprioridadOrden:  any[] = [];
-  protected listacatalogoMaquina: any[] = [];
+  protected listatipoOrden:         any[] = [];
+  protected listaprioridadOrden:    any[] = [];
+  protected listacatalogoMaquina:   any[] = [];
 
   protected usuariosAsignados: string[] = [];
 
@@ -39,7 +40,6 @@ export class RegistrarOrden implements OnInit {
   protected imagenSeleccionadaZoom: string | null = null;
   protected isDragging: boolean = false;
 
-  // Control de menú desplegable activo
   protected dropdownAbierto: string | null = null;
 
   constructor(
@@ -79,9 +79,13 @@ export class RegistrarOrden implements OnInit {
     }
   }
 
+  get esOrdenFinalizadaOCancelada(): boolean {
+    return this.idStatusOrder === 3 || this.idStatusOrder === 4;
+  }
+
   // --- Métodos para Desplegables 3D ---
   public toggleDropdown(nombreMenu: string): void {
-    if (this.pkOrden !== null && !this.puedeEditar) return;
+    if ((this.pkOrden !== null && !this.puedeEditar) || this.esOrdenFinalizadaOCancelada) return;
     this.dropdownAbierto = this.dropdownAbierto === nombreMenu ? null : nombreMenu;
     this.ch.detectChanges();
   }
@@ -134,6 +138,7 @@ export class RegistrarOrden implements OnInit {
       id_machines:          ['', Validators.required],
       id_employee:          [''],
       problem_description:  ['', Validators.required], 
+      conclusion:           ['', Validators.required], 
       id_type_maintenances: ['', Validators.required],
       id_priority:          ['', Validators.required],
       order_folio:          ['ORD-GEN-M'],
@@ -150,7 +155,7 @@ export class RegistrarOrden implements OnInit {
       this.esAdminOTecnico = (rolUsuario === 2 || rolUsuario === 3);
       this.puedeEditar = this.esAdminOTecnico || permisos.includes('editar_orden');
 
-      if (this.pkOrden !== null && !this.puedeEditar) {
+      if ((this.pkOrden !== null && !this.puedeEditar) || this.esOrdenFinalizadaOCancelada) {
         this.formOrden.disable();
       } else {
         this.formOrden.enable();
@@ -201,7 +206,10 @@ export class RegistrarOrden implements OnInit {
       const orden = respuesta.orden || respuesta;
       const evidencias = respuesta.evidencias || [];
 
-      const asignados = respuesta.usuariosAsignados || respuesta.usuarios_asignados || orden?.usuariosAsignados || [];
+      // Asignar el estado de la orden
+      this.idStatusOrder = Number(orden.id_status_order || orden.id_cat_status_order || 0);
+
+      const asignados = respuesta.usuariosAsignados || orden?.usuariosAsignados || [];
       
       if (Array.isArray(asignados)) {
         this.usuariosAsignados = asignados.map((u: any) => typeof u === 'string' ? u : (u.Name || u.name || ''));
@@ -231,16 +239,31 @@ export class RegistrarOrden implements OnInit {
         id_employee: orden.id_employee,
         id_departaments: orden.id_departaments,
         id_type_maintenances: orden.id_type_maintenances,
-        problem_description: orden.problem_description
+        problem_description: orden.problem_description,
+        conclusion: orden.conclusion
       }, { emitEvent: false });
 
-      this.images = Array.isArray(evidencias) ? evidencias.map((img: any) => ({
-        id_eviden_order: img.id_eviden_order || 0,
-        url_evidence_image: img.url_evidence_image || img.url || '',
-        nombreArchivo: 'Evidencia_Guardada.jpg',
-        tamanoTexto: 'Sincronizado',
-        progreso: 100
-      })) : [];
+      // Si la orden ya está finalizada o cancelada, deshabilitar edición
+      if (this.esOrdenFinalizadaOCancelada || !this.puedeEditar) {
+        this.formOrden.disable();
+      } else {
+        this.formOrden.enable();
+      }
+
+      this.images = Array.isArray(evidencias) ? evidencias.map((img: any) => {
+        const rutaRelativa = img.url_evidence_image || img.url || '';
+        const urlFinal = rutaRelativa.startsWith('http') || rutaRelativa.startsWith('data:') 
+          ? rutaRelativa 
+          : `http://localhost:8000/storage/${rutaRelativa.replace(/^\/?storage\//, '')}`;
+
+        return {
+          id_eviden_order: img.id_eviden_order || 0,
+          url_evidence_image: urlFinal,
+          nombreArchivo: rutaRelativa.split('/').pop() || 'Evidencia_Guardada.jpg',
+          tamanoTexto: 'Sincronizado',
+          progreso: 100
+        };
+      }) : [];
       
       this.ch.detectChanges();
 
@@ -260,32 +283,35 @@ export class RegistrarOrden implements OnInit {
     const respuesta: any = await this.ordenes.obtenerRecursosRegistroOrden().toPromise();
     const recursos = respuesta?.recursos || respuesta;
 
-    this.listaAreas              = Array.isArray(recursos?.listaareas) ? recursos.listaareas : [];
-    this.listaMaquinas           = Array.isArray(recursos?.listamaquinas) ? recursos.listamaquinas : [];
-    this.listaDepartamentos      = Array.isArray(recursos?.listadepartamentos) ? recursos.listadepartamentos : [];
-    this.listaEmpleados          = Array.isArray(recursos?.listaempleados) ? recursos.listaempleados : [];
-    this.listatipoMantenimiento  = Array.isArray(recursos?.listatipomantenimiento) ? recursos.listatipomantenimiento : [];
-    this.listatipoOrden          = Array.isArray(recursos?.listatipoorden) ? recursos.listatipoorden : [];
-    this.listaprioridadOrden     = Array.isArray(recursos?.listaprioridadorden) ? recursos.listaprioridadorden : [];
-    this.listacatalogoMaquina    = Array.isArray(recursos?.listacatalogomaquina) ? recursos.listacatalogomaquina : [];
+    this.listaAreas             = Array.isArray(recursos?.listaareas) ? recursos.listaareas : [];
+    this.listaMaquinas          = Array.isArray(recursos?.listamaquinas) ? recursos.listamaquinas : [];
+    this.listaDepartamentos     = Array.isArray(recursos?.listadepartamentos) ? recursos.listadepartamentos : [];
+    this.listaEmpleados         = Array.isArray(recursos?.listaempleados) ? recursos.listaempleados : [];
+    this.listatipoMantenimiento = Array.isArray(recursos?.listatipomantenimiento) ? recursos.listatipomantenimiento : [];
+    this.listatipoOrden         = Array.isArray(recursos?.listatipoorden) ? recursos.listatipoorden : [];
+    this.listaprioridadOrden    = Array.isArray(recursos?.listaprioridadorden) ? recursos.listaprioridadorden : [];
+    this.listacatalogoMaquina   = Array.isArray(recursos?.listacatalogomaquina) ? recursos.listacatalogomaquina : [];
     
     this.ch.detectChanges();
   }
 
   // --- Handlers Drag & Drop ---
   protected onDragOver(event: DragEvent): void {
+    if (this.esOrdenFinalizadaOCancelada) return;
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = true;
   }
 
   protected onDragLeave(event: DragEvent): void {
+    if (this.esOrdenFinalizadaOCancelada) return;
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
   }
 
   protected onDrop(event: DragEvent): void {
+    if (this.esOrdenFinalizadaOCancelada) return;
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
@@ -295,7 +321,7 @@ export class RegistrarOrden implements OnInit {
   }
 
   protected onFileSelected(event: any): void {
-    if (this.pkOrden !== null && !this.puedeEditar) return;
+    if ((this.pkOrden !== null && !this.puedeEditar) || this.esOrdenFinalizadaOCancelada) return;
     const selectedFiles = event.target.files;
     if (selectedFiles && selectedFiles.length > 0) {
       this.procesarArchivos(Array.from(selectedFiles));
@@ -342,12 +368,10 @@ export class RegistrarOrden implements OnInit {
   }
 
   protected eliminarEvidenciaOrden(index: number, id_eviden_order: number): void {
-    if (this.pkOrden !== null && !this.puedeEditar) return;
+    if ((this.pkOrden !== null && !this.puedeEditar) || this.esOrdenFinalizadaOCancelada) return;
 
     this.messages.mensajeConfirmacionCustom(
-      '¿Está seguro de eliminar la evidencia del orden?', 
-      'question', 
-      'Eliminar evidencia'
+      '¿Está seguro de eliminar la evidencia del orden?', 'question', 'Eliminar evidencia'
     ).then(res => {
       if (!res.isConfirmed) return;
 
@@ -427,28 +451,21 @@ export class RegistrarOrden implements OnInit {
   }
 
   protected actualizarOrden(): void {
-    if (!this.puedeEditar) {
-      this.messages.mensajeGenerico(
-        'No tienes el permiso del administrador, contacta al administrador para que te lo autorice.',
-        'error',
-        'Acceso denegado'
+    if (!this.puedeEditar || this.esOrdenFinalizadaOCancelada) {
+      this.messages.mensajeGenerico('La orden está finalizada o no cuentas con los permisos necesarios.', 'error', 'Acceso denegado'
       );
       return;
     }
 
     if (this.formOrden.invalid) {
       this.messages.mensajeGenerico(
-        'Aún hay campos vacíos o que no cumplen con la estructura correcta.',
-        'info', 
+        'Aún hay campos vacíos o que no cumplen con la estructura correcta.', 'info', 
         'Los campos requeridos están marcados con un *'
       );
       return;
     }
 
-    this.messages.mensajeConfirmacionCustom(
-      '¿Está seguro de continuar con la actualización del orden?',
-      'question', 
-      'Actualizar orden'
+    this.messages.mensajeConfirmacionCustom('¿Está seguro de continuar con la actualización del orden?', 'question', 'Actualizar orden'
     ).then(res => {
       if (!res.isConfirmed) return;
 
@@ -489,7 +506,7 @@ export class RegistrarOrden implements OnInit {
   }
 
   protected abrirAsignar(): void {
-    if (!this.puedeEditar) return;
+    if (!this.puedeEditar || this.esOrdenFinalizadaOCancelada) return;
 
     this.modal.abrirModalConComponente(AsignarOrden, {
       pkOrden: this.pkOrden, 

@@ -74,4 +74,15 @@ export class OrdenesService {
   public eliminarOrden(id_order: number): Observable<any> {
     return this.http.delete<any>(`${api}/ordenes/eliminarOrden/${id_order}`);
   }
+
+  public descargarPdfOrden(id_order: number): Observable<Blob> {
+    return this.http.get(`${api}/ordenes/descargarPdfOrden/${id_order}`, {
+      responseType: 'blob'
+    });
+  }
+
+  // === NUEVO MÉTODO AÑADIDO PARA ENVIAR PDF AL CHAT ===
+  public enviarPdfAlChat(idOrder: number): Observable<any> {
+    return this.http.post<any>(`${api}/ordenes/enviarPdfAlChat`, { id_order: idOrder });
+  }
 }

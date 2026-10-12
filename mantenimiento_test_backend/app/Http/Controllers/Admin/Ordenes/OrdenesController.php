@@ -27,7 +27,7 @@ class OrdenesController extends Controller
             Log::alert($error);
 
             return response()->json([
-                'error'   => $error,
+                'error'   => $error->getMessage(),
                 'mensaje' => 'Ocurrio un error interno'
             ], 500);
         }
@@ -57,56 +57,54 @@ class OrdenesController extends Controller
             Log::alert($error);
 
             return response()->json([
-                'error'   => $error,
+                'error'   => $error->getMessage(),
                 'mensaje' => 'Ocurrio un error interno'
-            ]);
+            ], 500);
         }
     }
 
     public function cancelarOrden(Request $request, int $id_order)
-{
-    try {
-        // BLOQUEO ESTRICTO POR API DE PERMISOS
-        if (!$this->ordenesService->verificarPermisoUsuario($request, 'cancelar_orden')) {
+    {
+        try {
+            if (!$this->ordenesService->verificarPermisoUsuario($request, 'cancelar_orden')) {
+                return response()->json([
+                    'title'   => 'Acceso denegado',
+                    'mensaje' => 'No tienes el permiso del administrador, contacta al administrador para que te lo autorice.'
+                ], 403);
+            }
+
+            return $this->ordenesService->cancelarOrden($id_order);
+        } catch (\Throwable $error) {
+            Log::alert('*********************************************');
+            Log::alert('Error al cancelar orden');
+            Log::alert($error->getMessage());
+
             return response()->json([
-                'title'   => 'Acceso denegado',
-                'mensaje' => 'No tienes el permiso del administrador, contacta al administrador para que te lo autorice.'
-            ], 403);
+                'mensaje' => $error->getMessage()
+            ], 400);
         }
-
-        return $this->ordenesService->cancelarOrden($id_order);
-    } catch (\Throwable $error) {
-        Log::alert('*********************************************');
-        Log::alert('Error al cancelar orden');
-        Log::alert($error->getMessage());
-
-        return response()->json([
-            'mensaje' => $error->getMessage()
-        ], 400);
     }
-}
 
-public function eliminarOrden(Request $request, int $id_order)
-{
-    try {
-        // Validación de permisos estricta
-        if (!$this->ordenesService->verificarPermisoUsuario($request, 'eliminar_orden')) {
+    public function eliminarOrden(Request $request, int $id_order)
+    {
+        try {
+            if (!$this->ordenesService->verificarPermisoUsuario($request, 'eliminar_orden')) {
+                return response()->json([
+                    'title'   => 'Acceso denegado',
+                    'mensaje' => 'No tienes el permiso para eliminar órdenes. Contacta al administrador.'
+                ], 403);
+            }
+
+            return $this->ordenesService->eliminarOrden($id_order);
+        } catch (\Throwable $error) {
+            Log::alert('Error al eliminar orden ' . $id_order);
+            Log::alert($error->getMessage());
+
             return response()->json([
-                'title'   => 'Acceso denegado',
-                'mensaje' => 'No tienes el permiso para eliminar órdenes. Contacta al administrador.'
-            ], 403);
+                'mensaje' => 'Ocurrió un error al intentar eliminar la orden.'
+            ], 400);
         }
-
-        return $this->ordenesService->eliminarOrden($id_order);
-    } catch (\Throwable $error) {
-        Log::alert('Error al eliminar orden ' . $id_order);
-        Log::alert($error->getMessage());
-
-        return response()->json([
-            'mensaje' => 'Ocurrió un error al intentar eliminar la orden.'
-        ], 400);
     }
-}
 
     public function obtenerStatusOrdenes() {
         try {
@@ -117,9 +115,9 @@ public function eliminarOrden(Request $request, int $id_order)
             Log::alert($error);
 
             return response()->json([
-                'error'   => $error,
+                'error'   => $error->getMessage(),
                 'mensaje' => 'Ocurrio un error interno'
-            ]);
+            ], 500);
         }
     }
 
@@ -163,8 +161,8 @@ public function eliminarOrden(Request $request, int $id_order)
             Log::alert($error);
 
             return response()->json([
-                'error'   => $error,
-                'mensaje' => 'Ocurrio un eror interno'
+                'error'   => $error->getMessage(),
+                'mensaje' => 'Ocurrio un error interno'
             ], 500);
         }
     }
@@ -178,8 +176,8 @@ public function eliminarOrden(Request $request, int $id_order)
             Log::alert($error->getMessage());
             
             return response()->json([
-                'error'   => $error,
-                'mensaje' => 'Ocurrio un error inerno'
+                'error'   => $error->getMessage(),
+                'mensaje' => 'Ocurrio un error interno'
             ], 500);
         }
     }
@@ -187,7 +185,6 @@ public function eliminarOrden(Request $request, int $id_order)
     public function actualizarOrden(Request $request)
     {
         try {
-            // BLOQUEO ESTRICTO POR API DE PERMISOS
             if (!$this->ordenesService->verificarPermisoUsuario($request, 'editar_orden')) {
                 return response()->json([
                     'title'   => 'Acceso denegado',
@@ -209,7 +206,6 @@ public function eliminarOrden(Request $request, int $id_order)
 
     public function asignarOrden(Request $request) {
         try {
-            // BLOQUEO ESTRICTO POR API DE PERMISOS
             if (!$this->ordenesService->verificarPermisoUsuario($request, 'editar_orden')) {
                 return response()->json([
                     'title'   => 'Acceso denegado',
@@ -227,7 +223,7 @@ public function eliminarOrden(Request $request, int $id_order)
             Log::alert($error->getMessage());
 
             return response()->json([
-                'error'   => $error,
+                'error'   => $error->getMessage(),
                 'mensaje' => 'Ocurrio un error interno'
             ], 500);
         }
@@ -242,7 +238,7 @@ public function eliminarOrden(Request $request, int $id_order)
             Log::alert($error);
 
             return response()->json([
-                'error'   => $error,
+                'error'   => $error->getMessage(),
                 'mensaje' => 'Ocurrio un error interno'
             ], 500);
         }
@@ -258,7 +254,7 @@ public function eliminarOrden(Request $request, int $id_order)
             Log::alert($error);
 
             return response()->json([
-                'error'   => $error,
+                'error'   => $error->getMessage(),
                 'mensaje' => 'Ocurrió un error interno'
             ], 500);
         }
@@ -287,10 +283,16 @@ public function eliminarOrden(Request $request, int $id_order)
     public function cambiarStatusYSolucionarOrden(Request $request)
     {
         try {
-            return $this->ordenesService->finalizarORechazarOrden($request->all());
+            $data = $request->all();
+            $files = $request->file('files') ?? $request->file('images');
+
+            return $this->ordenesService->finalizarORechazarOrden($data, $files);
         } catch (\Throwable $error) {
             Log::alert('Error al cambiar estatus/solucionar orden: ' . $error->getMessage());
-            return response()->json(['mensaje' => 'Ocurrió un error interno'], 500);
+            return response()->json([
+                'mensaje' => 'Ocurrió un error interno al actualizar el estatus de la orden',
+                'error'   => $error->getMessage()
+            ], 500);
         }
     }
 
@@ -304,6 +306,59 @@ public function eliminarOrden(Request $request, int $id_order)
         } catch (\Throwable $error) {
             Log::alert('Error al calificar solución de orden: ' . $error->getMessage());
             return response()->json(['mensaje' => 'Ocurrió un error interno'], 500);
+        }
+    }
+
+    public function descargarPdfOrden(Request $request, int $id_order)
+    {
+        try {
+            if (!$this->ordenesService->verificarPermisoUsuario($request, 'descargar_pdf_orden')) {
+                return response()->json([
+                    'title'   => 'Acceso denegado',
+                    'mensaje' => 'No tienes el permiso del administrador para descargar reportes PDF.'
+                ], 403);
+            }
+
+            $resultado = $this->ordenesService->generarPdfOrden($id_order);
+
+            if (!$resultado) {
+                return response()->json([
+                    'title'   => 'Orden no encontrada',
+                    'mensaje' => 'La orden solicitada no existe o no se pudo procesar.'
+                ], 404);
+            }
+
+            $nombreArchivo = 'Reporte_' . $resultado['folio'] . '.pdf';
+
+            return $resultado['pdf']->download($nombreArchivo);
+
+        } catch (\Throwable $error) {
+            Log::alert('*********************************************');
+            Log::alert('Error al descargar PDF de la orden ' . $id_order);
+            Log::alert($error->getMessage());
+
+            return response()->json([
+                'error'   => $error->getMessage(),
+                'mensaje' => 'Ocurrió un error interno al generar el archivo PDF'
+            ], 500);
+        }
+    }
+
+    public function enviarPdfAlChat(Request $request)
+    {
+        try {
+            $id_order = $request->input('id_order');
+            $id_user = $request->input('id_users_auth') ?? $request->attributes->get('id_users_auth') ?? 1;
+
+            $resultado = $this->ordenesService->insertarPdfEnChat($id_order, $id_user);
+
+            return response()->json($resultado, 200);
+        } catch (\Throwable $error) {
+            Log::alert('Error al enviar PDF al chat: ' . $error->getMessage());
+            return response()->json([
+                'mensaje' => 'Ocurrió un error interno al generar e insertar el PDF',
+                'error'   => $error->getMessage()
+            ], 500);
         }
     }
 }

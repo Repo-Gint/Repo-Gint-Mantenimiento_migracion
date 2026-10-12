@@ -3,12 +3,12 @@
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <div>
             <div class="d-flex align-items-center gap-2 mb-1">
-                <h1 class="h3 fw-bold text-dark mb-0">Órdenes</h1>
+                <h1 class="h3 fw-bold text-dark mb-0">Ordenes</h1>
                 <span class="badge badge-pill-light">Mantenimiento General</span>
             </div>
             <nav>
                 <ol class="breadcrumb mb-0 bg-transparent p-0 small">
-                    <li class="breadcrumb-item text-muted">Órdenes</li>
+                    <li class="breadcrumb-item text-muted">Ordenes</li>
                     <li class="breadcrumb-item active text-primary">Consulta Órdenes</li>
                 </ol>
             </nav>
@@ -46,33 +46,9 @@
                 <span class="text-muted small">Requieren atención operativa</span>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="metric-card-light p-3 shadow-sm">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <span class="text-muted small text-uppercase fw-semibold">Mantenimientos Urgentes</span>
-                    <div class="metric-icon-box bg-danger-subtle text-danger">
-                        <i class="bi bi-shield-exclamation"></i>
-                    </div>
-                </div>
-                <h2 class="text-dark fw-bold mb-1">02</h2>
-                <span class="text-danger small">Línea de producción NAVE-1</span>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="metric-card-light p-3 shadow-sm">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <span class="text-muted small text-uppercase fw-semibold">Tiempo Promedio Cierre</span>
-                    <div class="metric-icon-box bg-success-subtle text-success">
-                        <i class="bi bi-clock"></i>
-                    </div>
-                </div>
-                <h2 class="text-dark fw-bold mb-1">3.4 h</h2>
-                <span class="text-success small">-18% vs mes pas.</span>
-            </div>
-        </div>
     </div>
 
-    <!-- Filters Bar Card con Buscador Animado y 4 Columnas -->
+    <!-- Filters Bar Card con Buscador Animado -->
     <div class="filter-light-card p-3 mb-4 shadow-sm">
         <div class="row align-items-end g-3">
             <!-- Filtro Área -->
@@ -111,7 +87,7 @@
                 </div>
             </div>
 
-            <!-- Buscador Súper Animado -->
+            <!-- Buscador -->
             <div class="col-md-3">
                 <label class="form-label-light">Buscar:</label>
                 <div class="input-group input-group-sm search-animated-box">
@@ -134,7 +110,7 @@
         </div>
     </div>
 
-    <!-- Table Container Card con Paginación de 5 en 5 -->
+    <!-- Table Container Card -->
     <div class="table-light-card shadow-sm">
         <div class="p-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2 bg-white">
             <div class="d-flex align-items-center gap-2">
@@ -142,7 +118,6 @@
                 <h6 class="text-dark mb-0 fw-bold">ÓRDENES DE TRABAJO ACTIVAS</h6>
                 <span class="badge bg-light text-muted small px-2 border">{{ ordenesFiltradas.length }} resultados</span>
             </div>
-            <span class="text-muted small">Actualizado hace: 1min <i class="bi bi-arrow-repeat ms-1 cursor-pointer"></i></span>
         </div>
 
         <div class="table-responsive">
@@ -188,7 +163,6 @@
                         </td>
                         <td><span class="text-secondary">{{ orden.type_orders }}</span></td>
                         <td>
-                            <!-- Insignia de Prioridad / Status Animada -->
                             <span class="badge-priority-animated" [ngClass]="{
                                 'priority-urgent-pulse': orden.priority?.toLowerCase() === 'urgente',
                                 'priority-normal-badge': orden.priority?.toLowerCase() !== 'urgente'
@@ -199,6 +173,11 @@
                         </td>
                         <td class="pe-3">
                             <div class="d-flex justify-content-center gap-1">
+                                <!-- Descargar PDF -->
+                                <button class="btn-action-light text-primary" (click)="descargarPdf(orden.id_order)" title="Descargar Reporte PDF">
+                                    <i class="bi bi-file-earmark-pdf-fill"></i>
+                                </button>
+
                                 <!-- Editar -->
                                 <button class="btn-action-light btn-edit-light" (click)="abrirModalRegistrarOrdenes(orden.id_order)" title="Editar Orden">
                                     <i class="bi bi-pencil"></i>
@@ -209,9 +188,36 @@
                                     <i class="bi bi-x-lg"></i>
                                 </button>
 
-                                <!-- Borrar/Eliminar -->
-                                <button class="btn-action-light btn-delete-light text-danger" (click)="eliminarOrden(orden.id_order)" title="Eliminar Orden">
-                                    <i class="bi bi-trash3-fill"></i>
+                               <!-- Columna de Acción Eliminar dentro de tu *ngFor / @for -->
+                                <button [id]="'btnDelete_' + orden.id_order" class="del-btn" type="button" aria-label="Eliminar orden"(click)="eliminarOrden(orden.id_order)">
+
+                                  <svg class="del-btn__icon" viewBox="0 0 48 48" width="48px" height="48px" aria-hidden="true">
+                                    <clipPath [id]="'can-clip-' + orden.id_order">
+                                      <rect class="del-btn__icon-can-fill" x="5" y="24" width="14" height="11"></rect>
+                                    </clipPath>
+                                    <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="translate(12,12)">
+                                      <g class="del-btn__icon-lid">
+                                        <polyline points="9,5 9,1 15,1 15,5"></polyline>
+                                        <polyline points="4,5 20,5"></polyline>
+                                      </g>
+                                      <g class="del-btn__icon-can">
+                                        <g stroke-width="0">
+                                          <polyline [id]="'can-fill-' + orden.id_order" points="6,10 7,23 17,23 18,10"></polyline>
+                                          <use [attr.clip-path]="'url(#can-clip-' + orden.id_order + ')'" [attr.href]="'#can-fill-' + orden.id_order" fill="#fff"></use>
+                                        </g>
+                                        <polyline points="6,10 7,23 17,23 18,10"></polyline>
+                                      </g>
+                                    </g>
+                                  </svg>
+                              
+                                  <span class="del-btn__letters" aria-hidden="true">
+                                    <span class="del-btn__letter-box"><span class="del-btn__letter">B</span></span>
+                                    <span class="del-btn__letter-box"><span class="del-btn__letter">o</span></span>
+                                    <span class="del-btn__letter-box"><span class="del-btn__letter">r</span></span>
+                                    <span class="del-btn__letter-box"><span class="del-btn__letter">r</span></span>
+                                    <span class="del-btn__letter-box"><span class="del-btn__letter">a</span></span>
+                                    <span class="del-btn__letter-box"><span class="del-btn__letter">r</span></span>
+                                  </span>
                                 </button>
 
                                 <!-- Chat / Bitácora -->
@@ -231,7 +237,7 @@
             </table>
         </div>
 
-        <!-- Footer Pagination Dinámico (De 5 en 5) -->
+        <!-- Footer Pagination Dinámico -->
         <div class="p-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2 bg-white">
             <span class="text-muted small">
                 Mostrando {{ ordenesPaginadas.length > 0 ? (paginaActual - 1) * itemsPorPagina + 1 : 0 }} 
@@ -249,6 +255,45 @@
                 </ng-container>
                 <button class="btn btn-sm btn-outline-secondary px-2 py-1" [disabled]="paginaActual === totalPaginas || totalPaginas === 0" (click)="cambiarPagina(paginaActual + 1)">
                     Siguiente <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= MODAL DE DESCARGA DE PDF CON ANIMACIÓN DEL CAMIÓIN ================= -->
+<div class="modal fade" id="modalDescargaPdf" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg modal-truck-content">
+            <div class="modal-body text-center py-5 d-flex flex-column align-items-center justify-content-center">
+                <h5 class="fw-bold text-white mb-4">Generando Reporte PDF...</h5>
+
+                <button #btnCamion class="dl-button">
+                    <span class="default">Descargando...</span>
+                    <span class="success">
+                        Descarga Lista
+                        <svg viewBox="0 0 12 10">
+                            <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                        </svg>
+                    </span>
+                    <div class="truck-wrapper">
+                        <div class="truck">
+                            <div class="wheel"></div>
+                            <div class="back">
+                                <div class="shadow"></div>
+                                <div class="logo">
+                                    <svg width="40" height="45" viewBox="0 0 40 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M21.8383 5.61481C20.7936 4.64191 19.1997 4.6419 18.155 5.61481L14.178 9.31858C13.6251 9.83349 13.6251 10.7252 14.178 11.2401L18.155 14.9439C19.1997 15.9168 20.7936 15.9168 21.8383 14.9439L25.8153 11.2402C26.3682 10.7252 26.3682 9.8335 25.8153 9.31858L21.8383 5.61481Z" fill="#5AB9A8"/>
+                                        <path d="M15.5918 8.0018L18.1549 10.3888C19.1996 11.3617 20.7935 11.3617 21.8382 10.3888L24.4013 8.0018L21.8382 5.61481C20.7935 4.64191 19.1996 4.6419 18.1549 5.61481L15.5918 8.0018Z" fill="white"/>
+                                        <path d="M21.8383 1.15366C20.7936 0.180755 19.1997 0.180753 18.155 1.15366L14.178 4.85742C13.6251 5.37234 13.6251 6.26408 14.178 6.779L18.155 10.4828C19.1997 11.4557 20.7936 11.4557 21.8383 10.4828L25.8153 6.779C26.3682 6.26408 26.3682 5.37234 25.8153 4.85743L21.8383 1.15366Z" fill="white"/>
+                                    </svg>
+                                </div>
+                                <div class="box"></div>
+                            </div>
+                            <div class="front"></div>
+                            <div class="light"></div>
+                        </div>
+                    </div>
                 </button>
             </div>
         </div>

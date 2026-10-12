@@ -6,6 +6,8 @@ import { MessagesService } from '../../../services/messages/messages';
 import { OrdenesService } from '../../../services/api/ordenes/ordenes';
 import { ModalService } from '../../../services/modal/modal';
 
+declare var bootstrap: any;
+
 @Component({
   selector: 'app-chat-ordenes',
   imports: [CommonModule, ReactiveFormsModule, FormsModule],
@@ -16,13 +18,15 @@ import { ModalService } from '../../../services/modal/modal';
 export class ChatOrdenesComponent implements OnInit {
   @Input() pkOrden: any = null;
 
-  protected datosTabla: any = []; 
+  protected datosTabla: any[] = []; 
   protected formChat!: FormGroup;
   protected formOrden!: FormGroup; 
   protected formSolucion!: FormGroup;
   protected mensajesOrden: any[] = [];
   protected images: any[] = [];    
+  protected resolutionImages: File[] = []; // Archivos seleccionados para la resolución
   protected listaMonedas: any[] = [];
+  protected listaStatusOrden: any[] = [];
 
   protected listaAreas:             any[] = [];
   protected listaMaquinas:          any[] = [];
@@ -55,7 +59,11 @@ export class ChatOrdenesComponent implements OnInit {
       this.crearFormChat();
       this.crearFormOrdenBase();
       this.crearFormSolucionBase();
-      await this.obtenerRecursosRegistroOrden();
+
+      await Promise.all([
+        this.obtenerRecursosRegistroOrden(),
+        this.obtenerStatusOrdenes()
+      ]);
 
       if (this.pkOrden == null) {
         const paramKeys = this.route.snapshot.paramMap.keys;
@@ -84,9 +92,6 @@ export class ChatOrdenesComponent implements OnInit {
     }
   }
 
-  /**
-   * Determina si se debe mostrar una etiqueta separadora de fecha entre dos mensajes
-   */
   protected mostrarSeparadorFecha(index: number): boolean {
     if (index === 0) return true;
     const fechaActual = this.obtenerFechaSolo(this.mensajesOrden[index]?.created_at || this.mensajesOrden[index]?.send_date);
@@ -94,9 +99,6 @@ export class ChatOrdenesComponent implements OnInit {
     return fechaActual !== fechaAnterior;
   }
 
-  /**
-   * Determina si se debe mostrar el nombre del remitente en el mensaje actual
-   */
   protected mostrarRemitente(index: number): boolean {
     if (index === 0) return true;
     if (this.mostrarSeparadorFecha(index)) return true;
@@ -110,17 +112,11 @@ export class ChatOrdenesComponent implements OnInit {
     return remitenteActual !== remitenteAnterior;
   }
 
-  /**
-   * Extrae solo YYYY-MM-DD
-   */
   private obtenerFechaSolo(fechaStr: string): string {
     if (!fechaStr) return '';
     return fechaStr.split(' ')[0] || fechaStr.split('T')[0] || '';
   }
 
-  /**
-   * Extrae la hora en formato 12h o 24h (ej. 22:30)
-   */
   protected obtenerHora(fechaStr: string): string {
     if (!fechaStr) return '';
     const partes = fechaStr.split(' ');
@@ -159,7 +155,7 @@ export class ChatOrdenesComponent implements OnInit {
       business_mail: [''],
       id_users: [1],
       id_coin: [null, Validators.required],
-      order_cost: [null, Validators.required],
+      order_cost: [null, [Validators.required, Validators.min(0)]],
       resolution: ['', Validators.required],
       spare_parts: [''],
       materials: ['']
@@ -178,8 +174,19 @@ export class ChatOrdenesComponent implements OnInit {
     this.listatipoOrden         = Array.isArray(recursos?.listatipoorden) ? recursos.listatipoorden : [];
     this.listaprioridadOrden    = Array.isArray(recursos?.listaprioridadorden) ? recursos.listaprioridadorden : [];
     this.listacatalogogoMaquina = Array.isArray(recursos?.listacatalogomaquina) ? recursos.listacatalogomaquina : [];
-    
+
     this.ch.detectChanges();
+  }
+
+  public async obtenerStatusOrdenes(): Promise<void> {
+    try {
+      const respuesta: any = await this.ordenes.obtenerStatusOrdenes().toPromise();
+      const datos = respuesta?.ordenes || respuesta?.data || respuesta || [];
+      this.listaStatusOrden = Array.isArray(datos) ? datos.filter((item: any) => Number(item.active) === 1 || item.active === undefined) : [];
+      this.ch.detectChanges();
+    } catch (error) {
+      console.error('Error al obtener cat_status_order:', error);
+    }
   }
 
   public async obtenerMensajesOrden(idOrder: number): Promise<void> {
@@ -201,8 +208,12 @@ export class ChatOrdenesComponent implements OnInit {
   public async obtenerDetalleOrden(pkOrden: number): Promise<void> {
     try {
       const respuesta: any = await this.ordenes.obtenerDetalleOrden(pkOrden).toPromise();
-      const orden = respuesta.orden || respuesta;
-      const evidencias = respuesta.evidencias || [];
+      const orden = respuesta?.orden || respuesta;
+      const evidencias = respuesta?.evidencias || [];
+
+      if (orden) {
+        orden.id_status_order = Number(orden.id_status_order);
+      }
 
       setTimeout(() => {
         this.datosTabla = orden ? [orden] : [];
@@ -278,15 +289,16 @@ export class ChatOrdenesComponent implements OnInit {
           remitente_nombre: 'Administración', 
           subject: this.formChat.get('subject')?.value,
           content: this.formChat.get('content')?.value,
+          id_status_order: Number(ordenActual.id_status_order) || 1,
           es_admin: true 
         };
 
         const respuesta: any = await this.ordenes.enviarMensajeOrden(payload).toPromise();
-        
+
         this.formChat.reset();
         await this.obtenerMensajesOrden(this.pkOrden);
 
-        this.messages.mensajeGenerico(respuesta.mensaje || 'Mensaje enviado con éxito', 'success', respuesta.title || 'Éxito');
+        this.messages.mensajeGenerico(respuesta?.mensaje || 'Mensaje enviado con éxito', 'success', respuesta?.title || 'Éxito');
       } catch (error) {
         console.error('Error al enviar el mensaje:', error);
         this.messages.mensajeGenerico('Ocurrió un error al enviar el mensaje', 'error');
@@ -297,32 +309,67 @@ export class ChatOrdenesComponent implements OnInit {
     });
   }
 
-  protected cambiarEstatusOrden(orden: any): void {
+  protected cambiarEstatusOrden(orden: any, event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    let nuevoEstatus = Number(selectElement.value);
+
+    if (isNaN(nuevoEstatus) || !nuevoEstatus) {
+      const selectedOption = this.listaStatusOrden[selectElement.selectedIndex];
+      if (selectedOption) {
+        nuevoEstatus = Number(selectedOption.id_status_order);
+      }
+    }
+
+    const estatusOriginal = Number(orden.id_status_order);
+
     if (this.esOrdenFinalizada) {
       this.messages.mensajeGenerico('La orden está finalizada y no se puede modificar el estatus', 'info');
+      selectElement.value = String(estatusOriginal);
       return;
     }
 
-    const nuevoEstatus = Number(orden.id_status_order);
+    if (isNaN(nuevoEstatus)) {
+      console.warn('Estatus inválido seleccionado.');
+      return;
+    }
 
     if (nuevoEstatus === 2) {
+      orden.id_status_order = nuevoEstatus;
       this.actualizarEstatusYEnviarCorreo(orden, nuevoEstatus);
     } else if (nuevoEstatus === 3) {
+      orden.id_status_order = estatusOriginal;
+      selectElement.value = String(estatusOriginal);
       this.abrirModalSolucion(orden);
     } else {
-      this.actualizarEstatusBD(orden.id_order, nuevoEstatus);
+      orden.id_status_order = nuevoEstatus;
+      const idOrdenBD = Number(orden.id_order || orden.pk_orden || this.pkOrden);
+      this.actualizarEstatusBD(idOrdenBD, nuevoEstatus);
     }
   }
 
-  protected actualizarEstatusBD(idOrder: number, idStatus: number): void {
+  protected actualizarEstatusBD(idOrder: any, idStatus: any): void {
+    const parsedOrder = Number(idOrder);
+    const parsedStatus = Number(idStatus);
+
+    if (isNaN(parsedOrder) || isNaN(parsedStatus)) {
+      this.messages.mensajeGenerico('El estatus seleccionado no es válido', 'error');
+      return;
+    }
+
+    const payload = {
+      id_order: parsedOrder,
+      id_status_order: parsedStatus
+    };
+
     this.messages.mensajeEsperar();
-    this.ordenes.cambiarStatusYSolucionarOrden({ id_order: idOrder, id_status_order: idStatus }).subscribe({
+
+    this.ordenes.cambiarStatusYSolucionarOrden(payload).subscribe({
       next: (res: any) => {
         this.messages.mensajeGenerico('Estatus actualizado correctamente', 'success');
         this.obtenerDetalleOrden(this.pkOrden);
       },
       error: (err) => {
-        console.error(err);
+        console.error('ERROR CAMBIANDO ESTATUS:', err);
         this.messages.mensajeGenerico('Error al actualizar el estatus', 'error');
       }
     });
@@ -330,9 +377,10 @@ export class ChatOrdenesComponent implements OnInit {
 
   protected actualizarEstatusYEnviarCorreo(orden: any, nuevoEstatus: number): void {
     this.messages.mensajeEsperar();
+    const idOrdenBD = Number(orden.id_order || orden.pk_orden || this.pkOrden);
     const payload = {
-      id_order: orden.id_order,
-      id_status_order: nuevoEstatus
+      id_order: idOrdenBD,
+      id_status_order: Number(nuevoEstatus)
     };
 
     this.ordenes.cambiarStatusYSolucionarOrden(payload).subscribe({
@@ -348,25 +396,53 @@ export class ChatOrdenesComponent implements OnInit {
   }
 
   protected abrirModalSolucion(orden: any): void {
-    this.formSolucion.patchValue({
-      id_order: orden.id_order,
+    const idOrdenBD = Number(orden.id_order || orden.pk_orden || this.pkOrden);
+    const correoNegocio = orden.busines_mail || orden.correo_electronico || '';
+
+    this.resolutionImages = []; 
+
+    this.formSolucion.reset({
+      id_order: idOrdenBD,
       id_status_order: 3,
-      business_mail: orden.busines_mail,
-      id_users: 1 
+      business_mail: correoNegocio,
+      id_users: 1,
+      id_coin: null,
+      order_cost: null,
+      resolution: '',
+      spare_parts: '',
+      materials: ''
     });
 
     this.ordenes.obtenerListaMonedas().subscribe({
       next: (res: any) => {
-        this.listaMonedas = res.monedas || res.data || res;
+        this.listaMonedas = res?.monedas || res?.data || res || [];
+        this.ch.detectChanges();
       },
       error: (err) => {
         console.error('Error al cargar monedas:', err);
       }
     });
 
-    const modalElement = document.getElementById('modalSolucionOrden');
-    const modal = new (window as any).bootstrap.Modal(modalElement);
-    modal.show();
+    setTimeout(() => {
+      const modalElement = document.getElementById('modalSolucionOrden');
+      if (modalElement) {
+        const bootstrapObj = (window as any).bootstrap || bootstrap;
+        if (bootstrapObj && bootstrapObj.Modal) {
+          let modalInstance = bootstrapObj.Modal.getInstance(modalElement);
+          if (!modalInstance) {
+            modalInstance = new bootstrapObj.Modal(modalElement, { backdrop: 'static' });
+          }
+          modalInstance.show();
+        }
+      }
+    }, 50);
+  }
+
+  protected onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.resolutionImages = Array.from(input.files);
+    }
   }
 
   protected guardarSolucion(): void {
@@ -375,21 +451,61 @@ export class ChatOrdenesComponent implements OnInit {
       return;
     }
 
-    this.messages.mensajeEsperar();
-    this.ordenes.cambiarStatusYSolucionarOrden(this.formSolucion.value).subscribe({
-      next: (res: any) => {
-        this.messages.mensajeGenerico('Orden finalizada y solución registrada con éxito', 'success');
-        
-        const modalElement = document.getElementById('modalSolucionOrden');
-        const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
-        if (modal) modal.hide();
+    // Modal de confirmación preguntando si desea el PDF adjunto (justo al darle Guardar)
+    this.messages.mensajeConfirmacionCustom(
+      '¿Deseas que el PDF de la orden se envíe adjunto a la notificación de estatus finalizado?', 
+      'question', 
+      'Sí, enviar con PDF'
+    ).then((confirm: any) => {
+      
+      // Dependiendo de si acepta o rechaza/cancela, enviamos true o false en el payload
+      const enviarPdf = confirm.isConfirmed ? 'true' : 'false';
 
-        this.obtenerDetalleOrden(this.pkOrden);
-      },
-      error: (err) => {
-        console.error(err);
-        this.messages.mensajeGenerico('Error al registrar la solución', 'error');
+      this.messages.mensajeEsperar();
+
+      const formData = new FormData();
+      formData.append('id_order', String(this.formSolucion.value.id_order));
+      formData.append('id_status_order', String(this.formSolucion.value.id_status_order));
+      formData.append('id_coin', String(this.formSolucion.value.id_coin));
+      formData.append('order_cost', String(this.formSolucion.value.order_cost));
+      formData.append('resolution', this.formSolucion.value.resolution || '');
+      formData.append('spare_parts', this.formSolucion.value.spare_parts || '');
+      formData.append('materials', this.formSolucion.value.materials || '');
+      formData.append('business_mail', this.formSolucion.value.business_mail || '');
+      formData.append('id_users', String(this.formSolucion.value.id_users || 1));
+      
+      // Agregamos la bandera al formulario
+      formData.append('enviar_pdf', enviarPdf);
+
+      if (this.resolutionImages && this.resolutionImages.length > 0) {
+        for (let i = 0; i < this.resolutionImages.length; i++) {
+          formData.append('files[]', this.resolutionImages[i]);
+        }
       }
+
+      this.ordenes.cambiarStatusYSolucionarOrden(formData).subscribe({
+        next: (res: any) => {
+          // Ocultar modal del formulario
+          const modalElement = document.getElementById('modalSolucionOrden');
+          if (modalElement) {
+            const bootstrapObj = (window as any).bootstrap || bootstrap;
+            if (bootstrapObj && bootstrapObj.Modal) {
+              const modalInstance = bootstrapObj.Modal.getInstance(modalElement);
+              if (modalInstance) {
+                modalInstance.hide();
+              }
+            }
+          }
+
+          this.messages.mensajeGenerico('Orden finalizada con éxito', 'success');
+          this.obtenerDetalleOrden(this.pkOrden);
+          this.obtenerMensajesOrden(this.pkOrden);
+        },
+        error: (err) => {
+          console.error(err);
+          this.messages.mensajeGenerico('Error al registrar la solución', 'error');
+        }
+      });
     });
   }
 }

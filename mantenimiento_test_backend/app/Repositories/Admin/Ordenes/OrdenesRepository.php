@@ -25,6 +25,7 @@ class OrdenesRepository
         $registro->id_priority          = $ordenes['id_priority'];
         $registro->order_folio          = $ordenes['order_folio'];
         $registro->problem_description  = $ordenes['problem_description'];
+        $registro->conclusion           = $ordenes['conclusion'] ?? null;
         $registro->application          = Carbon::now();
         $registro->start_date           = Carbon::now();
         $registro->end_date             = Carbon::now();
@@ -76,6 +77,7 @@ class OrdenesRepository
             'cat_priority.priority',
             'tbl_orders.order_folio',
             'tbl_orders.problem_description',
+            'tbl_orders.conclusion',
             'tbl_orders.application',
             'tbl_orders.start_date',
             'tbl_orders.end_date'
@@ -94,8 +96,6 @@ class OrdenesRepository
                 ['tbl_orders.id_status_order', $pkStatus]
             ]);
 
-        // FILTRO ESTRICTO POR ROL: 
-        // Si el rol es Usuario (Rol 1), filtramos exclusivamente por las órdenes de su empleado asociado.
         if ((int)$idRol === 1) {
             $idEmployee = null;
             if ($idUser) {
@@ -105,7 +105,6 @@ class OrdenesRepository
             if ($idEmployee) {
                 $query->where('tbl_orders.id_employee', $idEmployee);
             } else {
-                // Si no se encuentra empleado asociado, devolvemos una condición vacía por seguridad
                 $query->where('tbl_orders.id_employee', -9999);
             }
         }
@@ -128,6 +127,7 @@ class OrdenesRepository
                 'tbl_orders.id_priority',
                 'tbl_orders.order_folio as folio_orden',
                 'tbl_orders.problem_description',
+                'tbl_orders.conclusion',
                 'tbl_orders.application',
                 'tbl_orders.start_date',
                 'tbl_orders.end_date',
@@ -152,7 +152,7 @@ class OrdenesRepository
             ->join('cat_type_maintenances', 'cat_type_maintenances.id_type_maintenances', '=', 'tbl_orders.id_type_maintenances')
             ->join('cat_type_orders',       'cat_type_orders.id_type_orders',       '=', 'tbl_orders.id_type_orders')
             ->join('cat_priority',          'cat_priority.id_priority',             '=', 'tbl_orders.id_priority')
-            ->where('tbl_orders.id_order', $pkOrden)
+            ->where('tbl_orders.id_order', (int)$pkOrden)
             ->first();
 
         return $orden;
@@ -160,7 +160,7 @@ class OrdenesRepository
 
     public function obtenerUsuariosAsignadosOrden(int $pkOrden)
     {
-        $usuariosAsignados = TblOrdenesAsignacion::where('tbl_orders_assignment.id_order', $pkOrden)
+        $usuariosAsignados = TblOrdenesAsignacion::where('tbl_orders_assignment.id_order', (int)$pkOrden)
             ->join('tbl_users', 'tbl_users.id_users', '=', 'tbl_orders_assignment.id_users')
             ->join('tbl_employee', 'tbl_employee.id_employee', '=', 'tbl_users.id_employee')
             ->pluck('tbl_employee.Name');
@@ -170,7 +170,7 @@ class OrdenesRepository
 
     public function obtenerIdsUsuariosAsignadosOrden($pkOrden)
     {
-        return TblOrdenesAsignacion::where('id_order', $pkOrden)
+        return TblOrdenesAsignacion::where('id_order', (int)$pkOrden)
             ->pluck('id_users');
     }
 
@@ -198,12 +198,31 @@ class OrdenesRepository
 
     public function obtenerEvidenciaOrden(int $pkOrden)
     {
+        $baseUrl = config('app.url', 'http://localhost:8000');
         $query = DB::table('tbl_orders_evidence')
             ->select(
                 'id_eviden_order',
-                DB::raw('CONCAT("http://localhost:8000/storage/", url_evidence_image) AS url_evidence_image')
+                'url_evidence_image',
+                DB::raw("CONCAT('{$baseUrl}/storage/', url_evidence_image) AS public_url"),
+                DB::raw("CONCAT('" . public_path('storage/') . "', url_evidence_image) AS absolute_path")
             )
-            ->where('id_order', $pkOrden);
+            ->where('id_order', (int)$pkOrden);
+
+        return $query->get();
+    }
+
+    public function obtenerResolucionOrden(int $pkOrden)
+    {
+        $baseUrl = config('app.url', 'http://localhost:8000');
+        $query = DB::table('tbl_orders_resolution')
+            ->select(
+                'id_resolution_order',
+                'id_order',
+                'url_resolution_image',
+                DB::raw("CONCAT('{$baseUrl}/storage/', url_resolution_image) AS public_url"),
+                DB::raw("CONCAT('" . public_path('storage/') . "', url_resolution_image) AS absolute_path")
+            )
+            ->where('id_order', (int)$pkOrden);
 
         return $query->get();
     }
@@ -224,11 +243,12 @@ class OrdenesRepository
                 'id_departaments'     => $orden['id_departaments'],
                 'id_area'             => $orden['id_area'],
                 'id_employee'         => $orden['id_employee'],
-                'id_type_maintenances' => $orden['id_type_maintenances'],
+                'id_type_maintenances'=> $orden['id_type_maintenances'],
                 'id_type_orders'      => $orden['id_type_orders'],
                 'id_priority'         => $orden['id_priority'],
                 'order_folio'         => $orden['order_folio'],
-                'problem_description' => $orden['problem_description']
+                'problem_description' => $orden['problem_description'],
+                'conclusion'          => $orden['conclusion'] ?? null
             ]);
     }
 
@@ -248,7 +268,7 @@ class OrdenesRepository
 
     public function depurarAsignacionesOrden($pkOrden)
     {
-        TblOrdenesAsignacion::where('id_order', $pkOrden)->delete();
+        TblOrdenesAsignacion::where('id_order', (int)$pkOrden)->delete();
     }
 
     public function asignarOrden(array $orden)
@@ -262,21 +282,24 @@ class OrdenesRepository
 
     public function cambiarStatusOrder($pkOrden, $status)
     {
-        $orden = Tblorders::findOrFail($pkOrden);
+        $orden = Tblorders::findOrFail((int)$pkOrden);
         $orden->id_status_order = $status;
         $orden->save();
     }
 
     public function obtenerCorreoYFolioOrden(int $id_order)
     {
-        return Tblorders::select(
+        return \Illuminate\Support\Facades\DB::table('tbl_orders')
+            ->select(
                 'tbl_orders.id_order',
-                DB::raw("CONCAT('ORD-', tbl_orders.id_order) as folio"),
+                \Illuminate\Support\Facades\DB::raw("CONCAT('ORD-', tbl_orders.id_order) as folio"),
                 'tbl_employee.busines_mail as user_business_mail',
-                'tbl_employee.Name as employee_name'
+                'tbl_employee.Name as employee_name',
+                'tbl_machines.machines'
             )
             ->join('tbl_employee', 'tbl_employee.id_employee', '=', 'tbl_orders.id_employee')
-            ->where('tbl_orders.id_order', $id_order)
+            ->leftJoin('tbl_machines', 'tbl_machines.id_machines', '=', 'tbl_orders.id_machines')
+            ->where('tbl_orders.id_order', (int)$id_order)
             ->first();
     }
 
@@ -296,7 +319,7 @@ class OrdenesRepository
                 'tbl_chat_mesages_order.send_date',
                 'tbl_chat_mesages_order.id_status_order'
             )
-            ->where('tbl_chat_mesages_order.id_order', $id_order)
+            ->where('tbl_chat_mesages_order.id_order', (int)$id_order)
             ->orderBy('tbl_chat_mesages_order.send_date', 'asc')
             ->get();
     }
@@ -316,42 +339,119 @@ class OrdenesRepository
         ]);
     }
 
-    public function registrarSolucionOrden(array $data)
+    public function registrarSolucionOrden(array $data, $files = null)
     {
-        // Obtenemos automáticamente el business_mail de la orden si no viene explícito
         $ordenInfo = $this->obtenerCorreoYFolioOrden($data['id_order']);
         $businessMail = $data['business_mail'] ?? ($ordenInfo->user_business_mail ?? null);
-
-        return DB::table('cat_solution_order')->insertGetId([
-            'id_order'       => $data['id_order'],
-            'id_status_order'=> $data['id_status_order'],
-            'id_users'       => $data['id_users'] ?? 1,
-            'business_mail'  => $businessMail,
-            'id_coin'        => $data['id_coin'],
-            'order_cost'     => $data['order_cost'],
-            'resolution'     => $data['resolution'],
-            'spare_parts'    => $data['spare_parts'],
-            'materials'      => $data['materials'],
-            'created_at'     => Carbon::now(),
-            'updated_at'     => Carbon::now(),
+    
+        $idSolucion = DB::table('cat_solution_order')->insertGetId([
+            'id_order'        => $data['id_order'],
+            'id_status_order' => $data['id_status_order'],
+            'id_users'        => $data['id_users'] ?? 1,
+            'business_mail'   => $businessMail,
+            'id_coin'         => $data['id_coin'],
+            'order_cost'      => $data['order_cost'],
+            'resolution'      => $data['resolution'],
+            'spare_parts'     => $data['spare_parts'],
+            'materials'       => $data['materials'],
+            'created_at'      => Carbon::now(),
+            'updated_at'      => Carbon::now(),
         ]);
+    
+        if ($files) {
+            foreach ($files as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('resolution', $filename, 'public');
+    
+                DB::table('tbl_orders_resolution')->insert([
+                    'id_order'             => $data['id_order'],
+                    'url_resolution_image' => $path,
+                    'created_at'           => Carbon::now(),
+                    'updated_at'           => Carbon::now()
+                ]);
+            }
+        }
+    
+        return $idSolucion;
+    }
+    
+    public function obtenerDetalleSolucionOrden(int $id_order)
+    {
+        return DB::table('cat_solution_order')
+            ->join('cat_coins', 'cat_coins.id_coins', '=', 'cat_solution_order.id_coin')
+            ->select(
+                'cat_solution_order.*',
+                'cat_coins.coin'
+            )
+            ->where('cat_solution_order.id_order', (int)$id_order)
+            ->first();
     }
 
-    public function obtenerDetalleSolucionOrden(int $id_order)
-{
-    return DB::table('cat_solution_order')
-        ->join('cat_coins', 'cat_coins.id_coins', '=', 'cat_solution_order.id_coin')
-        ->select(
-            'cat_solution_order.*',
-            'cat_coins.coin'
-        )
-        ->where('cat_solution_order.id_order', $id_order)
-        ->first();
-}
+    public function eliminarOrden(int $id_order)
+    {
+        $orden = Tblorders::findOrFail((int)$id_order);
+        return $orden->delete();
+    }
 
-public function eliminarOrden(int $id_order)
-{
-    $orden = Tblorders::findOrFail($id_order);
-    return $orden->delete();
-}
+    public function obtenerDatosPdfOrden(int $pkOrden)
+    {
+        $orden = Tblorders::select(
+                'tbl_orders.id_order',
+                DB::raw("CONCAT('ORD-', tbl_orders.id_order) as folio"),
+                'tbl_orders.problem_description',
+                'tbl_orders.conclusion',
+                'tbl_orders.application',
+                'tbl_orders.start_date',
+                'tbl_orders.end_date',
+                'tbl_orders.order_folio',
+                'cat_areas.area',
+                'cat_departaments.Departament_ES',
+                'cat_machines.cat_machines',
+                'tbl_machines.machines',
+                'tbl_employee.Name',
+                'tbl_employee.busines_mail',
+                'cat_type_maintenances.type_maintenances',
+                'cat_type_orders.type_orders',
+                'cat_status_order.status',
+                'cat_priority.priority'
+            )
+            ->join('cat_areas',             'cat_areas.id_area',                    '=', 'tbl_orders.id_area')
+            ->join('cat_status_order',      'cat_status_order.id_status_order',     '=', 'tbl_orders.id_status_order')
+            ->join('cat_machines',          'cat_machines.id_cat_machines',         '=', 'tbl_orders.id_cat_machines')
+            ->join('tbl_machines',          'tbl_machines.id_machines',             '=', 'tbl_orders.id_machines')
+            ->join('cat_departaments',      'cat_departaments.id_departaments',     '=', 'tbl_orders.id_departaments')
+            ->join('tbl_employee',          'tbl_employee.id_employee',             '=', 'tbl_orders.id_employee')
+            ->join('cat_type_maintenances', 'cat_type_maintenances.id_type_maintenances', '=', 'tbl_orders.id_type_maintenances')
+            ->join('cat_type_orders',       'cat_type_orders.id_type_orders',       '=', 'tbl_orders.id_type_orders')
+            ->join('cat_priority',          'cat_priority.id_priority',             '=', 'tbl_orders.id_priority')
+            ->where('tbl_orders.id_order', (int)$pkOrden)
+            ->first();
+
+        if (!$orden) {
+            return null;
+        }
+
+        $usuariosAsignados = $this->obtenerUsuariosAsignadosOrden((int)$pkOrden);
+        $evidencias        = $this->obtenerEvidenciaOrden((int)$pkOrden);
+        $resoluciones      = $this->obtenerResolucionOrden((int)$pkOrden);
+        $solucion          = $this->obtenerDetalleSolucionOrden((int)$pkOrden);
+
+        return [
+            'orden'             => $orden,
+            'usuariosAsignados' => $usuariosAsignados,
+            'evidencias'        => $evidencias,
+            'resoluciones'      => $resoluciones,
+            'solucion'          => $solucion
+        ];
+    }
+
+    public function registrarPdfResolucion(int $id_order, string $path)
+    {
+        return DB::table('tbl_orders_resolution')->insert([
+            'id_order'             => $id_order,
+            'url_resolution_image' => $path,
+            'created_at'           => \Carbon\Carbon::now(),
+            'updated_at'           => \Carbon\Carbon::now()
+        ]);
+    }
 }

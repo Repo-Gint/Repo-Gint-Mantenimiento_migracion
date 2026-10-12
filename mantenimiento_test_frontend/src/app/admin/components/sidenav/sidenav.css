@@ -10,12 +10,12 @@
 }
 
 /* Colapsa y quita el fondo azul de la cuadrícula de la plantilla */
-#layoutSidenav,
-#layoutSidenav_nav,
 #layoutSidenav #layoutSidenav_nav {
-  background-color: transparent !important;
-  background: none !important;
-  box-shadow: none !important;
+  flex-basis: 225px;
+  flex-shrink: 0;
+  transition: transform 0.15s ease-in-out;
+  z-index: 1038;
+  transform: translateX(-225px);
 }
 
 /* Fuerza al contenedor principal de la vista a recuperar todo el ancho libre */

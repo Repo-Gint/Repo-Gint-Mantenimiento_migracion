@@ -10860,61 +10860,95 @@ body {
 }
 
 #layoutSidenav {
-  display: flex;
+  display: flex !important;
+  width: 100% !important;
+  min-height: calc(100vh - 56px) !important;
+  overflow-x: hidden !important;
+  background-color: #f4f6f9 !important;
 }
-#layoutSidenav #layoutSidenav_nav {
-  flex-basis: 225px;
-  flex-shrink: 0;
-  transition: transform 0.15s ease-in-out;
-  z-index: 1038;
-  transform: translateX(-225px);
+
+#layoutSidenav {
+  display: flex !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  min-height: calc(100vh - 56px) !important;
+  overflow-x: hidden !important; 
+  box-sizing: border-box !important;
 }
 /* =======================================================
    MARGEN SUPERIOR PARA SEPARAR EL CONTENIDO DEL NAVBAR
    ======================================================= */
 
 #layoutSidenav #layoutSidenav_content {
-  padding-top: 2rem !important; /* Incrementa a 2rem o 2.5rem hasta que el título baje lo suficiente */
+  padding-top: 2rem !important;
   padding-left: 80px !important;
-  width: calc(100% - 80px) !important;
+  padding-right: 1.5rem !important; /* Espaciado interno derecho para no pegar al borde */
+  width: 100% !important;
+  max-width: 100% !important;
   margin-left: 0 !important;
   transition: all 800ms cubic-bezier(.8, 0, .33, 1) !important;
   box-sizing: border-box !important;
+  overflow-x: hidden !important; /* Garantiza que el contenido se adapte internamente */
 }
 
 /* Mantiene el empuje dinámico cuando abres el menú */
 #layoutSidenav app-sidenav.nav-open ~ #layoutSidenav_content,
 #layoutSidenav app-sidenav:has(#layoutSidenav_nav.nav-open) ~ #layoutSidenav_content {
   padding-left: 360px !important;
-  width: calc(100% - 360px) !important;
+  padding-right: 1.5rem !important;
+  width: 100% !important;
 }
 
 
-/* Espaciado superior para todas las vistas cargadas en el router-outlet */
+/* Espaciado para el área interna del Router-Outlet */
 #layoutSidenav_content .contenido,
 #layoutSidenav_content main {
-  padding-top: 1.5rem !important; /* Espacio extra vertical debajo de la barra azul */
+  padding-top: 1.5rem !important;
+  width: 100% !important;
+  max-width: 100% !important;
   box-sizing: border-box !important;
 }
 
-/* Ajuste para pantallas pequeñas */
-@media (max-width: 768px) {
-  #layoutSidenav #layoutSidenav_content.nav-open {
-    padding-left: 310px !important;
-    width: calc(100% - 310px) !important;
+/* =======================================================
+   ADAPTATIVO PARA LAPTOPS, MONITORES Y MÓVILES
+   ======================================================= */
+/* Laptops y pantallas medianas */
+@media (max-width: 991.98px) {
+  #layoutSidenav #layoutSidenav_content {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-top: 1rem !important;
   }
 }
 
+/* Móviles */
+@media (max-width: 767.98px) {
+  #layoutSidenav_nav {
+    position: fixed !important;
+    top: 56px;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+  }
+
+
 #layoutSidenav_nav {
-    background-color: #263b5e;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  background-color: #263b5e;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0 !important;
+  width: 225px !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  z-index: 1038;
 }
 
 .sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav {
-  transform: translateX(0);
-}
+    transform: translateX(0) !important;
+    margin-left: 0 !important;
+  }
+
+
 .sb-sidenav-toggled #layoutSidenav #layoutSidenav_content:before {
   content: "";
   display: block;
@@ -10934,9 +10968,10 @@ body {
     transform: translateX(0);
   }
   #layoutSidenav #layoutSidenav_content {
-    margin-left: 0;
-    transition: margin 0.15s ease-in-out;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
   }
+}
   .sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav {
     transform: translateX(-225px);
   }

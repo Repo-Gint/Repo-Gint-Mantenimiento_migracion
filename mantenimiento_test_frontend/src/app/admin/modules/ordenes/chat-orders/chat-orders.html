@@ -1,9 +1,9 @@
 <section class="section dashboard container-fluid p-0">
   <div class="row g-4">
-    
+
     <!-- ================= COLUMNA IZQUIERDA: Datos y Detalles ================= -->
     <div class="col-lg-5 col-xl-4">
-      
+
       <!-- Tarjeta: Datos de la orden -->
       <div class="card card-custom-light mb-4 p-3 animated-card">
         <div class="card-body p-0">
@@ -13,21 +13,23 @@
               {{ orden.status }}
             </span>
           </div>
-          
+
           <div *ngFor="let orden of datosTabla" class="d-flex flex-column gap-2">
             <div class="p-2 info-box-light">
               <div class="d-flex justify-content-between align-items-center mb-1">
                 <label class="info-box-label mb-0">Cambiar Estatus de la Orden</label>
                 <small *ngIf="esOrdenFinalizada" class="text-warning fw-bold" style="font-size: 10px;"><i class="bi bi-lock-fill"></i> Bloqueado</small>
               </div>
+              
               <select class="form-select form-select-sm form-select-custom-light" 
-                      [(ngModel)]="orden.id_status_order" 
-                      (change)="cambiarEstatusOrden(orden)"
+                      [ngModel]="orden.id_status_order" 
+                      (change)="cambiarEstatusOrden(orden, $event)"
                       [disabled]="esOrdenFinalizada">
-                <option [value]="1">Abierto</option>
-                <option [value]="2">En proceso</option>
-                <option [value]="3">Finalizado</option>
+                <option *ngFor="let st of listaStatusOrden" [ngValue]="st.id_status_order">
+                  {{ st.status }}
+                </option>
               </select>
+
             </div>
 
             <div class="p-2 info-box-light">
@@ -83,7 +85,7 @@
     <div class="col-lg-7 col-xl-8">
       <div class="card card-custom-light p-3 h-100 animated-card">
         <div class="card-body p-0 d-flex flex-column">
-          
+
           <!-- Header del Historial -->
           <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
             <div>
@@ -97,10 +99,10 @@
 
           <!-- Timeline de Mensajes -->
           <div class="chat-timeline flex-grow-1 mb-4 pe-2">
-            
+
             <ng-container *ngFor="let mensaje of mensajesOrden; let i = index">
-              
-              <!-- Separador de Día (Se muestra sólo cuando cambia la fecha) -->
+
+              <!-- Separador de Día -->
               <div *ngIf="mostrarSeparadorFecha(i)" class="chat-date-separator text-center my-3">
                 <span class="badge bg-light text-secondary border fw-normal px-3 py-1 shadow-sm">
                   <i class="bi bi-calendar3 me-1"></i> {{ mensaje.created_at || mensaje.send_date | date:'dd MMMM, yyyy' }}
@@ -113,15 +115,13 @@
                    [class.mb-1]="!mostrarRemitente(i + 1)"
                    [class.message-bubble--out]="mensaje.es_admin"
                    [class.message-bubble--in]="!mensaje.es_admin">
-                
-                <!-- Encabezado del Remitente (Sólo si cambia de remitente o es el primer mensaje) -->
+
                 <div *ngIf="mostrarRemitente(i)" class="message-header d-flex justify-content-between align-items-center mb-1">
                   <strong class="sender-name" [class.text-white]="mensaje.es_admin" [class.text-primary]="!mensaje.es_admin">
                     {{ mensaje.remitente_nombre || mensaje.remitente }}
                   </strong>
                 </div>
 
-                <!-- Cuerpo del Mensaje y Hora a la derecha -->
                 <div class="message-content-wrapper d-flex justify-content-between align-items-end gap-3">
                   <p class="mb-0 message-text">{{ mensaje.content || mensaje.mensaje }}</p>
                   <span class="message-time" [class.text-white-50]="mensaje.es_admin" [class.text-muted]="!mensaje.es_admin">
@@ -133,7 +133,7 @@
 
             </ng-container>
 
-            <!-- Indicador de Escritura Animado -->
+            <!-- Indicador de Escritura -->
             <div *ngIf="cargandoMensajes || enviandoMensajeState" class="cb-typing-container mb-3">
               <div class="cb-typing-bubble">
                 <span class="cb-dot" style="--i:0"></span>
@@ -179,7 +179,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </section>
 
@@ -196,8 +195,8 @@
           <div class="col-md-6">
             <label class="form-label text-secondary small fw-bold">Moneda</label>
             <select class="form-select" formControlName="id_coin">
-              <option [ngValue]="null" disabled>Seleccione una moneda...</option>
-              <option *ngFor="let moneda of listaMonedas" [value]="moneda.id_coins">{{ moneda.coin }}</option>
+              <option [ngValue]="null" disabled selected>Seleccione una moneda...</option>
+              <option *ngFor="let moneda of listaMonedas" [ngValue]="moneda.id_coins">{{ moneda.coin }}</option>
             </select>
           </div>
           <div class="col-md-6">
@@ -216,6 +215,14 @@
             <label class="form-label text-secondary small fw-bold">Materiales</label>
             <textarea class="form-control" rows="2" formControlName="materials" placeholder="Materiales utilizados..."></textarea>
           </div>
+          
+          <!-- CAMPO ADICIONADO PARA SUBIR IMÁGENES DE RESOLUCIÓN -->
+          <div class="col-12">
+            <label class="form-label text-secondary small fw-bold">Evidencia de Resolución (Imágenes)</label>
+            <input type="file" class="form-control" (change)="onFileSelected($event)" multiple accept="image/*">
+            <small class="text-muted" style="font-size: 11px;">Puede seleccionar una o varias imágenes como evidencia del trabajo concluido.</small>
+          </div>
+
         </div>
       </div>
       <div class="modal-footer border-top">

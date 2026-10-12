@@ -8,7 +8,7 @@
         {{ pkOrden == null ? 'Registrar' : 'Actualizar'}} orden
       </h4> 
       <span class="badge badge-status" [ngClass]="pkOrden == null ? 'bg-accent' : 'bg-info-custom'">
-        {{ pkOrden == null ? 'Nueva Solicitud' : 'Modo Edición' }}
+        {{ pkOrden == null ? 'Nueva Solicitud' : 'Actualizar Orden' }}
       </span>
     </div>
 
@@ -257,14 +257,18 @@
         <div class="col-12"> 
           <div class="form-floating-custom">
             <i class="bi bi-card-text input-icon textarea-icon"></i>
-            <textarea #problemTextarea
-                      class="custom-textarea" 
-                      rows="3" 
-                      formControlName="problem_description" 
-                      id="problem_description" 
-                      placeholder=" "
+            <textarea #problemTextarea class="custom-textarea" rows="3" formControlName="problem_description" id="problem_description" placeholder=" "
                       (input)="adjustTextareaHeight($event)"></textarea>
             <label for="problem_description">Descripción del problema</label>
+          </div>
+        </div>
+        
+        <div class="col-12"> 
+          <div class="form-floating-custom">
+            <i class="bi bi-card-text input-icon textarea-icon"></i>
+            <textarea #problemTextarea class="custom-textarea" rows="3" formControlName="conclusion" id="conclusion" placeholder=" "
+                      (input)="adjustTextareaHeight($event)"></textarea>
+            <label for="conclusion">Comentario</label>
           </div>
         </div> 
 
@@ -274,18 +278,10 @@
             <i class="bi bi-images me-2 text-accent"></i>Evidencias Fotográficas
           </label> 
 
-          <div class="file-upload__upload" 
-               [class.drag]="isDragging"
-               (dragover)="onDragOver($event)"
-               (dragleave)="onDragLeave($event)"
-               (drop)="onDrop($event)"
-               (click)="fileInput.click()">
-            
+          <div class="file-upload__upload" [class.drag]="isDragging" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="fileInput.click()">
             <div class="file-upload__input-sphere file-upload__first-sphere"></div>
             <div class="file-upload__input-sphere file-upload__second-sphere"></div>
-
             <input #fileInput type="file" multiple accept="image/*" (change)="onFileSelected($event)" hidden />
-
             <div class="file-upload__icon-glow mb-2">
               <i class="bi bi-cloud-arrow-up-fill text-accent display-5"></i>
             </div>
@@ -383,12 +379,12 @@
     <i class="bi bi-check-circle me-1"></i>Registrar 
   </button>
   
-  <button *ngIf="pkOrden != null && puedeEditar" class="btn btn-custom-info" (click)="abrirAsignar()">
-    <i class="bi bi-person-plus me-1"></i>Asignar a
+  <button *ngIf="pkOrden !== null && !esOrdenFinalizadaOCancelada" type="button" class="btn btn-custom-cancel" (click)="abrirAsignar()">
+    <i class="bi bi-person-plus me-1"></i>Asignar
   </button>
 
-  <button *ngIf="pkOrden != null && puedeEditar" class="btn btn-custom-warning" (click)="actualizarOrden()">
-    <i class="bi bi-arrow-repeat me-1"></i>Actualizar
+  <button *ngIf="pkOrden !== null && !esOrdenFinalizadaOCancelada" type="button" class="btn btn-custom-primary" (click)="actualizarOrden()">
+    <i class="bi bi-check-circle me-1"></i>Actualizar Orden
   </button>
 </div>
 

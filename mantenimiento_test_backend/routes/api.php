@@ -17,118 +17,118 @@ use App\Http\Middleware\AuthTokenMiddleware;
 use Illuminate\Support\Facades\Route;
 
 // =========================================================================
-// 1. RUTAS PÚBLICAS (NO requieren token, como el LOGIN)
+// 1. (LOGIN)
 // =========================================================================
 Route::post('/usuarios/login', [UsuariosController::class, 'login']);
-
-
+Route::get('/ordenes/calificar-solucion',                                                 [OrdenesController::class, 'calificarSolucionOrden']); 
 // =========================================================================
-// 2. RUTAS PROTEGIDAS (Requieren Token válido e inyectan id_users_auth)
+// 2. RUTAS PROTEGIDAS 
 // =========================================================================
 Route::middleware([AuthTokenMiddleware::class])->group(function () {
     
     // Órdenes
-    Route::get('/ordenes/obtenerRecursosRegistroOrden',                                  [OrdenesController::class, 'obtenerRecursosRegistroOrden']); 
-    Route::post('/ordenes/registrarOrden',                                               [OrdenesController::class, 'registrarOrden']);
-    Route::post('/ordenes/ObtenerListaGeneralOrdenes',                                   [OrdenesController::class, 'ObtenerListaGeneralOrdenes']); 
-    Route::get('/ordenes/obtenerDetalleOrden/{pkOrden}',                                 [OrdenesController::class, 'obtenerDetalleOrden']);
-    Route::post('/ordenes/asignarOrden',                                                 [OrdenesController::class, 'asignarOrden']);
-    Route::post('/ordenes/actualizarOrden',                                              [OrdenesController::class, 'actualizarOrden']);
-    Route::get('/ordenes/obtenerStatusOrdenes',                                          [OrdenesController::class, 'obtenerStatusOrdenes']);
-    Route::delete('/ordenes/eliminarEvidenciaOrden/{id_eviden_order}',                   [OrdenesController::class, 'eliminarEvidenciaOrden']);
-    Route::get('/ordenes/obtenerMaquinasPorAreaYCategoria/{pkArea}/{pkCatalogoMaquina}', [OrdenesController::class, 'obtenerMaquinasPorAreaYCategoria']);
-    Route::post('/ordenes/cancelarOrden/{id_order}',                                     [OrdenesController::class, 'cancelarOrden']);
-    Route::get('/ordenes/obtenerUsuariosAsignacion/{pkOrden}',                          [OrdenesController::class, 'obtenerUsuariosAsignacion']);
-    Route::delete('/ordenes/eliminarOrden/{id_order}',                                   [OrdenesController::class, 'eliminarOrden']);
+    Route::get('/ordenes/obtenerRecursosRegistroOrden',                                    [OrdenesController::class, 'obtenerRecursosRegistroOrden']); 
+    Route::post('/ordenes/registrarOrden',                                                 [OrdenesController::class, 'registrarOrden']);
+    Route::post('/ordenes/ObtenerListaGeneralOrdenes',                                     [OrdenesController::class, 'ObtenerListaGeneralOrdenes']); 
+    Route::get('/ordenes/obtenerDetalleOrden/{pkOrden}',                                   [OrdenesController::class, 'obtenerDetalleOrden']);
+    Route::post('/ordenes/asignarOrden',                                                   [OrdenesController::class, 'asignarOrden']);
+    Route::post('/ordenes/actualizarOrden',                                                [OrdenesController::class, 'actualizarOrden']);
+    Route::get('/ordenes/obtenerStatusOrdenes',                                            [OrdenesController::class, 'obtenerStatusOrdenes']);
+    Route::delete('/ordenes/eliminarEvidenciaOrden/{id_eviden_order}',                     [OrdenesController::class, 'eliminarEvidenciaOrden']);
+    Route::get('/ordenes/obtenerMaquinasPorAreaYCategoria/{pkArea}/{pkCatalogoMaquina}',   [OrdenesController::class, 'obtenerMaquinasPorAreaYCategoria']);
+    Route::post('/ordenes/cancelarOrden/{id_order}',                                       [OrdenesController::class, 'cancelarOrden']);
+    Route::get('/ordenes/obtenerUsuariosAsignacion/{pkOrden}',                             [OrdenesController::class, 'obtenerUsuariosAsignacion']);
+    Route::delete('/ordenes/eliminarOrden/{id_order}',                                     [OrdenesController::class, 'eliminarOrden']);
+    Route::get('/ordenes/descargarPdfOrden/{id_order}',                                    [OrdenesController::class, 'descargarPdfOrden']);
 
     // Chat y Solución de Órdenes
-    Route::get('/ordenes/obtenerMensajesOrden/{id_order}',                   [OrdenesController::class, 'obtenerMensajesOrden']);
-    Route::post('/ordenes/enviarMensajeOrden',                               [OrdenesController::class, 'enviarMensajeOrden']);
-    Route::post('/ordenes/cambiarStatusYSolucionarOrden',                    [OrdenesController::class, 'cambiarStatusYSolucionarOrden']);
-    Route::get('/ordenes/calificar-solucion',                                [OrdenesController::class, 'calificarSolucionOrden']); 
+    Route::get('/ordenes/obtenerMensajesOrden/{id_order}',                                 [OrdenesController::class, 'obtenerMensajesOrden']);
+    Route::post('/ordenes/enviarMensajeOrden',                                             [OrdenesController::class, 'enviarMensajeOrden']);
+    Route::post('/ordenes/cambiarStatusYSolucionarOrden',                                  [OrdenesController::class, 'cambiarStatusYSolucionarOrden']);
+    Route::post('/ordenes/enviarPdfAlChat',                                                [OrdenesController::class, 'enviarPdfAlChat']);
 
     // Usuarios (Gestión autenticada)
-    Route::post('/usuarios/registrarUsuario',                                [UsuariosController::class, 'registrarUsuario']);
-    Route::post('/usuarios/cerrarSesion',                                    [UsuariosController::class, 'cerrarSesion']);
-    Route::get('/usuarios/obtenerListaGeneralUsuarios',                      [UsuariosController::class, 'obtenerListaGeneralUsuarios']);
-    Route::get('/usuarios/obtenerDetalleUsuario/{pkUsuario}',                [UsuariosController::class, 'obtenerDetalleUsuario']);
-    Route::get('/usuarios/obtenerRecursosRegistroUsuario',                   [UsuariosController::class, 'obtenerRecursosRegistroUsuario']);
-    Route::put('/usuarios/actualizarUsuario',                                [UsuariosController::class, 'actualizarUsuario']);
-    Route::get('/usuarios/cambiarStatusUsuario/{id}',                        [UsuariosController::class, 'cambiarStatusUsuario']);
-    Route::get('/usuarios/obtenerPermisosUsuarioActual',                     [UsuariosController::class, 'obtenerPermisosUsuarioActual']);
+    Route::post('/usuarios/registrarUsuario',                                              [UsuariosController::class, 'registrarUsuario']);
+    Route::post('/usuarios/cerrarSesion',                                                  [UsuariosController::class, 'cerrarSesion']);
+    Route::get('/usuarios/obtenerListaGeneralUsuarios',                                    [UsuariosController::class, 'obtenerListaGeneralUsuarios']);
+    Route::get('/usuarios/obtenerDetalleUsuario/{pkUsuario}',                              [UsuariosController::class, 'obtenerDetalleUsuario']);
+    Route::get('/usuarios/obtenerRecursosRegistroUsuario',                                 [UsuariosController::class, 'obtenerRecursosRegistroUsuario']);
+    Route::put('/usuarios/actualizarUsuario',                                              [UsuariosController::class, 'actualizarUsuario']);
+    Route::get('/usuarios/cambiarStatusUsuario/{id}',                                      [UsuariosController::class, 'cambiarStatusUsuario']);
+    Route::get('/usuarios/obtenerPermisosUsuarioActual',                                   [UsuariosController::class, 'obtenerPermisosUsuarioActual']);
         
     // Areas         
-    Route::post('/areas/registrarArea',                                      [AreasController::class, 'registrarArea']);
-    Route::get('/areas/obtenerListaAreas',                                   [AreasController::class, 'obtenerListaAreas']);
-    Route::get('/areas/obtenerDetalleArea/{pkArea}',                         [AreasController::class, 'obtenerDetalleArea']);
-    Route::put('/areas/actualizarArea',                                      [AreasController::class, 'actualizarArea']);
-    Route::get('/areas/cambiarStatusArea/{id}',                              [AreasController::class, 'cambiarStatusArea']);
+    Route::post('/areas/registrarArea',                                                    [AreasController::class, 'registrarArea']);
+    Route::get('/areas/obtenerListaAreas',                                                 [AreasController::class, 'obtenerListaAreas']);
+    Route::get('/areas/obtenerDetalleArea/{pkArea}',                                       [AreasController::class, 'obtenerDetalleArea']);
+    Route::put('/areas/actualizarArea',                                                    [AreasController::class, 'actualizarArea']);
+    Route::get('/areas/cambiarStatusArea/{id}',                                            [AreasController::class, 'cambiarStatusArea']);
         
     // Departamentos             
-    Route::post('/departamentos/registrarDepartamento',                      [DepartamentsController::class, 'registrarDepartamento']);
-    Route::get('/departamentos/obtenerListaDepartamentos',                   [DepartamentsController::class, 'obtenerListaDepartamentos']);
-    Route::get('/departamentos/obtenerDetalleDepartamento/{pkDepartamento}', [DepartamentsController::class, 'obtenerDetalleDepartamento']);
-    Route::put('/departamentos/actualizarDepartamento',                      [DepartamentsController::class, 'actualizarDepartamento']);
-    Route::get('/departamentos/cambiarStatusDepartamento/{id}',              [DepartamentsController::class, 'cambiarStatusDepartamento']);
+    Route::post('/departamentos/registrarDepartamento',                                    [DepartamentsController::class, 'registrarDepartamento']);
+    Route::get('/departamentos/obtenerListaDepartamentos',                                 [DepartamentsController::class, 'obtenerListaDepartamentos']);
+    Route::get('/departamentos/obtenerDetalleDepartamento/{pkDepartamento}',               [DepartamentsController::class, 'obtenerDetalleDepartamento']);
+    Route::put('/departamentos/actualizarDepartamento',                                    [DepartamentsController::class, 'actualizarDepartamento']);
+    Route::get('/departamentos/cambiarStatusDepartamento/{id}',                            [DepartamentsController::class, 'cambiarStatusDepartamento']);
         
     // Maquinas             
-    Route::post('/maquinas/registrarMaquina',                                [MaquinasController::class, 'registrarMaquina']);
-    Route::get('/maquinas/obtenerListaMaquinas',                             [MaquinasController::class, 'obtenerListaMaquinas']);
-    Route::get('/maquinas/obtenerDetalleMaquina/{pkMaquina}',                [MaquinasController::class, 'obtenerDetalleMaquina']);
-    Route::get('/maquinas/obtenerRecursosRegistroMaquina',                   [MaquinasController::class, 'obtenerRecursosRegistroMaquina']);
-    Route::put('/maquinas/actualizarMaquina',                                [MaquinasController::class, 'actualizarMaquina']);
-    Route::get('/maquinas/cambiarStatusMaquina/{id}',                        [MaquinasController::class, 'cambiarStatusMaquina']);
-    Route::get('/maquinas/obtenerMaquinasPorAreaYCategoria',                 [MaquinasController::class, 'obtenerMaquinasPorAreaYCategoria']);
+    Route::post('/maquinas/registrarMaquina',                                              [MaquinasController::class, 'registrarMaquina']);
+    Route::get('/maquinas/obtenerListaMaquinas',                                           [MaquinasController::class, 'obtenerListaMaquinas']);
+    Route::get('/maquinas/obtenerDetalleMaquina/{pkMaquina}',                              [MaquinasController::class, 'obtenerDetalleMaquina']);
+    Route::get('/maquinas/obtenerRecursosRegistroMaquina',                                 [MaquinasController::class, 'obtenerRecursosRegistroMaquina']);
+    Route::put('/maquinas/actualizarMaquina',                                              [MaquinasController::class, 'actualizarMaquina']);
+    Route::get('/maquinas/cambiarStatusMaquina/{id}',                                      [MaquinasController::class, 'cambiarStatusMaquina']);
+    Route::get('/maquinas/obtenerMaquinasPorAreaYCategoria',                               [MaquinasController::class, 'obtenerMaquinasPorAreaYCategoria']);
 
     // Catálogo de Maquinas
-    Route::post('/catalogosmaquinas/registrarCatalogoMaquina',               [MaquinasCatalogoController::class, 'registrarCatalogoMaquina']);
-    Route::get('/catalogosmaquinas/obtenerListaCatalogoMaquina',             [MaquinasCatalogoController::class, 'obtenerListaCatalogoMaquina']);
-    Route::get('/catalogosmaquinas/obtenerDetalleCatalogoMaquina/{pkCatalogoMaquina}', [MaquinasCatalogoController::class, 'obtenerDetalleCatalogoMaquina']);
-    Route::put('/catalogosmaquinas/actualizarCatalogoMaquina',               [MaquinasCatalogoController::class, 'actualizarCatalogoMaquina']);
+    Route::post('/catalogosmaquinas/registrarCatalogoMaquina',                             [MaquinasCatalogoController::class, 'registrarCatalogoMaquina']);
+    Route::get('/catalogosmaquinas/obtenerListaCatalogoMaquina',                           [MaquinasCatalogoController::class, 'obtenerListaCatalogoMaquina']);
+    Route::get('/catalogosmaquinas/obtenerDetalleCatalogoMaquina/{pkCatalogoMaquina}',     [MaquinasCatalogoController::class, 'obtenerDetalleCatalogoMaquina']);
+    Route::put('/catalogosmaquinas/actualizarCatalogoMaquina',                             [MaquinasCatalogoController::class, 'actualizarCatalogoMaquina']);
 
     // Monedas             
-    Route::post('/monedas/registrarMoneda',                                  [MonedasController::class,  'registrarMoneda']);
-    Route::get('/monedas/obtenerListaMonedas',                               [MonedasController::class,  'obtenerListaMonedas']);
-    Route::get('/monedas/obtenerDetalleMoneda/{pkMoneda}',                   [MonedasController::class,  'obtenerDetalleMoneda']);                                    
-    Route::put('/monedas/actualizarMoneda',                                  [MonedasController::class,  'actualizarMoneda']);
-    Route::get('/monedas/cambiarStatusMoneda/{id}',                          [MonedasController::class,  'cambiarStatusMoneda']);
+    Route::post('/monedas/registrarMoneda',                                                [MonedasController::class,  'registrarMoneda']);
+    Route::get('/monedas/obtenerListaMonedas',                                             [MonedasController::class,  'obtenerListaMonedas']);
+    Route::get('/monedas/obtenerDetalleMoneda/{pkMoneda}',                                 [MonedasController::class,  'obtenerDetalleMoneda']);                                    
+    Route::put('/monedas/actualizarMoneda',                                                [MonedasController::class,  'actualizarMoneda']);
+    Route::get('/monedas/cambiarStatusMoneda/{id}',                                        [MonedasController::class,  'cambiarStatusMoneda']);
         
     // Tipo Orden               
-    Route::post('/tipoOrdenes/registrarTipoOrden',                           [TipoOrdenController::class, 'registrarTipoOrden']);
-    Route::get('/tipoOrdenes/obtenerListaTipoOrden',                         [TipoOrdenController::class, 'obtenerListaTipoOrden']);
-    Route::get('/tipoOrdenes/obtenerDetalleTipoOrden/{pktipoOrden}',         [TipoOrdenController::class, 'obtenerDetalleTipoOrden']);
-    Route::put('/tipoOrdenes/actualizarTipoOrden',                           [TipoOrdenController::class, 'actualizarTipoOrden']);
-    Route::get('/tipoOrdenes/cambiarStatusTipoOrden/{id}',                   [TipoOrdenController::class, 'cambiarStatusTipoOrden']);                
+    Route::post('/tipoOrdenes/registrarTipoOrden',                                         [TipoOrdenController::class, 'registrarTipoOrden']);
+    Route::get('/tipoOrdenes/obtenerListaTipoOrden',                                       [TipoOrdenController::class, 'obtenerListaTipoOrden']);
+    Route::get('/tipoOrdenes/obtenerDetalleTipoOrden/{pktipoOrden}',                       [TipoOrdenController::class, 'obtenerDetalleTipoOrden']);
+    Route::put('/tipoOrdenes/actualizarTipoOrden',                                         [TipoOrdenController::class, 'actualizarTipoOrden']);
+    Route::get('/tipoOrdenes/cambiarStatusTipoOrden/{id}',                                 [TipoOrdenController::class, 'cambiarStatusTipoOrden']);                
 
     // Prioridad Orden
-    Route::post('/prioridadOrden/registrarPrioridadOrden',                   [PrioridadOrdenController::class, 'registrarPrioridadOrden']);
-    Route::get('/prioridadOrden/obtenerListaPrioridadOrden',                 [PrioridadOrdenController::class, 'obtenerListaPrioridadOrden']);
-    Route::get('/prioridadOrden/obtenerDetallePrioridadOrden/{pkPrioridadOrden}', [PrioridadOrdenController::class, 'obtenerPrioridadOrden']);
-    Route::put('/prioridadOrden/actualizarPrioridadOrden',                   [PrioridadOrdenController::class, 'actualizarPrioridadOrden']);
+    Route::post('/prioridadOrden/registrarPrioridadOrden',                                 [PrioridadOrdenController::class, 'registrarPrioridadOrden']);
+    Route::get('/prioridadOrden/obtenerListaPrioridadOrden',                               [PrioridadOrdenController::class, 'obtenerListaPrioridadOrden']);
+    Route::get('/prioridadOrden/obtenerDetallePrioridadOrden/{pkPrioridadOrden}',          [PrioridadOrdenController::class, 'obtenerPrioridadOrden']);
+    Route::put('/prioridadOrden/actualizarPrioridadOrden',                                 [PrioridadOrdenController::class, 'actualizarPrioridadOrden']);
 
     // Tipo Mantenimiento
-    Route::post('/tipoMantenimiento/registrarTipoMantenimiento',             [TipoMantenimientoController::class, 'registrarTipoMantenimiento']);
-    Route::get('/tipoMantenimiento/obtenerListatipoMantenimientos',          [TipoMantenimientoController::class, 'obtenerListatipoMantenimientos']);
+    Route::post('/tipoMantenimiento/registrarTipoMantenimiento',                           [TipoMantenimientoController::class, 'registrarTipoMantenimiento']);
+    Route::get('/tipoMantenimiento/obtenerListatipoMantenimientos',                        [TipoMantenimientoController::class, 'obtenerListatipoMantenimientos']);
     Route::get('/tipoMantenimiento/obtenerDetalletipoMantenimiento/{pktipoMantenimiento}', [TipoMantenimientoController::class, 'obtenerDetalletipoMantenimiento']);
-    Route::put('/tipoMantenimiento/actualizartipoMantenimiento',             [TipoMantenimientoController::class, 'actualizartipoMantenimiento']);
-    Route::get('/tipoMantenimiento/cambiarStatustipoMantenimiento/{id}',     [TipoMantenimientoController::class, 'cambiarStatustipoMantenimiento']);
+    Route::put('/tipoMantenimiento/actualizartipoMantenimiento',                           [TipoMantenimientoController::class, 'actualizartipoMantenimiento']);
+    Route::get('/tipoMantenimiento/cambiarStatustipoMantenimiento/{id}',                   [TipoMantenimientoController::class, 'cambiarStatustipoMantenimiento']);
 
     // Empleados     
-    Route::post('/empleados/registrarEmpleado',                              [EmpleadosController::class, 'registrarEmpleado']);
-    Route::get('/empleados/obtenerListaEmpleados',                           [EmpleadosController::class, 'obtenerListaEmpleados']);
-    Route::get('/empleados/obtenerDetalleEmpleado/{pkEmpleado}',             [EmpleadosController::class, 'obtenerDetalleEmpleado']);
-    Route::put('/empleados/actualizarEmpleado',                              [EmpleadosController::class, 'actualizarEmpleado']);
-    Route::get('/empleados/cambiarStatusMaquina/{id}',                       [EmpleadosController::class, 'cambiarStatusMaquina']);
+    Route::post('/empleados/registrarEmpleado',                                            [EmpleadosController::class, 'registrarEmpleado']);
+    Route::get('/empleados/obtenerListaEmpleados',                                         [EmpleadosController::class, 'obtenerListaEmpleados']);
+    Route::get('/empleados/obtenerDetalleEmpleado/{pkEmpleado}',                           [EmpleadosController::class, 'obtenerDetalleEmpleado']);
+    Route::put('/empleados/actualizarEmpleado',                                            [EmpleadosController::class, 'actualizarEmpleado']);
+    Route::get('/empleados/cambiarStatusMaquina/{id}',                                     [EmpleadosController::class, 'cambiarStatusMaquina']);
 
     // Materiales 
-    Route::post('/materiales/registrarMaterial',                             [MaterialesController::class, 'registrarMaterial']);
-    Route::get('/materiales/obtenerListaMateriales',                         [MaterialesController::class, 'obtenerListaMateriales']);
-    Route::get('/materiales/obtenerDetalleMaterial/{pkMaterial}',            [MaterialesController::class, 'obtenerDetalleMaterial']);
-    Route::put('/materiales/actualizarMaterial',                             [MaterialesController::class, 'actualizarMaterial']);
-    Route::get('/materiales/cambiarStatusMaterial/{id}',                     [MaterialesController::class, 'cambiarStatusMaterial']);
+    Route::post('/materiales/registrarMaterial',                                           [MaterialesController::class, 'registrarMaterial']);
+    Route::get('/materiales/obtenerListaMateriales',                                       [MaterialesController::class, 'obtenerListaMateriales']);
+    Route::get('/materiales/obtenerDetalleMaterial/{pkMaterial}',                          [MaterialesController::class, 'obtenerDetalleMaterial']);
+    Route::put('/materiales/actualizarMaterial',                                           [MaterialesController::class, 'actualizarMaterial']);
+    Route::get('/materiales/cambiarStatusMaterial/{id}',                                   [MaterialesController::class, 'cambiarStatusMaterial']);
 
     // Roles
-    Route::post('/roles/registrarRoles',                                     [RolesController::class, 'registrarRoles']);
-    Route::get('/roles/obtenerListaRoles',                                   [RolesController::class, 'obtenerListaRoles']);
+    Route::post('/roles/registrarRoles',                                                   [RolesController::class, 'registrarRoles']);
+    Route::get('/roles/obtenerListaRoles',                                                 [RolesController::class, 'obtenerListaRoles']);
 
 });

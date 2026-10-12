@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ModalService } from '../../../services/modal/modal';
 import { MessagesService } from '../../../services/messages/messages';
@@ -8,6 +8,9 @@ import { AreasService } from '../../../services/api/areas/areas';
 import { UsuariosService } from '../../../services/api/usuarios/usuarios';
 import { RegistrarOrden } from '../registrar-orden/registrar-orden';
 import { Router } from '@angular/router';
+import gsap from 'gsap';
+
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-consulta-ordenes',
@@ -17,6 +20,8 @@ import { Router } from '@angular/router';
   styleUrl: './consulta-ordenes.css',
 })
 export class ConsultaOrdenes implements OnInit, OnDestroy {
+  @ViewChild('btnCamion') btnCamion!: ElementRef;
+
   protected datosTabla: any = [];
   private intervalo: any;
 
@@ -90,7 +95,7 @@ export class ConsultaOrdenes implements OnInit, OnDestroy {
       }
 
       if (navigator.onLine) this.ObtenerListaGeneralOrdenes();
-    }, 10000);
+    }, 10000|                                                                                                                                                                                                                                                                                                                                 0);
   }
 
   private async obtenerStatusOrdenes(): Promise<any> {
@@ -184,6 +189,7 @@ export class ConsultaOrdenes implements OnInit, OnDestroy {
       return;
     }
 
+    // 1. Mostrar confirmación previa
     this.messages.mensajeConfirmacionCustom(
       '¿Está seguro de que desea eliminar permanentemente esta orden? Esta acción no se puede deshacer.',
       'warning',
@@ -191,25 +197,141 @@ export class ConsultaOrdenes implements OnInit, OnDestroy {
     ).then(res => {
       if (!res.isConfirmed) return;
 
-      this.messages.mensajeEsperar();
+      // 2. Localizar el botón de la fila seleccionada y activar animación CSS
+      const btnDeleteElem = document.getElementById(`btnDelete_${id_order}`);
+      if (btnDeleteElem) {
+        btnDeleteElem.setAttribute('data-running', 'true');
+      }
 
-      this.ordenes.eliminarOrden(id_order).subscribe({
-        next: (respuesta: any) => {
-          this.messages.mensajeGenerico(
-            respuesta.mensaje || 'Orden eliminada con éxito',
-            'success',
-            'Eliminado'
-          );
-          this.ObtenerListaGeneralOrdenes();
-        },
-        error: (error) => {
-          this.messages.mensajeGenerico(
-            error?.error?.mensaje || 'Ocurrió un error al eliminar la orden.',
-            'error'
-          );
+      // 3. Esperar a que la animación de la papelera complete su ciclo (2000 ms)
+      setTimeout(() => {
+        this.messages.mensajeEsperar();
+
+        this.ordenes.eliminarOrden(id_order).subscribe({
+          next: (respuesta: any) => {
+            this.messages.mensajeGenerico(
+              respuesta.mensaje || 'Orden eliminada con éxito',
+              'success',
+              'Eliminado'
+            );
+            this.ObtenerListaGeneralOrdenes();
+          },
+          error: (error) => {
+            // Reiniciar estado del botón si ocurrió un error
+            if (btnDeleteElem) {
+              btnDeleteElem.setAttribute('data-running', 'false');
+            }
+            this.messages.mensajeGenerico(
+              error?.error?.mensaje || 'Ocurrió un error al eliminar la orden.',
+              'error'
+            );
+          }
+        });
+      }, 2000);
+    });
+  }
+
+  public descargarPdf(idOrder: number): void {
+    if (!idOrder) return;
+
+    const modalElem = document.getElementById('modalDescargaPdf');
+    if (!modalElem) return;
+
+    const bootstrapObj = (window as any).bootstrap || bootstrap;
+    const modalInstance = new bootstrapObj.Modal(modalElem, { backdrop: 'static', keyboard: false });
+    modalInstance.show();
+
+    const button = this.btnCamion?.nativeElement;
+
+    if (button) {
+      gsap.killTweensOf(button);
+      button.classList.remove('done', 'animating');
+      
+      gsap.set(button, {
+        '--rotate': '0deg',
+        '--y': '0px',
+        '--default-o': 1,
+        '--success-o': 0,
+        '--success-offset': '16px',
+        '--truck-base-x': '-186px',
+        '--box-x': '0px',
+        '--box-y': '0px',
+        '--box-r': '0deg',
+        '--light-opacity': 1
+      });
+
+      button.classList.add('animating');
+
+      gsap.to(button, {
+        '--rotate': '-90deg',
+        '--y': '25px',
+        '--default-o': 0,
+        duration: 0.4,
+        ease: 'power1.out'
+      });
+
+      gsap.to(button, {
+        keyframes: [
+          { '--truck-base-x': '-4px', duration: 1.2, ease: 'power1.inOut' },
+          { '--truck-base-x': '0px', duration: 0.5 },
+          {
+            '--truck-base-x': '60px',
+            '--box-x': '-60px',
+            duration: 1.4,
+            ease: 'power1.inOut',
+            onStart() {
+              setTimeout(() => {
+                gsap.to(button, {
+                  keyframes: [
+                    { '--box-y': '10px', '--box-r': '-8deg', duration: 0.4 },
+                    { '--box-r': '0deg', duration: 0.4 }
+                  ]
+                });
+              }, 300);
+            }
+          },
+          { '--truck-base-x': '56px', '--box-x': '-56px', duration: 0.6 },
+          { '--truck-base-x': '180px', '--box-x': '68px', duration: 1.5, ease: 'power1.in' },
+          { '--light-opacity': 0, duration: 0.4 }
+        ],
+        onComplete: () => {
+          button.classList.add('done');
+          button.classList.remove('animating');
+
+          gsap.to(button, {
+            keyframes: [
+              { '--rotate': '0deg', '--y': '0px', duration: 0.4 },
+              { '--success-offset': '0px', '--success-o': 1, duration: 0.3 }
+            ],
+            onComplete: () => {
+              this.ordenes.descargarPdfOrden(idOrder).subscribe({
+                next: (blob: Blob) => {
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `Reporte_ORD-${idOrder}.pdf`;
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+
+                  setTimeout(() => {
+                    modalInstance.hide();
+                  }, 400);
+                },
+                error: (error) => {
+                  console.error('Error al descargar el PDF:', error);
+                  modalInstance.hide();
+                  this.messages.mensajeGenerico(
+                    'Ocurrió un error al intentar generar el PDF.',
+                    'error',
+                    'Error PDF'
+                  );
+                }
+              });
+            }
+          });
         }
       });
-    });
+    }
   }
 
   getStatusIcon(status: string): string {
