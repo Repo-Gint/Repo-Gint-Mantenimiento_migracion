@@ -36,16 +36,16 @@
                 </div>
 
                 <!-- Menú Desplegable Personalizado de Empleados -->
-                <div class="custom-dropdown-menu shadow-lg rounded-3 border bg-white position-absolute w-100 mt-1 z-3 animate-fade-in" *ngIf="dropdownEmpleadoAbierto">
-                    <div class="custom-dropdown-item py-2 px-3 text-muted small border-bottom bg-light" (click)="seleccionarEmpleado('', 'Selecciona una opción')">
-                        <em>Selecciona una opción</em>
-                    </div>
-                    <div class="custom-dropdown-item py-2.5 px-3 text-dark small cursor-pointer transition-all border-bottom border-light" 
-                         *ngFor="let empleado of listaempleado" 
-                         (click)="seleccionarEmpleado(empleado.id_employee, empleado.Name)">
-                        <i class="bi bi-person-circle text-primary me-2"></i> {{ empleado.Name }}
-                    </div>
-                </div>
+<div class="custom-dropdown-menu shadow-lg rounded-3 border bg-white position-absolute w-100 mt-1 z-3 animate-fade-in" *ngIf="dropdownEmpleadoAbierto">
+    <div class="custom-dropdown-item py-2 px-3 text-muted small border-bottom bg-light" (click)="seleccionarEmpleado('', 'Selecciona una opción')">
+        <em>Selecciona una opción</em>
+    </div>
+    <div class="custom-dropdown-item py-2.5 px-3 text-dark small cursor-pointer transition-all border-bottom border-light" 
+         *ngFor="let empleado of listaempleado" 
+         (click)="seleccionarEmpleado(empleado.id_employee, empleado.name)">
+        <i class="bi bi-person-circle text-primary me-2"></i> {{ empleado.name }} {{ empleado.paternal }}
+    </div>
+</div>
 
                 <div class="invalid-feedback d-block fs-xxs text-danger mt-1" *ngIf="formUsuario.get('id_employee')?.invalid && formUsuario.get('id_employee')?.touched">
                     <i class="bi bi-exclamation-circle me-1"></i> Selecciona un empleado del catálogo.

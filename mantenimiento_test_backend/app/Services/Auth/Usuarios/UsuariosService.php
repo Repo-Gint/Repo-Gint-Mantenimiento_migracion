@@ -4,7 +4,6 @@ namespace App\Services\Auth\Usuarios;
 
 use App\Repositories\Auth\Usuarios\UsuariosRepository;
 use Illuminate\Support\Str;
-use App\Models\TblSessions;
 use App\Repositories\Admin\Catalogos\EmpleadosRepository;
 use App\Repositories\Admin\Catalogos\RolesRepository;
 
@@ -57,6 +56,8 @@ class UsuariosService
         }
     
         $usuario['busines_mail'] = $correo;
+        $usuario['password'] = bcrypt($usuario['password']); // Lógica de encriptación en el Service
+
         $pkUsuario = $this->usuariosRepository->registrarUsuario($usuario);
 
         if (isset($usuario['permisos']) && is_array($usuario['permisos'])) {
@@ -96,6 +97,12 @@ class UsuariosService
         $pkUsuario = $data['pkUsuario'];
         $datosUsuario = $data['usuario'];
 
+        $datosUsuario['busines_mail'] = strtolower(trim($datosUsuario['busines_mail']));
+
+        if (!empty($datosUsuario['password'])) {
+            $datosUsuario['password'] = bcrypt($datosUsuario['password']); // Lógica en Service
+        }
+
         $this->usuariosRepository->actualizarUsuario($pkUsuario, $datosUsuario);
 
         if (isset($datosUsuario['permisos']) && is_array($datosUsuario['permisos'])) {
@@ -119,31 +126,32 @@ class UsuariosService
 
     public function login(array $usuario)
     {
-        $resultado = $this->usuariosRepository->login($usuario);    
-        if ($resultado === 'no_usuario') {
+        $correoLimpio = strtolower(trim($usuario['busines_mail']));
+        $usuarioEncontrado = $this->usuariosRepository->buscarPorCorreo($correoLimpio);    
+
+        if (!$usuarioEncontrado) {
             return response()->json([
                 'success' => 204,
                 'title'   => 'Usuario no encontrado',
                 'mensaje' => 'El usuario no existe o las credenciales son incorrectas'
             ]);
         }    
-        if ($resultado === 'mal_contraseña') {
+
+        if (!password_verify($usuario['password'], $usuarioEncontrado->password)) { // Validación en Service
             return response()->json([
                 'success' => 204,
                 'title'   => 'Credenciales Incorrectas',
                 'mensaje' => 'Las credenciales son incorrectas'
             ]);
         }    
-        $token = Str::random(60);    
-        TblSessions::create([
-            'id_users' => $resultado->id_users,
-            'token'    => hash('sha256', $token) 
-        ]);    
 
-        $permisos = $this->usuariosRepository->obtenerPermisosPorUsuario($resultado->id_users);
+        $token = Str::random(60);    
+        $this->usuariosRepository->registrarSesion($usuarioEncontrado->id_users, hash('sha256', $token)); // Hashing en Service
+
+        $permisos = $this->usuariosRepository->obtenerPermisosPorUsuario($usuarioEncontrado->id_users);
 
         return response()->json([
-            'usuarios' => $resultado,
+            'usuarios' => $usuarioEncontrado,
             'permisos' => $permisos,
             'token'    => $token,
             'mensaje'  => 'Inicio de sesión correctamente'
@@ -162,7 +170,9 @@ class UsuariosService
         }
 
         $token = str_replace('Bearer ', '', $header);
-        $eliminado = $this->usuariosRepository->cerrarSesion($token);
+        $tokenHash = hash('sha256', $token); // Lógica de hash en Service
+
+        $eliminado = $this->usuariosRepository->cerrarSesion($tokenHash);
 
         return response()->json([
             'success' => (bool) $eliminado,
@@ -171,18 +181,20 @@ class UsuariosService
     }
 
     public function obtenerPermisosUsuarioActual($request) {
-    $header = $request->header('Authorization');
-    if (!$header || !str_starts_with($header, 'Bearer ')) {
-        return response()->json(['mensaje' => 'Token no proporcionado'], 401);
+        $header = $request->header('Authorization');
+        if (!$header || !str_starts_with($header, 'Bearer ')) {
+            return response()->json(['mensaje' => 'Token no proporcionado'], 401);
+        }
+
+        $token = str_replace('Bearer ', '', $header);
+        $tokenHash = hash('sha256', $token); // Lógica de hash en Service
+
+        $datos = $this->usuariosRepository->obtenerPermisosPorToken($tokenHash);
+
+        if (!$datos) {
+            return response()->json(['mensaje' => 'Sesión no válida'], 401);
+        }
+
+        return response()->json($datos);
     }
-
-    $token = str_replace('Bearer ', '', $header);
-    $datos = $this->usuariosRepository->obtenerPermisosPorToken($token);
-
-    if (!$datos) {
-        return response()->json(['mensaje' => 'Sesión no válida'], 401);
-    }
-
-    return response()->json($datos);
-}
 }

@@ -8,10 +8,9 @@ use Illuminate\Support\Facades\DB;
 
 class UsuariosRepository
 {
-    public function validarUsuarioExistente($busines_mail)
+    public function validarUsuarioExistente(string $correo)
     {
-        $query = TblUsuarios::where('busines_mail', strtolower(trim($busines_mail)));
-        return $query->count();
+        return TblUsuarios::where('busines_mail', $correo)->count();
     }
     
     public function registrarUsuario(array $usuario)
@@ -19,8 +18,8 @@ class UsuariosRepository
         $registro = new TblUsuarios();
         $registro->id_rol_users = $usuario['id_rol_users'];
         $registro->id_employee  = $usuario['id_employee'];
-        $registro->busines_mail = strtolower(trim($usuario['busines_mail']));
-        $registro->password     = bcrypt($usuario['password']);
+        $registro->busines_mail = $usuario['busines_mail'];
+        $registro->password     = $usuario['password']; // Recibe el hash desde el Service
         $registro->active       = 1;
         $registro->save();
     
@@ -28,7 +27,7 @@ class UsuariosRepository
     }
 
     public function obtenerListaGeneralUsuarios() {
-        $query = TblUsuarios::select(
+        return TblUsuarios::select(
             'tbl_users.id_users',
             'cat_roles.roles as rol',
             'tbl_employee.name as empleado',
@@ -43,13 +42,12 @@ class UsuariosRepository
             ")
         )
         ->join('cat_roles', 'cat_roles.id_roles', '=', 'tbl_users.id_rol_users')
-        ->join('tbl_employee', 'tbl_employee.id_employee', '=', 'tbl_users.id_employee');
-    
-        return $query->get();
+        ->join('tbl_employee', 'tbl_employee.id_employee', '=', 'tbl_users.id_employee')
+        ->get();
     }
     
     public function obtenerDetalleUsuario(int $pkUsuario) {
-        $query = TblUsuarios::select(
+        return TblUsuarios::select(
             'id_users',
             'id_rol_users',
             'id_employee',
@@ -57,9 +55,8 @@ class UsuariosRepository
             'password',
             'active'
         )
-        ->where('id_users', $pkUsuario);
-
-        return $query->get();
+        ->where('id_users', $pkUsuario)
+        ->get();
     }
 
     public function actualizarUsuario(int $id, array $usuario) {
@@ -67,10 +64,10 @@ class UsuariosRepository
 
         $actualizar->id_rol_users = $usuario['id_rol_users'];
         $actualizar->id_employee  = $usuario['id_employee'];
-        $actualizar->busines_mail = strtolower(trim($usuario['busines_mail']));
+        $actualizar->busines_mail = $usuario['busines_mail'];
         
         if (!empty($usuario['password'])) {
-            $actualizar->password = bcrypt($usuario['password']);
+            $actualizar->password = $usuario['password']; 
         }
 
         $actualizar->save();
@@ -84,19 +81,20 @@ class UsuariosRepository
         return $usuario->active;
     }
 
-    public function login (array $usuario) {
-        $correoLimpio = strtolower(trim($usuario['busines_mail']));
-        $usuarioEncontrado = TblUsuarios::where('busines_mail', $correoLimpio)->first();
-
-        if (!$usuarioEncontrado) return 'no_usuario';
-        if (!password_verify($usuario['password'], $usuarioEncontrado->password)) return 'mal_contraseña';
-
-        return $usuarioEncontrado;
+    public function buscarPorCorreo(string $correoLimpio) {
+        return TblUsuarios::where('busines_mail', $correoLimpio)->first();
     }
 
-    public function cerrarSesion($token)
+    public function registrarSesion(int $idUser, string $tokenHash) {
+        return TblSessions::create([
+            'id_users' => $idUser,
+            'token'    => $tokenHash
+        ]);
+    }
+
+    public function cerrarSesion(string $tokenHash)
     {
-        return TblSessions::where('token', hash('sha256', $token))->delete();
+        return TblSessions::where('token', $tokenHash)->delete();
     }
 
     // --- MÉTODOS PARA PERMISOS DINÁMICOS ---
@@ -129,22 +127,22 @@ class UsuariosRepository
         }
     }
 
-    public function obtenerPermisosPorToken($token) {
-    $session = DB::table('tbl_sessions')->where('token', hash('sha256', $token))->first();
-    if (!$session) return null;
+    public function obtenerPermisosPorToken(string $tokenHash) {
+        $session = DB::table('tbl_sessions')->where('token', $tokenHash)->first();
+        if (!$session) return null;
 
-    $user = DB::table('tbl_users')->where('id_users', $session->id_users)->first();
-    if (!$user) return null;
+        $user = DB::table('tbl_users')->where('id_users', $session->id_users)->first();
+        if (!$user) return null;
 
-    $permisos = DB::table('tbl_user_permissions')
-        ->join('cat_permissions', 'cat_permissions.id_permission', '=', 'tbl_user_permissions.id_permission')
-        ->where('tbl_user_permissions.id_users', $user->id_users)
-        ->pluck('cat_permissions.slug')
-        ->toArray();
+        $permisos = DB::table('tbl_user_permissions')
+            ->join('cat_permissions', 'cat_permissions.id_permission', '=', 'tbl_user_permissions.id_permission')
+            ->where('tbl_user_permissions.id_users', $user->id_users)
+            ->pluck('cat_permissions.slug')
+            ->toArray();
 
-    return [
-        'id_rol_users' => $user->id_rol_users,
-        'permisos'     => $permisos
-    ];
-}
+        return [
+            'id_rol_users' => $user->id_rol_users,
+            'permisos'     => $permisos
+        ];
+    }
 }

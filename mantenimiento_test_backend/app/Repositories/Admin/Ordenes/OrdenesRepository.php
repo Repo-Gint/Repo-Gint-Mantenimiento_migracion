@@ -50,7 +50,7 @@ class OrdenesRepository
     {
         $orden = Tblorders::findOrFail($id_order);
         $orden->cancellation_date = Carbon::now();
-        $orden->id_status_order = 4;
+        $orden->id_status_order   = 4;
         $orden->save();
         return $orden;
     }

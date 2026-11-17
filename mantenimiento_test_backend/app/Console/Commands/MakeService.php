@@ -13,40 +13,26 @@ class MakeService extends Command
     public function handle()
     {
         $name = $this->argument('name');
+        $path = app_path("Services/{$name}.php");
 
-        // Convertir a formato correcto
-        $name = str_replace('\\', '/', $name);
-
-        $className = class_basename($name);
-        $folder = dirname($name);
-
-        $folderPath = $folder === '.' ? '' : $folder;
-
-        $path = app_path("Services/{$folderPath}");
-        $filePath = "{$path}/{$className}.php";
-
-        if (File::exists($filePath)) {
+        if (File::exists($path)) {
             $this->error('Service already exists!');
             return;
         }
 
-        // Crear carpetas automáticamente
-        File::ensureDirectoryExists($path);
-
-        // Namespace dinámico
-        $namespace = 'App\\Services' . ($folderPath ? '\\' . str_replace('/', '\\', $folderPath) : '');
+        File::ensureDirectoryExists(app_path('Services'));
 
         $stub = "<?php
 
-        namespace {$namespace};
+namespace App\Services;
 
-        class {$className}
-        {
-            //
-        }
-    ";
+class {$name}
+{
+    //
+}
+";
 
-        File::put($filePath, $stub);
+        File::put($path, $stub);
 
         $this->info("Service created successfully.");
     }

@@ -22,7 +22,7 @@ class EmpleadosService
         return response()->json(
             [
                 'pkEmpleado' => $pkEmpleado,
-                'mensaje'    => 'Se registro el empleadocon éxito',
+                'mensaje'    => 'Se registro el empleado con éxito',
                 'title'      => 'Registro exitoso'
             ]
         );

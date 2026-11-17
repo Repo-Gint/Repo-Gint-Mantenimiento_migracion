@@ -13,37 +13,26 @@ class MakeRepository extends Command
     public function handle()
     {
         $name = $this->argument('name');
+        $path = app_path("Repositories/{$name}.php");
 
-        $name = str_replace('\\', '/', $name);
-
-        $className = class_basename($name);
-        $folder = dirname($name);
-
-        $folderPath = $folder === '.' ? '' : $folder;
-
-        $path = app_path("Repositories/{$folderPath}");
-        $filePath = "{$path}/{$className}.php";
-
-        if (File::exists($filePath)) {
+        if (File::exists($path)) {
             $this->error('Repository already exists!');
             return;
         }
 
-        File::ensureDirectoryExists($path);
+        File::ensureDirectoryExists(app_path('Repositories'));
 
-        $namespace = 'App\\Repositories' . ($folderPath ? '\\' . str_replace('/', '\\', $folderPath) : '');
+        $stub = "<?php
 
-                $stub = "<?php
+namespace App\Repositories;
 
-        namespace {$namespace};
+class {$name}
+{
+    //
+}
+";
 
-        class {$className}
-        {
-            //
-        }
-      ";
-
-        File::put($filePath, $stub);
+        File::put($path, $stub);
 
         $this->info("Repository created successfully.");
     }

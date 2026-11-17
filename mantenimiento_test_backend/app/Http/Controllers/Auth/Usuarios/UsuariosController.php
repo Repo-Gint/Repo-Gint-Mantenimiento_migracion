@@ -143,7 +143,7 @@ public function registrarUsuario(Request $request)
                     500
                 );
             }
-    }
+        }
 
     public function cerrarSesion(Request $request)
     {

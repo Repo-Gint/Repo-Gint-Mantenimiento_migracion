@@ -18,15 +18,15 @@ declare var bootstrap: any;
 export class ChatOrdenesComponent implements OnInit {
   @Input() pkOrden: any = null;
 
-  protected datosTabla: any[] = []; 
-  protected formChat!: FormGroup;
-  protected formOrden!: FormGroup; 
-  protected formSolucion!: FormGroup;
-  protected mensajesOrden: any[] = [];
-  protected images: any[] = [];    
-  protected resolutionImages: File[] = []; // Archivos seleccionados para la resolución
-  protected listaMonedas: any[] = [];
-  protected listaStatusOrden: any[] = [];
+  protected datosTabla:       any [] = []; 
+  protected formChat!:        FormGroup;
+  protected formOrden!:       FormGroup; 
+  protected formSolucion!:    FormGroup;
+  protected mensajesOrden:    any [] = [];
+  protected images:           any [] = [];    
+  protected resolutionImages: File[] = []; 
+  protected listaMonedas:     any [] = [];
+  protected listaStatusOrden: any [] = [];
 
   protected listaAreas:             any[] = [];
   protected listaMaquinas:          any[] = [];
@@ -37,7 +37,7 @@ export class ChatOrdenesComponent implements OnInit {
   protected listaprioridadOrden:    any[] = [];
   protected listacatalogogoMaquina: any[] = [];
 
-  protected cargandoMensajes: boolean = false;
+  protected cargandoMensajes:     boolean = false;
   protected enviandoMensajeState: boolean = false;
 
   constructor(

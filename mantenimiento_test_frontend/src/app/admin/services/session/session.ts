@@ -13,11 +13,11 @@ export class SessionService {
   private listenersActivos = false;
 
   private mousemoveFn = () => this.resetTimer();
-  private keydownFn = () => this.resetTimer();
-  private clickFn = () => this.resetTimer();
+  private keydownFn   = () => this.resetTimer();
+  private clickFn     = () => this.resetTimer();
 
   constructor(
-    private router: Router,
+    private router:   Router,
     private messages: MessagesService
   ) { }
 
@@ -64,11 +64,7 @@ export class SessionService {
   sessionStorage.clear();
 
 
-  this.messages.mensajeGenerico(
-    'Tu sesión expiró por inactividad',
-    'warning',
-    'Sesión expirada'
-  );
+  this.messages.mensajeGenerico('Tu sesión expiró por inactividad', 'warning','Sesión expirada');
 
   this.router.navigate(['/login']);
 
