@@ -44,7 +44,7 @@ export class ConsultarCatmaquinas implements OnInit, OnDestroy {
 
   private repetitiveInstruction(): void {
     this.intervalo = setInterval(() => {
-      this.obtenerListaCatalogoMaquina(true); // Actualización silenciosa de fondo
+      this.obtenerListaCatalogoMaquina(true); 
     }, 10000);
   }
 

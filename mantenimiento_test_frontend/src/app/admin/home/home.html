@@ -5,6 +5,170 @@
 
     <div id="layoutSidenav_content">
         <main class="contenido">
+            
+            <!-- DASHBOARD DE INICIO (SOLO SE MUESTRA EN LA RUTA RAÍZ) -->
+            <div *ngIf="esRutaInicio" class="container-fluid px-0 mb-4">
+                
+                <!-- Encabezado -->
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                    <div>
+                        <h2 class="text-dark fw-bold mb-1">Panel de Control</h2>
+                        <p class="text-muted mb-0">Control de ordenes, máquinas y naves en tiempo real.</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm shadow-sm px-3" (click)="cargarMetricasDashboard()">
+                        <i class="fas fa-sync-alt me-1"></i> Actualizar
+                    </button>
+                </div>
+
+                <!-- Tarjetas KPI -->
+                <div class="row">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-0 shadow-sm border-start border-primary border-4 py-2 h-100">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <div class="text-xs fw-bold text-primary text-uppercase mb-1">Total de Ordenes</div>
+                                        <div class="h3 mb-0 fw-bold text-dark">{{ totalOrdenes }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-clipboard-list fa-2x text-primary opacity-50"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-0 shadow-sm border-start border-warning border-4 py-2 h-100">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <div class="text-xs fw-bold text-warning text-uppercase mb-1">M. Correctivos</div>
+                                        <div class="h3 mb-0 fw-bold text-dark">{{ totalCorrectivos }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-tools fa-2x text-warning opacity-50"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-0 shadow-sm border-start border-success border-4 py-2 h-100">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <div class="text-xs fw-bold text-success text-uppercase mb-1">M. Preventivos</div>
+                                        <div class="h3 mb-0 fw-bold text-dark">{{ totalPreventivos }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-shield-alt fa-2x text-success opacity-50"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-0 shadow-sm border-start border-danger border-4 py-2 h-100">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <div class="text-xs fw-bold text-danger text-uppercase mb-1">Ordenes Urgentes</div>
+                                        <div class="h3 mb-0 fw-bold text-dark">{{ totalUrgentes }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-exclamation-triangle fa-2x text-danger opacity-50"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección de Gráficas de Barras Chart.js -->
+                <div class="row">
+                    <div class="col-lg-7 mb-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white py-3 fw-bold text-dark d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-chart-bar me-2 text-primary"></i> Ordenes por Máquina</span>
+                                <span class="badge bg-light text-secondary border">Chart.js</span>
+                            </div>
+                            <div class="card-body">
+                                <div style="height: 320px; position: relative;">
+                                    <canvas id="graficaBarrasMaquinas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5 mb-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white py-3 fw-bold text-dark d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-chart-column me-2 text-primary"></i> Resumen por Tipo y Urgencia</span>
+                                <span class="badge bg-light text-secondary border">Tiempo Real</span>
+                            </div>
+                            <div class="card-body">
+                                <div style="height: 320px; position: relative;">
+                                    <canvas id="graficaBarrasResumen"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Ordenes Recientes -->
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white py-3 fw-bold text-dark">
+                                <i class="fas fa-list-alt me-2 text-primary"></i> Ordenes Recientes
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light fs-7 text-uppercase">
+                                            <tr>
+                                                <th class="ps-3">Folio</th>
+                                                <th>Área / Nave</th>
+                                                <th>Máquina</th>
+                                                <th>Mantenimiento</th>
+                                                <th class="text-end pe-3">Prioridad</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let ord of listaOrdenesRecientes">
+                                                <td class="ps-3"><span class="fw-bold text-primary">{{ ord.folio || ('ORD-' + ord.id_order) }}</span></td>
+                                                <td>{{ ord.area }}</td>
+                                                <td>{{ ord.machines }}</td>
+                                                <td>{{ ord.type_maintenances }}</td>
+                                                <td class="text-end pe-3">
+                                                    <span class="badge" 
+                                                          [ngClass]="{
+                                                            'bg-danger': ord.priority === 'Urgente',
+                                                            'bg-warning text-dark': ord.priority === 'Normal',
+                                                            'bg-info text-dark': ord.priority === 'Programado'
+                                                          }">
+                                                        {{ ord.priority }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr *ngIf="listaOrdenesRecientes.length === 0">
+                                                <td colspan="5" class="text-center text-muted py-4">Sin registros recientes</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- FIN DEL DASHBOARD -->
+
+            <!-- Router Outlet para las demás vistas del sistema -->
             <router-outlet></router-outlet>
         </main>
     </div>

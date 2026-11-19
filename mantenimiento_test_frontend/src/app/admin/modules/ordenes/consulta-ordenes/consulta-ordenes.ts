@@ -52,10 +52,7 @@ export class ConsultaOrdenes implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<any> {
     this.messages.mensajeEsperar();
-
-    // Verificamos los permisos mediante la API antes de renderizar la tabla y acciones
     await this.verificarPermisosUsuario();
-
     await this.obtenerListaAreas();
     await this.obtenerStatusOrdenes(); 
 
@@ -95,7 +92,7 @@ export class ConsultaOrdenes implements OnInit, OnDestroy {
       }
 
       if (navigator.onLine) this.ObtenerListaGeneralOrdenes();
-    }, 10000|                                                                                                                                                                                                                                                                                                                                 0);
+    }, 10000|                                                                                                                                                                                                                                                                                                                                0);
   }
 
   private async obtenerStatusOrdenes(): Promise<any> {

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Repositories\Admin\Catalogos;
-
 use App\Models\TblMaquinas;
 use Illuminate\Support\Facades\DB;
 

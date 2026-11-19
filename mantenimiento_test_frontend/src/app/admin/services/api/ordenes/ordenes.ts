@@ -24,7 +24,7 @@ export class OrdenesService {
   }
 
   public ObtenerListaGeneralOrdenes(data: any): Observable<any> {
-    return this.http.post<any>(`${api}/ordenes/ObtenerListaGeneralOrdenes`, data); 
+    return this.http.get<any>(`${api}/ordenes/ObtenerListaGeneralOrdenes`, { params: data }); 
   }
 
   public obtenerDetalleOrden($pkOrden: number): Observable<any> {
